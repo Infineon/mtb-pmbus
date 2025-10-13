@@ -1,0 +1,24 @@
+var group__group__pmbus__macro__error__evt =
+[
+    [ "MTB_PMBUS_ERR_RD_TOO_MANY_BYTES", "group__group__pmbus__macro__error__evt.html#ga20affc71dab47ce9654fcaa56f14bc7e", null ],
+    [ "MTB_PMBUS_ERR_WR_TOO_MANY_BYTES", "group__group__pmbus__macro__error__evt.html#gaeebd739b801553c843b6585821e3b746", null ],
+    [ "MTB_PMBUS_ERR_UNSUPPORTED_CMD", "group__group__pmbus__macro__error__evt.html#ga8eb960ef735afb6e8adaaeecfd0e5c36", null ],
+    [ "MTB_PMBUS_ERR_WR_LESS_BYTES", "group__group__pmbus__macro__error__evt.html#gaf4e17ec2ad4e836577f2671bb2394901", null ],
+    [ "MTB_PMBUS_ERR_RD_LESS_BYTES", "group__group__pmbus__macro__error__evt.html#ga8e5ff28cae5194734a3bed1f1356334a", null ],
+    [ "MTB_PMBUS_ERR_TIMEOUT", "group__group__pmbus__macro__error__evt.html#gae1a42e2f3cea3600ae4a4d94f4f66018", null ],
+    [ "MTB_PMBUS_ERR_CORRUPTED_DATA", "group__group__pmbus__macro__error__evt.html#gab2da8a4ae3b28ca7b94c6796d17bbb9f", null ],
+    [ "MTB_PMBUS_ERR_WR_AFTER_SECOND_ADDR", "group__group__pmbus__macro__error__evt.html#ga610d1328f7c45e3b85ed36b0f5c1b158", null ],
+    [ "MTB_PMBUS_ERR_BYTE_COUNT_TOO_BIG", "group__group__pmbus__macro__error__evt.html#ga02da61a220f51bcd49596059ebf220c3", null ],
+    [ "MTB_PMBUS_ERR_REQ_WR_FOR_RD_ONLY", "group__group__pmbus__macro__error__evt.html#ga63b6d2ea03979ddc5d100f703aec7ffa", null ],
+    [ "MTB_PMBUS_ERR_ARB_LOST", "group__group__pmbus__macro__error__evt.html#ga7e7e6447da1aa4f957803401e97ffb41", null ],
+    [ "MTB_PMBUS_ERR_INVALID_PAGE", "group__group__pmbus__macro__error__evt.html#ga3936a58d1d00497758f9622713e51994", null ],
+    [ "MTB_PMBUS_ERR_INVALID_PHASE", "group__group__pmbus__macro__error__evt.html#gaaf6f8498213f0941ff1947b213d90095", null ],
+    [ "MTB_PMBUS_ERR_APP_NACK_BYTE", "group__group__pmbus__macro__error__evt.html#ga6fc42223ebc7acebc248ce30cf1a6a27", null ],
+    [ "MTB_PMBUS_ERR_WR_TO_PROT_CMD", "group__group__pmbus__macro__error__evt.html#gac8ca50fb30b365928def7cd87b8225d7", null ],
+    [ "MTB_PMBUS_ERR_BUS_ERROR", "group__group__pmbus__macro__error__evt.html#gafb5a357e0c9f07180ef8b3d123e233d5", null ],
+    [ "MTB_PMBUS_ERR_ADDR_WITH_RD_BIT", "group__group__pmbus__macro__error__evt.html#gaaf8c805e8257dd49d2708e12bc7ac80f", null ],
+    [ "MTB_PMBUS_ERR_REQ_RD_FOR_PC_ONLY", "group__group__pmbus__macro__error__evt.html#ga36afae40ce0064b9ed56facc88eddf53", null ],
+    [ "MTB_PMBUS_ERR_REQ_WR_FOR_PC_ONLY", "group__group__pmbus__macro__error__evt.html#gafe88288691e0b74cb6812334c2608247", null ],
+    [ "MTB_PMBUS_ERR_ZONE_VALUE_OUT_OF_RANGE", "group__group__pmbus__macro__error__evt.html#gad3bb55c9370ca271a0a8e9b6c329db1f", null ],
+    [ "MTB_PMBUS_ERR_READ_REQ_FOR_FF", "group__group__pmbus__macro__error__evt.html#gaaa8d4a19daa2b961de117036e851cd22", null ]
+];

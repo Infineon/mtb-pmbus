@@ -1,0 +1,8 @@
+{
+    "configurator_support": true,
+    "core": {
+        "id": "9578d5a0-262a-4012-847d-3c8ace680c4d",
+        "name": "mtb-pmbus",
+        "version": "1.0.0.1028"
+    }
+}
