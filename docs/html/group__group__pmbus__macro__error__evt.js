@@ -20,5 +20,6 @@ var group__group__pmbus__macro__error__evt =
     [ "MTB_PMBUS_ERR_REQ_RD_FOR_PC_ONLY", "group__group__pmbus__macro__error__evt.html#ga36afae40ce0064b9ed56facc88eddf53", null ],
     [ "MTB_PMBUS_ERR_REQ_WR_FOR_PC_ONLY", "group__group__pmbus__macro__error__evt.html#gafe88288691e0b74cb6812334c2608247", null ],
     [ "MTB_PMBUS_ERR_ZONE_VALUE_OUT_OF_RANGE", "group__group__pmbus__macro__error__evt.html#gad3bb55c9370ca271a0a8e9b6c329db1f", null ],
-    [ "MTB_PMBUS_ERR_READ_REQ_FOR_FF", "group__group__pmbus__macro__error__evt.html#gaaa8d4a19daa2b961de117036e851cd22", null ]
+    [ "MTB_PMBUS_ERR_READ_REQ_FOR_FF", "group__group__pmbus__macro__error__evt.html#gaaa8d4a19daa2b961de117036e851cd22", null ],
+    [ "MTB_PMBUS_ERR_REQ_RD_FOR_WR_ONLY", "group__group__pmbus__macro__error__evt.html#ga00cbc6af7910fc94fefff4459ace1b13", null ]
 ];

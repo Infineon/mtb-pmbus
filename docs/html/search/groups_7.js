@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['macros_0',['Macros',['../group__group__pmbus__macro.html',1,'']]],
-  ['miscellaneous_20functions_1',['Miscellaneous Functions',['../group__group__pmbus__miscellaneous__func.html',1,'']]]
+  ['level_20macros_0',['Logging level Macros',['../group__group__pmbus__macro__log.html',1,'']]],
+  ['logging_20level_20macros_1',['Logging level Macros',['../group__group__pmbus__macro__log.html',1,'']]]
 ];

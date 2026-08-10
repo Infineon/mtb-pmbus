@@ -1,0 +1,1086 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<!--****************************************************************************
+* \file pmbus_tcpwm.cypersonality
+* \version 1.0
+*
+* \brief
+* PMBus personality
+*
+********************************************************************************
+* \copyright
+* (c) 2026, Infineon Technologies AG, or an affiliate of Infineon
+* Technologies AG.  SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*****************************************************************************-->
+
+<PersonalityTemplate id='pmbus_tcpwm' name='PMBus' version='1.0' xmlns='http://cypress.com/xsd/cyhwpersonality_v12' >
+  <Constants>
+    <Const id='MIN_SCB_CLK_4DR_LE0K1_SM' value='1.55' />
+    <Const id='MIN_SCB_CLK_4DR_LE0K4_SM' value='7.82' />
+    <Const id='MIN_SCB_CLK_4DR_LE1K0_SM' value='15.84' />
+    <Const id='MIN_SCB_CLK_4DR_LE1K0_MM' value='14.32' />
+
+    <Const id='MAX_SCB_CLK_4DR_LE0K1_MM' value='3.2' />
+    <Const id='MAX_SCB_CLK_4DR_LE0K4_MM' value='10.0' />
+    <Const id='MAX_SCB_CLK_4DR_LE1K0_MM' value='25.8' />
+    <Const id='MAX_SCB_CLK_4DR_LE0K1_SM' value='12.8' />
+    <Const id='MAX_SCB_CLK_4DR_LE0K4_SM' value='15.38' />
+    <Const id='MAX_SCB_CLK_4DR_LE1K0_SM' value='89.0' />
+
+    <Const id='NUM_OF_DEFAULT_EXTRA_LINES' value='4' />
+    <Const id='NUM_OF_CUSTOM_EXTRA_LINES' value='16' />
+
+    <Const id='PMBUS_TIMEOUT_IN_SEC' value='0.025' />
+    <Const id='MIN_I2C_THIGH_AT0K1_USEC' value='4.0' />
+    <Const id='MIN_I2C_THIGH_AT0K4_USEC' value='0.6' />
+    <Const id='MIN_I2C_THIGH_AT1K0_USEC' value='0.26' />
+    <Const id='SCB_CLK_ACCURACY' value='0.1' /> <!-- 10% -->
+
+    <Const id='PMBUS_STD_CMD_NUM' value='0' />
+    <Const id='PMBUS_STD_CMD_MAX' value='255' /> <!-- The maximum value, as defined by the specification, is 256. However, it has been reduced to 255 due to implementation constraints. A variable that stores the number of standard PMBus commands is uint8_t, so the maximum value is 255. -->
+    <Const id='PMBUS_EXT_CMD_NUM' value='2' />
+    <Const id='PMBUS_EXT_CMD_MAX' value='255' /> <!-- The maximum value, as defined by the specification, is 256. However, it has been reduced to 255 due to implementation constraints. A variable that stores the number of extended PMBus commands is uint8_t, so the maximum value is 255. -->
+    <Const id='PMBUS_TARGET_ADDRESS' value='32' />
+    <Const id='PMBUS_PAGES_NUM' value='16' />
+    <Const id='PMBUS_PAGES_MAX' value='32' />
+    <Const id='PMBUS_PHASES_NUM' value='16' />
+    <Const id='PMBUS_PHASES_MAX' value='128' />
+    <Const id='PMBUS_ZONE_NUM' value='127' />
+    <Const id='PMBUS_ZONE_MAX' value='191' />
+
+    <Const id='PMBUS_CMD_CAP_DIR_WR' value='1' />
+    <Const id='PMBUS_CMD_CAP_DIR_RD' value='2' />
+    <Const id='PMBUS_CMD_CAP_DIR_PROCESS_CALL' value='4' />
+    <Const id='PMBUS_CMD_CAP_BLOCK' value='8' />
+    <Const id='PMBUS_CMD_CAP_PAGE' value='16' />
+    <Const id='PMBUS_CMD_CAP_PHASE' value='32' />
+    <Const id='PMBUS_CMD_CAP_MAX' value='63' />
+    <Const id='PMBUS_INST_NUM_MAX' value='5' />
+  </Constants>
+
+  <VirtualResourceDefinition ipblock='VirtualResource' type='vres' count='1' >
+    <VirtualResourceDefinition type='pmbus' display_name='PMBus' display_path='PMBus' display_mode='DYNAMIC' count='$PMBUS_INST_NUM_MAX' profile_fileName='pmbus' />
+  </VirtualResourceDefinition>
+  <FittingRules>
+    <MappingRules>
+      <IpBlock name='VirtualResource' />
+      <Resource name='vres\.pmbus' />
+    </MappingRules>
+    <RoutingRules>
+      <Connections>
+        <Connection>
+          <Port templateId='i2c_hw'  port='tr_i2c_scl_filtered[0]' />
+          <Port templateId='tcpwmTimer' port='reload[0]' />
+          <Port templateId='tcpwmTimer' port='stop[0]' />
+        </Connection>
+      </Connections>
+    </RoutingRules>
+  </FittingRules>
+
+  <ExposedMembers />
+  <Parameters>
+    <!-- Debug/internal -->
+    <ParamBool id='debug' name='debug' group='Internal' default='false' visible='false' editable='true' desc='' />
+    <ParamBool id='intConfig' name='intConfig' group='Internal' default='false' visible='false' editable='`${debug}`' desc='' />
+    <ParamString id='instName' name='instName' group='Internal' default='`${INST_NAME}`' visible='`${debug}`' editable='false' desc='' />
+    <ParamRange id='instNum' name='instNum' group='Internal' default='`${getInstNumber("pmbus")}`' min='0' max='$PMBUS_INST_NUM_MAX' resolution='1' visible='`${debug}`' editable='false' desc='' />
+
+    <ParamRange id="personalityInternalRevision" name="Personality internal revision" group="Internal" default="1" min="0" max="100" resolution="1" visible="`${intConfig}`" editable="false" desc="" />
+    <ParamString id='null' name='null' group='Internal' default='' visible='`${debug}`' editable='false' desc='null string' />
+    <ParamRange id='instCount' name='PMBus Instance Count' group='Internal' default='`${(isBlockUsed("vres[0].pmbus[0]") ? 1 : 0) + (isBlockUsed("vres[0].pmbus[1]") ? 1 : 0) + (isBlockUsed("vres[0].pmbus[2]") ? 1 : 0) + (isBlockUsed("vres[0].pmbus[3]") ? 1 : 0) + (isBlockUsed("vres[0].pmbus[4]") ? 1 : 0)}`' 
+    min='0' max='$PMBUS_INST_NUM_MAX' resolution='1' visible='`${intConfig}`' editable='false' desc='The total number of PMBus instances' />
+    <ParamRange id='expectedInstCount' name='Expected PMBus Instance Count' group='Internal' default='1' min='0' max='$PMBUS_INST_NUM_MAX' resolution='1' visible='`${intConfig}`' editable='true' desc='The number of PMBus instances configured by the PMBus Configurator.' />
+    <ParamBool id='isConfigured' name='Is configured by Configurator' group='Internal' default='false' visible='`${intConfig}`' editable='true' desc='Tracks if this PMBus instance was configured by the PMBus configurator to guarantee the Compile Time Options integrity.' />
+
+    <!-- Documentation Link -->
+    <ParamDoc id='pmbusDoc' name='PMBus Documentation' group='General' default='file:///`${cy_libs_path()}`/docs/mtb_pmbus_overview/api_reference_manual.html' linkText='Link to PMBus Documentation' visible='true' desc='Link to PMBus Documentation' />
+
+    <!-- PMBus Configurator -->
+    <ParamCustom id='pmbusConf' name='PMBus Configurator' group='External Tools' path='`${cy_tools_path("pmbus-configurator") . "/pmbus-configurator"}`' visible='true' editable='true' desc='Launch the PMBus Configurator'>
+      <Arg value='`${"--design=" . cy_design_file()}`' />
+    </ParamCustom>
+
+  <!-- General Configurations -->
+  <!-- External Tool Interface for Code Generation -->
+  <!-- "hw_config"  field components -->
+  <ParamString id='hwCfgStructName' name='HW Config Struct Name' group='Configurator General/HW Config' default='`${instName}`_hw_config' visible='`${intConfig}`' editable='false' desc='The pointer to the hardware configuration structure.' />
+  <ParamString id='halCfgStructName' name='HAL Config Struct Name' group='Configurator HAL Config' default='_hal_config' visible='`${intConfig}`' editable='true' desc='The pointer to HAL configuration structure.' />
+  <ParamString id='hwResCtrlCallName' name='HW Resource Control Callback' group='Configurator General/HW Config' default='_hw_resource_ctrl' visible='`${intConfig}`' editable='true' desc='User callback to enable/disable I2C hardware.' />
+  <ParamString id='hwIrqEnaCallName' name='HW IRQ Enable Callback' group='Configurator General/HW Config' default='_hw_irq_enable' visible='`${intConfig}`' editable='true' desc='User callback to enable I2C hardware interrupts.' />
+  <ParamString id='hwIrqDisCallName' name='HW IRQ Disable Callback' group='Configurator General/HW Config' default='_hw_irq_disable' visible='`${intConfig}`' editable='true' desc='User callback to disable I2C hardware interrupts.' />
+
+  <ParamString id='ctrlHwResEventCallName' name='Controller Events Callback' group='Configurator General/HW Config' default='_ctrl_events_ctrl' visible='`${intConfig}`' editable='true' desc='User callback to handle Controller events' />
+  <ParamString id='ctrlHalCfgStructName' name='HAL Config Struct Name' group='Configurator HAL Config' default='_ctrl_hal_config' visible='`${intConfig}`' editable='true' desc='Pointer to HAL configuration structure' />
+  <ParamString id='ctrlHwResCtrlCallName' name='HW Resource Control Callback' group='Configurator General/HW Config' default='_ctrl_hw_resource_ctrl' visible='`${intConfig}`' editable='true' desc='User callback to enable/disable I2C hardware.' />
+  <ParamString id='ctrlHwIrqEnaCallName' name='HW IRQ Enable Callback' group='Configurator General/HW Config' default='_ctrl_hw_irq_enable' visible='`${intConfig}`' editable='true' desc='User callback to enable I2C hardware interrupts.' />
+  <ParamString id='ctrlHwIrqDisCallName' name='HW IRQ Disable Callback' group='Configurator General/HW Config' default='_ctrl_hw_irq_disable' visible='`${intConfig}`' editable='true' desc='User callback to disable I2C hardware interrupts.' />
+
+  <ParamBool id='pmbusEna' name='PMBus Support' group='Configurator General' default='true' visible='false' editable='true' desc='Enable PMBus functionality.' />
+  <ParamBool id='ctrlEna' name='Controller Mode' group='Configurator General' default='false' visible='false' editable='true' desc='Enable Controller functionality.' />
+  <ParamBool id='pmbusTrgtEnaInt' name='PMBus Target Mode' group='Configurator General' default='`${pmbusEna &amp;&amp; !ctrlEna}`' visible='false' editable='false' desc='Defines if PMBus Target mode is enabled.' />
+  
+  <ParamBool id='trgtHnpEna' name='Enable Host Notify Protocol' group='Configurator General' default='false' visible='false' editable='`${!ctrlEna}`' desc='Enable support of the host notify protocol.' />
+  <ParamBool id='ctrlHnpEna' name='Enable Host Notify Protocol' group='Configurator General' default='false' visible='false' editable='`${ctrlEna}`' desc='Enable support of the host notify protocol.' />
+  <ParamChoice id='pmbusSpeed' name='Data Rate' group='Configurator General' default='100' visible='false' editable='true' desc='PMBus communication speed'>
+    <Entry name='100 kbps' value='100' visible='true' />
+    <Entry name='400 kbps' value='400' visible='true' />
+    <Entry name='1000 kbps' value='1000' visible='true' />
+  </ParamChoice>
+
+  <ParamString id='stdCmdTableName' name='Standard Command Table Name' group='Configurator General' default='_std_cmd_table' visible='`${intConfig}`' editable='true' desc='Symbol name for PMBus command table.' />
+  <ParamRange id='stdCmdNum' name='Standard Command Number' group='Configurator General' default='`${ctrlEna ? 0 : $PMBUS_STD_CMD_NUM}`' min='0' max='255' resolution='1' visible='`${intConfig}`' editable='`${!ctrlEna}`' desc='The number of supported standard PMBus commands.' />
+  <ParamBool id='pecEna' name='Enable Packet Error Checking' group='Configurator General' default='`${!ctrlEna}`' visible='`${intConfig}`' editable='`${!ctrlEna}`' desc='Enable the packet error checking.' />
+  <ParamBool id='smbalertEna' name='Enable SMBAlert' group='Configurator General' default='`${!ctrlEna}`' visible='`${intConfig}`' editable='`${!ctrlEna}`' desc='Enable SMBAlert feature.' />
+  <ParamBool id='genCallAddrRespEna' name='Enable General Call Address' group='Configurator General' default='`${!ctrlEna}`' visible='`${intConfig}`' editable='`${!ctrlEna}`' desc='Enables the response to the general call address (global broadcast).' />
+  <ParamRange id='targetAddr' name='Target Address (7-bit)' group='Configurator General' default='`${$PMBUS_TARGET_ADDRESS + instNum}`' min='9' max='119' resolution='1' visible='`${intConfig}`' editable='true' desc='7-bit PMBus target address (R/W bit excluded)' />
+  <ParamRange id='targetAddressMask' name='Target Address Mask (8-bit)' group='Configurator General' default='0' min='0' max='254' resolution='1' visible='`${intConfig}`' editable='true' desc='Specifies the PMBus target address mask. The range: 0x00-0xFE' />
+  <ParamString id='genCallName' name='General Callback' group='Configurator General' default='_gen_callback' visible='`${intConfig}`' editable='true' desc='The custom handler name of a general event.' />
+  <ParamString id='errCallName' name='Error Callback' group='Configurator General' default='_error_callback' visible='`${intConfig}`' editable='true' desc='The custom handler name of an error event.' />
+  <ParamString id='trgtHnpCallName' name='Host Notify Protocol Callback' group='Configurator General' default='_hnp_callback' visible='`${intConfig}`' editable='true' desc='The custom handler name of a Host Notify Protocol.' />
+  <ParamString id='ctrlHnpCallName' name='Host Notify Protocol Callback' group='Configurator General' default='_callback_hnp' visible='`${intConfig}`' editable='true' desc='The custom handler name of a Host Notify Protocol.' />
+  <ParamBool id='extCmdEna' name='Enable Extended Commands' group='Configurator General' default='false' visible='`${intConfig}`' editable='`${pmbusEna}`' desc='Enables the extended commands support.' />
+  <ParamString id='extCmdTableName' name='Extended Command Table Name' group='Configurator General' default='_ext_cmd_table' visible='`${intConfig &amp;&amp; extCmdEna}`' editable='true' desc='The symbol name for the extended command table.' />
+  <ParamRange id='extCmdNum' name='Extended Command Number' group='Configurator General' default='`${extCmdEna ? $PMBUS_EXT_CMD_NUM : 0}`' min='0' max='255' resolution='1' visible='`${intConfig &amp;&amp; extCmdEna}`' editable='`${extCmdEna}`' desc='The number of the supported extended PMBus commands.' />
+  <ParamChoice id='revNum' name='Revision Number' group='Configurator General' default='MTB_PMBUS_REVISION_1_4' visible='`${intConfig}`' editable='`${pmbusEna}`' desc='The supported revision number of PMBus specification.' >
+    <Entry name='Revision 1.4' value='MTB_PMBUS_REVISION_1_4' visible='true' />
+  </ParamChoice>
+
+  <ParamBool id='ieeeEna' name='Enable IEEE Format' group='Configurator General' default='false' visible='`${intConfig}`' editable='`${pmbusEna}`' desc='Enable IEEE floating point format.' />
+  <ParamRange id='pagesNum' name='Number of Pages' group='Configurator General' default='`${pmbusTrgtEnaInt ? $PMBUS_PAGES_NUM : 0}`' min='0' max='$PMBUS_PAGES_MAX' resolution='1' visible='`${intConfig}`' editable='`${pmbusTrgtEnaInt}`' desc='The total number of PMBus pages. If equal to 0, the pages are not supported' />
+  <ParamRange id='phasesNum' name='Number of Phases' group='Configurator General' default='`${pmbusTrgtEnaInt ? $PMBUS_PHASES_NUM : 0}`' min='0' max='$PMBUS_PHASES_MAX' resolution='1' visible='`${intConfig}`' editable='`${pmbusTrgtEnaInt}`' desc='The total number of PMBus phases. If equal to 0, the phases are not supported.' />
+  <ParamBool id='zoneEna' name='Enable Zone' group='Configurator General' default='`${pmbusTrgtEnaInt}`' visible='`${intConfig}`' editable='`${pmbusTrgtEnaInt}`' desc='Enable the Zone Write and Zone Read protocols support.' />
+  <ParamString id='zoneCallName' name='Zone Callback' group='Configurator General' default='`${zoneEna ? "_zone_callback" : "NULL"}`' visible='`${intConfig}`' editable='`${zoneEna}`' desc='Zone protocol custom handler name' />
+  <ParamBool id='pagesEnaInt' name='Pages Support' group='Internal' default='`${(pagesNum &gt; 0)}`' visible='`${intConfig}`' editable='false' desc='Enable page support.' />
+  <ParamBool id='phasesEnaInt' name='Phases Support' group='Internal' default='`${(phasesNum &gt; 0)}`' visible='`${intConfig}`' editable='false' desc='Enable phase support.' />
+
+  <!-- "impl_cmd_mask" field components -->
+  <ParamBool id='pageCmdEna'          name='PAGE (0x00)'            group='Configurator General/Implemented Commands' default='`${pagesEnaInt}`'  visible='`${intConfig}`' editable='`${pagesEnaInt}`' desc='Enable the PAGE (0x00) command' />
+  <ParamBool id='phaseCmdEna'         name='PHASE (0x04)'           group='Configurator General/Implemented Commands' default='`${phasesEnaInt}`'   visible='`${intConfig}`' editable='`${phasesEnaInt}`' desc='Enable the PHASE (0x04) command' />
+  <ParamBool id='capabilityCmdEna'    name='CAPABILITY (0x19)'      group='Configurator General/Implemented Commands' default='`${pmbusEna}`'  visible='`${intConfig}`' editable='`${pmbusEna}`' desc='Enable the CAPABILITY (0x19) command' />
+  <ParamBool id='queryCmdEna'         name='QUERY (0x1A)'           group='Configurator General/Implemented Commands' default='`${pmbusEna}`'  visible='`${intConfig}`' editable='`${pmbusEna}`' desc='Enable the QUERY (0x1A) command' />
+  <ParamBool id='revisionCmdEna'      name='PMBUS_REVISION (0x98)'  group='Configurator General/Implemented Commands' default='`${pmbusEna}`'  visible='`${intConfig}`' editable='`${pmbusEna}`' desc='Enable the PMBUS_REVISION (0x98) command' />
+  <ParamBool id='zoneConfigCmdEna'    name='ZONE_CONFIG (0x07)'     group='Configurator General/Implemented Commands' default='`${zoneEna}`'  visible='`${intConfig}`' editable='`${zoneEna}`' desc='Enable the ZONE_CONFIG (0x07) command' />
+  <ParamBool id='zoneActiveCmdEna'    name='ZONE_ACTIVE (0x08)'     group='Configurator General/Implemented Commands' default='`${zoneEna}`'   visible='`${intConfig}`' editable='`${zoneEna}`' desc='Enable the ZONE_ACTIVE (0x08) command' />
+  <ParamBool id='pagePlusWriteCmdEna' name='PAGE_PLUS_WRITE (0x05)' group='Configurator General/Implemented Commands' default='`${pagesEnaInt}`'  visible='`${intConfig}`' editable='`${pagesEnaInt}`' desc='Enable the PAGE_PLUS_WRITE (0x05) command' />
+  <ParamBool id='pagePlusReadCmdEna'  name='PAGE_PLUS_READ (0x06)'  group='Configurator General/Implemented Commands' default='`${pagesEnaInt}`'  visible='`${intConfig}`' editable='`${pagesEnaInt}`' desc='Enable the PAGE_PLUS_READ (0x06) command' />
+  <ParamBool id='p2PlusWriteCmdEna'   name='P2_PLUS_WRITE (0x09)'   group='Configurator General/Implemented Commands' default='`${pagesEnaInt &amp;&amp; phasesEnaInt}`' visible='`${intConfig}`' editable='`${pagesEnaInt &amp;&amp; phasesEnaInt}`' desc='Enable the P2_PLUS_WRITE (0x09) command' />
+  <ParamBool id='p2PlusReadCmdEna'    name='P2_PLUS_READ (0x0A)'    group='Configurator General/Implemented Commands' default='`${pagesEnaInt &amp;&amp; phasesEnaInt}`'  visible='`${intConfig}`' editable='`${pagesEnaInt &amp;&amp; phasesEnaInt}`' desc='Enable the P2_PLUS_READ (0x0A) command' />
+
+  <!-- External Tool Interface for Standard Command Table Code Generation -->
+  <Repeat count='$PMBUS_STD_CMD_MAX'>
+    <ParamBool id='stdCmd$idxEna' name='Enable' group='Configurator General/Standard Command$idx' default='`${$idx &lt; stdCmdNum}`' visible='`${intConfig}`' editable='`${pmbusEna}`' desc='Enable this command table entry' />
+    <ParamBool id='stdCmd$idxVis' name='Visible' group='Configurator General/Standard Command$idx' default='`${intConfig}`' visible='`${intConfig}`' editable='false' desc='Defines visibility this command table entry' />
+    <ParamString id='stdCmd$idxName' name='Function Name' group='Configurator General/Standard Command$idx' default='STD_COMMAND$idx' visible='`${stdCmd$idxVis}`' editable='`${stdCmd$idxEna}`' desc='Function name for this command' />
+    <ParamRange id='stdCmd$idxCode' name='Command Code' group='Configurator General/Standard Command$idx' default='`${$idx}`' min='0x00' max='0xFF' resolution='0x01' visible='`${stdCmd$idxVis}`' editable='`${stdCmd$idxEna}`' desc='PMBus command code (uint8_t)' />
+    <!-- "cmd_cap" field components -->
+    <ParamRange id='stdCmd$idxBinCap' name='Std Cmd Capabilities' group='Configurator General/Standard Command$idx/Capabilities' default='0' min='0' max='$PMBUS_CMD_CAP_MAX' resolution='1' visible='`${stdCmd$idxVis}`' editable='`${stdCmd$idxEna}`' desc='Aggregated capabilities for standard commands' />
+    <ParamChoice id='stdCmd$idxFormat' name='Data Format' group='Configurator General/Standard Command$idx/Capabilities' default='MTB_PMBUS_CMD_CAP_FORMAT_NO_NUM' visible='`${stdCmd$idxVis}`' editable='`${stdCmd$idxEna}`' desc='The numeric data format for this command.'>
+      <Entry name='LINEAR11/ULINEAR16' value='MTB_PMBUS_CMD_CAP_FORMAT_LIN_11_16' visible='true' />
+      <Entry name='16-bit Signed' value='MTB_PMBUS_CMD_CAP_FORMAT_16_BIT' visible='true' />
+      <Entry name='IEEE Half Precision' value='MTB_PMBUS_CMD_CAP_FORMAT_IEEE' visible='`${ieeeEna || stdCmd$idxFormat eq MTB_PMBUS_CMD_CAP_FORMAT_IEEE}`' />
+      <Entry name='Direct Mode' value='MTB_PMBUS_CMD_CAP_FORMAT_DIR_MODE' visible='true' />
+      <Entry name='8-bit Unsigned' value='MTB_PMBUS_CMD_CAP_FORMAT_8_BIT' visible='true' />
+      <Entry name='VID Mode' value='MTB_PMBUS_CMD_CAP_FORMAT_VID_MODE' visible='true' />
+      <Entry name='Manufacturer Specific' value='MTB_PMBUS_CMD_CAP_FORMAT_MFC_SPEC' visible='true' />
+      <Entry name='No Numeric Data' value='MTB_PMBUS_CMD_CAP_FORMAT_NO_NUM' visible='true' />
+    </ParamChoice>
+    <ParamString id='stdCmd$idxPagesNumArr' name='stdCmd$idxPagesNumArr' group='Internal' default='`${(stdCmd$idxBinCap &amp; $PMBUS_CMD_CAP_PAGE) &amp;&amp; (pagesNum &gt; 0) ? "[" . pagesNum . "U]" : ""}`' visible='`${debug}`' editable='false' desc='' />
+    <ParamString id='stdCmd$idxPhasesNumArr' name='stdCmd$idxPhasesNumArr' group='Internal' default='`${(stdCmd$idxBinCap &amp; $PMBUS_CMD_CAP_PHASE) &amp;&amp; (phasesNum &gt; 0) ? "[" . phasesNum . "U]" : ""}`' visible='`${debug}`' editable='false' desc='' />
+    <ParamString id='stdCmd$idxDataBuf' name='Data Buffer' group='Configurator General/Standard Command$idx' default='NULL' visible='`${stdCmd$idxVis}`' editable='`${stdCmd$idxEna}`' desc='The pointer to the command data buffer.' />
+    <ParamRange id='stdCmd$idxDataSize' name='Data Size' group='Configurator General/Standard Command$idx' default='0' min='0' max='255' resolution='1' visible='`${stdCmd$idxVis}`' editable='`${stdCmd$idxEna}`' desc='Command data size (uint8_t)' />
+    <ParamString id='stdCmd$idxCallback' name='Callback' group='Configurator General/Standard Command$idx' default='NULL' visible='`${stdCmd$idxVis}`' editable='`${stdCmd$idxEna}`' desc='Command callback function name' />
+  </Repeat>
+
+  <!-- External Tool Interface for Extended Command Table Code Generation -->
+  <Repeat count='$PMBUS_EXT_CMD_MAX'>
+    <ParamBool id='extCmd$idxEna' name='Enable' group='Configurator General/Extended Command$idx' default='`${($idx &lt; extCmdNum) &amp;&amp; extCmdEna}`' visible='`${intConfig &amp;&amp; extCmdEna}`' editable='false' desc='Enable this extended command table entry.' />
+    <ParamBool id='extCmd$idxVis' name='Visible' group='Configurator General/Extended Command$idx' default='`${intConfig}`' visible='`${intConfig &amp;&amp; extCmdEna}`' editable='false' desc='Defines the visibility of this extended command table entry.' />
+    <ParamString id='extCmd$idxName' name='Function Name' group='Configurator General/Extended Command$idx' default='EXT_COMMAND$idx' visible='`${extCmd$idxVis}`' editable='`${extCmd$idxEna}`'  desc='Function name for this extended command' />
+    <ParamRange id='extCmd$idxCode' name='Command Code' group='Configurator General/Extended Command$idx' default='`${$idx}`' min='0x00' max='0xFF' resolution='0x01' visible='`${extCmd$idxVis}`' editable='`${extCmd$idxEna}`'  desc='PMBus extended command code (uint8_t)' />
+    <!-- "cmd_cap" field components -->
+    <ParamRange id='extCmd$idxBinCap' name='Ext Cmd Capabilities' group='Configurator General/Extended Command$idx/Capabilities' default='0' min='0' max='$PMBUS_CMD_CAP_MAX' resolution='1' visible='`${extCmd$idxVis}`' editable='`${extCmd$idxEna}`' desc='Aggregated capabilities for extended commands' />
+    <ParamChoice id='extCmd$idxFormat' name='Data Format' group='Configurator General/Extended Command$idx/Capabilities' default='MTB_PMBUS_CMD_CAP_FORMAT_NO_NUM' visible='`${extCmd$idxVis}`' editable='`${extCmd$idxEna}`'  desc='The numeric data format for this extended command.'>
+      <Entry name='LINEAR11/ULINEAR16' value='MTB_PMBUS_CMD_CAP_FORMAT_LIN_11_16' visible='true' />
+      <Entry name='16-bit Signed' value='MTB_PMBUS_CMD_CAP_FORMAT_16_BIT' visible='true' />
+      <Entry name='IEEE Half Precision' value='MTB_PMBUS_CMD_CAP_FORMAT_IEEE' visible='`${ieeeEna || extCmd$idxFormat eq MTB_PMBUS_CMD_CAP_FORMAT_IEEE}`' />
+      <Entry name='Direct Mode' value='MTB_PMBUS_CMD_CAP_FORMAT_DIR_MODE' visible='true' />
+      <Entry name='8-bit Unsigned' value='MTB_PMBUS_CMD_CAP_FORMAT_8_BIT' visible='true' />
+      <Entry name='VID Mode' value='MTB_PMBUS_CMD_CAP_FORMAT_VID_MODE' visible='true' />
+      <Entry name='Manufacturer Specific' value='MTB_PMBUS_CMD_CAP_FORMAT_MFC_SPEC' visible='true' />
+      <Entry name='No Numeric Data' value='MTB_PMBUS_CMD_CAP_FORMAT_NO_NUM' visible='true' />
+    </ParamChoice>
+    <ParamString id='extCmd$idxPagesNumArr' name='extCmd$idxPagesNumArr' group='Internal' default='`${(extCmd$idxBinCap &amp; $PMBUS_CMD_CAP_PAGE) &amp;&amp; (pagesNum &gt; 0) ? "[" . pagesNum . "U]" : ""}`' visible='`${debug}`' editable='false' desc='' />
+    <ParamString id='extCmd$idxPhasesNumArr' name='extCmd$idxPhasesNumArr' group='Internal' default='`${(extCmd$idxBinCap &amp; $PMBUS_CMD_CAP_PHASE) &amp;&amp; (phasesNum &gt; 0) ? "[" . phasesNum . "U]" : ""}`' visible='`${debug}`' editable='false' desc='' />
+    <ParamString id='extCmd$idxDataBuf' name='Data Buffer' group='Configurator General/Extended Command$idx' default='NULL' visible='`${extCmd$idxVis}`' editable='`${extCmd$idxEna}`'  desc='The pointer to the extended command data buffer.' />
+    <ParamRange id='extCmd$idxDataSize' name='Data Size' group='Configurator General/Extended Command$idx' default='0' min='0' max='255' resolution='1' visible='`${extCmd$idxVis}`' editable='`${extCmd$idxEna}`'  desc='Extended command data size (uint8_t)' />
+    <ParamString id='extCmd$idxCallback' name='Callback' group='Configurator General/Extended Command$idx' default='NULL' visible='`${extCmd$idxVis}`' editable='`${extCmd$idxEna}`'  desc='Extended command callback function name' />
+  </Repeat>
+
+<!-- External Tool Interface for the Compile Time Options (for the first instance only) -->
+  <ParamBool id='isFirstInstance' name='Is First Instance' group='Configurator General/Compile Time Options' default='`${(instNum eq 0)}`' visible='`${intConfig}`' editable='false' desc='True if this is the first PMBus instance (instNum == 0).' />
+  <ParamChoice id='ctoLogLevel' name='Log Level' group='Configurator General/Compile Time Options' default='MTB_PMBUS_LOG_LEVEL_WARNING' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Select the log level.'>
+    <Entry name='Off'     value='MTB_PMBUS_LOG_LEVEL_OFF'     visible='true'/>
+    <Entry name='Error'   value='MTB_PMBUS_LOG_LEVEL_ERROR'   visible='true'/>
+    <Entry name='Warning' value='MTB_PMBUS_LOG_LEVEL_WARNING' visible='true'/>
+    <Entry name='Info'    value='MTB_PMBUS_LOG_LEVEL_INFO'    visible='true'/>
+    <Entry name='Debug'   value='MTB_PMBUS_LOG_LEVEL_DEBUG'   visible='true'/>
+  </ParamChoice>
+  <ParamBool id='ctoCustomLog' name='Enable Custom Log' group='Configurator General/Compile Time Options' default='false' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable the custom log.' />
+  <ParamBool id='ctoSupportExtCmd' name='Support Extended Commands' group='Configurator General/Compile Time Options' default='false' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable Extended Commands.' />
+  <ParamBool id='ctoSupportPec' name='Enable PEC' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable Packet Error Checking (PEC).' />
+  <ParamRange id='ctoPagesNum' name='Pages Number' group='Configurator General/Compile Time Options' default='$PMBUS_PAGES_NUM' min='0' max='$PMBUS_PAGES_MAX' resolution='1' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Set the maximum number of pages.' />
+  <ParamRange id='ctoPhasesNum' name='Phases Number' group='Configurator General/Compile Time Options' default='$PMBUS_PHASES_NUM' min='0' max='$PMBUS_PHASES_MAX' resolution='1' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Set the maximum number of phases.' />
+  <ParamBool id='ctoEnableConfigCheck' name='Enable Config Check' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable the checking of configuration parameters (recommended only for debug purposes).' />
+  <ParamBool id='ctoConfigFullCheck' name='Full Config Check' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Define the level of the configuration parameter checking: 0U: Minimal checking, only critical parameters (e.g., to avoid hard faults).' />
+  <ParamBool id='ctoEnableTimeout' name='Enable Timeout' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable the timeout error when the clock line is held low for 25 ms. It can only be disabled for debugging purposes.' />
+  <ParamBool id='ctoEnableTimeoutTGS' name='Enable TGS Timeout' group='Configurator General/Compile Time Options' default='false' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable the TGS timeout.' />
+  <ParamBool id='ctoEnableTimeoutTCPWM' name='Enable TCPWM Timeout' group='Configurator General/Compile Time Options' default='false' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable the TCPWM timeout.' />
+  <ParamRange id='ctoZoneMaxNum' name='Zone Max Number' group='Configurator General/Compile Time Options' default='$PMBUS_ZONE_NUM' min='0' max='$PMBUS_ZONE_MAX' resolution='1' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Define the range for Zone values.' />
+  <ParamBool id='ctoZoneSelAdv' name='Zone Selection Advanced' group='Configurator General/Compile Time Options' default='false' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='When enabled, the application can control the zone selection initiated by the controller using the Zone callback.' />
+  <ParamBool id='ctoCmdCallbackAdv' name='Command Callback Advanced' group='Configurator General/Compile Time Options' default='false' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='When enabled, the command callback also provides a sequence number for each received byte.' />
+  <ParamBool id='ctoImplCmdRevision' name='Implement CMD REVISION' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable the automatic response to the PMBUS_REVISION (0x98) command.' />
+  <ParamBool id='ctoImplCmdCapability' name='Implement CMD CAPABILITY' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable the automatic response to the CAPABILITY (0x19) command.' />
+  <ParamBool id='ctoImplCmdQuery' name='Implement CMD QUERY' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable automatic response to the QUERY (0x1A) command.' />
+  <ParamBool id='ctoImplCmdPage' name='Implement CMD PAGE' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable automatic response to the PAGE (0x00) command.' />
+  <ParamBool id='ctoImplCmdPhase' name='Implement CMD PHASE' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable the automatic response to the PHASE (0x04) command.' />
+  <ParamBool id='ctoImplCmdZoneConfig' name='Implement CMD ZONE_CONFIG' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable the automatic response to the ZONE_CONFIG (0x07) command.' />
+  <ParamBool id='ctoImplCmdZoneActive' name='Implement CMD ZONE_ACTIVE' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable the automatic response to the ZONE_ACTIVE (0x08) command.' />
+  <ParamBool id='ctoImplCmdPagePlusWrite' name='Implement CMD PAGE_PLUS_WRITE' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable the automatic response to the PAGE_PLUS_WRITE (0x05) command.' />
+  <ParamBool id='ctoImplCmdPagePlusRead' name='Implement CMD PAGE_PLUS_READ' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable the automatic response to the PAGE_PLUS_READ (0x06) command.' />
+  <ParamBool id='ctoImplCmdP2PlusWrite' name='Implement CMD P2_PLUS_WRITE' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable the automatic response on P2_PLUS_WRITE (0x09) command.' />
+  <ParamBool id='ctoImplCmdP2PlusRead' name='Implement CMD P2_PLUS_READ' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable automatic response to the P2_PLUS_READ (0x0A) command.' />
+  <ParamBool id='ctoImplCmdPageSelAdv' name='Page Selection Advanced' group='Configurator General/Compile Time Options' default='false' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='When enabled, the application can control the page selection initiated by the controller via the callback for all page-related commands.' />
+  <ParamBool id='ctoImplCmdPhaseSelAdv' name='Phase Selection Advanced' group='Configurator General/Compile Time Options' default='false' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='When enabled, the application can control the phase selection initiated by the controller via the callback for all phase-related commands.' />
+  <ParamBool id='ctoTrgtHNP' name='Target Host Notify Protocol' group='Configurator General/Compile Time Options' default='false' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable Host Notify Protocol.' />
+  <ParamBool id='ctoCtrlHNP' name='Controller Host Notify Protocol' group='Configurator General/Compile Time Options' default='false' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='Enable or disable Host Notify Protocol.' />
+  <ParamBool id='ctoSupportPmbus' name='Enable PMBus' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='True if any PMBus instance has PMBus support enabled.' />
+  <ParamBool id='ctoSupportZone' name='Enable Zone' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='True if any PMBus instance has Zone support enabled.' />
+  <ParamBool id='ctoSupportSmbalert' name='Enable SMBALERT' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='True if any PMBus instance has SMBALERT support enabled.' />
+  <ParamBool id='ctoSupportGenCallAddr' name='Enable General Call Address' group='Configurator General/Compile Time Options' default='true' visible='`${isFirstInstance &amp;&amp; intConfig}`' editable='true' desc='True if any PMBus instance has General Call Address support enabled.' />
+
+  <!-- PMBus Instance X: I2C HW -->
+    <ParamString templateId='i2c_hw' id='instName' name='Instance Name' group='I2C HW' default='`${pmbus_tcpwm.instName}`_I2C' visible='`${pmbus_tcpwm.debug}`' editable='false' desc='' />
+
+    <ParamString templateId='i2c_hw' id='ModeUser' name='Mode' group='I2C HW' default='`${pmbus_tcpwm.ctrlEna &amp;&amp; !pmbus_tcpwm.ctrlHnpEna ? "Master" :
+                                                                                        (!pmbus_tcpwm.ctrlEna &amp;&amp; !pmbus_tcpwm.trgtHnpEna ? "Slave" :
+                                                                                         "Master-Slave")}`'
+               visible='true' editable='false' desc='This parameter defines the I2C operation mode: Master, Slave or Master-Slave.' />
+    <ParamBool templateId='i2c_hw' id='Slave' name='Slave' group='Internal' default='`${ModeUser eq "Slave"}`' visible='false' editable='false' desc='Enables Slave functionality.' />
+    <ParamBool templateId='i2c_hw' id='Master' name='Master' group='Internal' default='`${ModeUser eq "Master"}`' visible='false' editable='false' desc='Enables Master functionality.' />
+    <ParamBool templateId='i2c_hw' id='MasterSlave' name='Master-Slave' group='Internal' default='`${ModeUser eq "Master-Slave"}`' visible='false' editable='false' desc='Enables Master-Slave functionality.' />
+
+    <!-- Data Rate and Clock -->
+    <ParamBool templateId='i2c_hw' id='ManualDataRate' name='ManualDataRate' group='I2C HW' default='false' visible='`${pmbus_tcpwm.debug}`' editable='false' desc='This parameter allows the user to configure data rate-related parameters for master modes.' />
+    <ParamRange templateId='i2c_hw' id='DataRate' name='Data Rate (kbps)' group='I2C HW' default='`${pmbus_tcpwm.pmbusSpeed eq "100" ? 100 : pmbus_tcpwm.pmbusSpeed eq "400" ? 400 : 1000}`' min='100' max='1000' resolution='1' visible='`${!ManualDataRate &amp;&amp; pmbus_tcpwm.intConfig}`' editable='false' desc='I2C operational data rate - maximum 1000 kbps.' />
+
+    <ParamString templateId='i2c_hw' id='ScbClkMinMHz' name='ScbClkMinMHz' group='Internal' default='`${(DataRate &lt;= 100) ? $MIN_SCB_CLK_4DR_LE0K1_SM :
+                                                                                                       ((DataRate &gt; 100) &amp;&amp; (DataRate &lt;= 400)) ? $MIN_SCB_CLK_4DR_LE0K4_SM :
+                                                                                                        (Master ? $MIN_SCB_CLK_4DR_LE1K0_MM : $MIN_SCB_CLK_4DR_LE1K0_SM)}`'
+                 visible='false' editable='false' desc='Minimum clock frequency required to operate at the desired data rate.' />
+    <ParamString templateId='i2c_hw' id='ScbClkMaxMHz' name='ScbClkMaxMHz' group='Internal' default='`${Master ? ((DataRate &lt;= 100) ? $MAX_SCB_CLK_4DR_LE0K1_MM :
+                                                                                                                 ((DataRate &gt; 100) &amp;&amp; (DataRate &lt;= 400)) ? $MAX_SCB_CLK_4DR_LE0K4_MM : $MAX_SCB_CLK_4DR_LE1K0_MM) :
+                                                                                                                 ((DataRate &lt;= 100) ? $MAX_SCB_CLK_4DR_LE0K1_SM :
+                                                                                                                 ((DataRate &gt; 100) &amp;&amp; (DataRate &lt;= 400)) ? $MAX_SCB_CLK_4DR_LE0K4_SM : $MAX_SCB_CLK_4DR_LE1K0_SM)}`'
+                 visible='false' editable='false' desc='Maximum clock frequency allowed to operate at the desired data rate.' />
+
+    <ParamSignal templateId='i2c_hw' port='clock_scb_en[0]' name='Clock Signal' group='I2C HW' visible='`${hasVisibleOption("clock_scb_en[0]")}`' desc='Clock that operates the I2C block.' canBeEmpty='false' >
+      <Constraint type='REQUIRE' targetLocation='peri\[\d+\](\.group\[\d+\])?\.div_.*' valid='`${!ManualDataRate}`' >
+        <Parameter id='intDivider' severity='ERROR' reason='The clock frequency must be within the range `${ScbClkMinMHz}` - `${ScbClkMaxMHz}` MHz to operate with Data Rate `${DataRate}` kbps.' valid='`${!ManualDataRate}`' >
+          <Range
+            min='`${ceil(getExposedMember("REF_LOCATION", "frequency") * getExposedMember("REF_LOCATION", "divider") / (ScbClkMaxMHz * 1000000))}`'
+            max='`${floor(getExposedMember("REF_LOCATION", "frequency") * getExposedMember("REF_LOCATION", "divider") / (ScbClkMinMHz * 1000000))}`' />
+        </Parameter>
+      </Constraint>
+      <Constraint type='ACCEPT' targetLocation='peri\[\d+\](\.group\[\d+\])?\.div_(16.5|24.5).*' valid='true' >
+        <Parameter id='fracDivider' severity='ERROR' reason='Fractional divider must be 0 for I2C interface.' >
+          <Fixed value='0' />
+        </Parameter>
+      </Constraint>
+    <Constraint type='ACCEPT' targetLocation='.*' valid='`${ManualDataRate}`' />
+    </ParamSignal>
+
+    <ParamString id='scbClkRes' name='scbClkRes' group='I2C HW' default='`${getOrDefault(getBlockFromSignal(makeId("i2c_hw", "clock_scb_en[0]")), "")}`' visible='`${debug}`' editable='false' desc='' />
+    <ParamRange templateId='i2c_hw' id='scbClkHz' name='scbClkHz' group='I2C HW' default='`${getExposedMember(getBlockFromSignal("clock_scb_en[0]"), "frequency")}`' min='1' max='200000000' resolution='1' visible='false' editable='false' desc='SCB clock frequency in kHz' />
+    <ParamString templateId='i2c_hw' id='ClkFreq' name='Clock Frequency' group='I2C HW' default='`${(scbClkHz &lt; 1000000) ? (scbClkHz / 1000.0) . " kHz" : (scbClkHz / 1000000.0) . " MHz"}`' visible='true' editable='false' desc='The connected clock frequency.' />
+    <ParamString templateId='i2c_hw' id='ipName' name='IP Block Name' group='I2C HW' default='`${getIpBlockName()}`' visible='`${pmbus_tcpwm.debug}`' editable='false' desc='The I2C block name.' />
+
+    <!-- Routing -->
+    <ParamPlacement templateId='i2c_hw' name='I2C Placement' group='I2C HW/Routing' desc='I2C block consumed by this solution' visible='true' />
+    <ParamSignal templateId='i2c_hw' port='i2c_scl[0]' name='SCL' group='I2C HW/Routing' visible='true' desc='Serial clock (SCL) is the master-generated I2C clock signal.' canBeEmpty='false' >
+      <Constraint type='ACCEPT' targetLocation='ioss\[\d+\]\.port\[\d+\]\.pin.*' valid='true' >
+        <Parameter id='DriveModes' severity='DEFAULT' reason='' >
+          <Fixed value='CY_GPIO_DM_OD_DRIVESLOW' />
+        </Parameter>
+      </Constraint>
+      <Constraint type='ACCEPT' targetLocation='ioss\[\d+\]\.port\[\d+\]\.pin.*' valid='true' >
+        <Parameter id='DriveModes' severity='INFO' reason='The pin Drive Mode parameter does not match the expected.' >
+          <Fixed value='CY_GPIO_DM_OD_DRIVESLOW' />
+        </Parameter>
+      </Constraint>
+    </ParamSignal>
+
+    <ParamSignal templateId='i2c_hw' port='i2c_sda[0]' name='SDA' group='I2C HW/Routing' visible='true' desc='Serial data (SDA) is the I2C data signal.' canBeEmpty='false' >
+      <Constraint type='ACCEPT' targetLocation='ioss\[\d+\]\.port\[\d+\]\.pin.*' valid='true' >
+        <Parameter id='DriveModes' severity='DEFAULT' reason='' >
+          <Fixed value='CY_GPIO_DM_OD_DRIVESLOW' />
+        </Parameter>
+      </Constraint>
+      <Constraint type='ACCEPT' targetLocation='ioss\[\d+\]\.port\[\d+\]\.pin.*' valid='true' >
+        <Parameter id='DriveModes' severity='INFO' reason='The pin Drive Mode parameter does not match the expected.' >
+          <Fixed value='CY_GPIO_DM_OD_DRIVESLOW' />
+        </Parameter>
+      </Constraint>
+    </ParamSignal>
+
+    <!-- Timeout Detection -->
+    <ParamChoice id='toTmrRes' name='HW Resource' group='Timeout Detection' visible='false' editable='true' default='TCPWM' desc='The hardware resource used for the timeout detection.' >
+      <Entry name='TGS timeout measurement' value='TGS' visible='false' />
+      <Entry name='TCPWM timeout measurement' value='TCPWM' visible='true' />
+    </ParamChoice>
+    <ParamBool id='toTmrResIsTCPWM' name='toTmrResIsTCPWM' group='Timeout Detection' default='`${toTmrRes eq "TCPWM"}`' visible='`${debug}`' editable='false' desc='The TCPWM timer is selected as the timeout detection hardware resource.' />
+    <ParamChoice id='toConfig' group='Timeout Detection' name='Timing Configuration' visible='true' editable='true' default='AUTO' desc='Timeout detection configuration' >
+      <Entry name='Auto' value='AUTO' visible='true' />
+      <Entry name='Manual' value='MANUAL' visible='true' />
+    </ParamChoice>
+    <ParamBool id='toConfigIsManual' name='toConfigIsManual' group='Timeout Detection' default='`${toConfig eq "MANUAL"}`' visible='`${debug}`' editable='false' desc='Manual configuration mode is selected for the timeout detection.' />
+
+    <!-- TGS -->
+    <ParamSignal templateId='i2c_hw' port='clock_tgs_en[0]' name='Clock Signal' group='Timeout Detection' visible='`${hasVisibleOption("clock_tgs_en[0]") &amp;&amp; !pmbus_tcpwm.toTmrResIsTCPWM}`' desc='The clock which operates the TGS.' canBeEmpty="`${pmbus_tcpwm.toTmrResIsTCPWM}`" />
+    <ParamRange id='tgsTmrWidth' name="tgsTmrWidth(bit's)" group='Timeout Detection' default='18' min='18' max='18' resolution='1' visible='`${debug}`' editable='false' desc="TGS timer width in bit's" />
+    <ParamString id='tgsClkRes' name='tgsClkRes' group='Timeout Detection' default='`${getOrDefault(getBlockFromSignal(makeId("i2c_hw", "clock_tgs_en[0]")), "")}`' visible='`${debug}`' editable='false' desc='TGS timer clock resource' />
+    <!-- TCPWM -->
+    <ParamString templateId='tcpwmTimer' id='instName' name='Instance Name' group='Timeout Detection' default='`${pmbus_tcpwm.instName}`_TIMEOUT' visible='`${pmbus_tcpwm.debug &amp;&amp; pmbus_tcpwm.toTmrResIsTCPWM}`' editable='false' desc='' />
+    <ParamSignal templateId='tcpwmTimer' port='clock_counter_en[0]' name='Clock Signal' group='Timeout Detection' visible='`${hasVisibleOption("clock_counter_en[0]") &amp;&amp; pmbus_tcpwm.toTmrResIsTCPWM}`' desc='The clock input defines the operating frequency.' canBeEmpty='`${!pmbus_tcpwm.toTmrResIsTCPWM}`' />
+    <ParamString templateId='tcpwmTimer' id='pCntWidthEx' name='pCntWidthEx' desc='pCntWidthEx' group='Timeout Detection'  default='GRP_NR[`${getInstNumber("group")}`].CNT.GRP_CNT_WIDTH' visible='false' editable='false' />
+    <ParamRange templateId='tcpwmTimer' id='pCntWidth' name='pCntWidth' desc='pCntWidth' group='Timeout Detection'  default='`${lookupExpression(pCntWidthEx)}`' min='16' max='32' resolution='1' visible='false' editable='false' />
+    <ParamString id='tcpwmClkRes' name='tcpwmClkRes' group='Timeout Detection' default='`${getOrDefault(getBlockFromSignal(makeId("tcpwmTimer", "clock_counter_en[0]")), "")}`' visible='`${debug}`' editable='false' desc='TCPWM timer clock resource' />
+
+    <ParamString id='toClkRes' name='toClkRes' group='Timeout Detection' default='`${pmbus_tcpwm.toTmrResIsTCPWM ? tcpwmClkRes : tgsClkRes}`' visible='`${debug}`' editable='false' desc='The current clock resource for the timeout detection.' />
+    <ParamBool id='toClkUsed' name='toClkUsed' group='Timeout Detection' default='`${toClkRes ne "" ? isBlockUsed(toClkRes) : false}`' visible='`${debug}`' editable='false' desc='' />
+    <ParamRange id='toClkMinFreq' name='toClkMinFreq(Hz)' group='Timeout Detection' default='`${(i2c_hw.DataRate == 100 ) ? ceil((1e6 * (1 + $SCB_CLK_ACCURACY))/ $MIN_I2C_THIGH_AT0K1_USEC) :
+                                                                                                (i2c_hw.DataRate == 400 ) ? ceil((1e6 * (1 + $SCB_CLK_ACCURACY))/ $MIN_I2C_THIGH_AT0K4_USEC) :
+                                                                                                                            ceil((1e6 * (1 + $SCB_CLK_ACCURACY))/ $MIN_I2C_THIGH_AT1K0_USEC)}`' min='1' max='10000000000' resolution='0.001' visible='`${debug}`' editable='false' desc='' />
+    <ParamRange id='toClkFreq' name='toClkFreq(Hz)' group='Timeout Detection' default='`${toClkUsed ? getExposedMember(toClkRes, "frequency") : 0}`' min='0' max='1000000000' resolution='1' visible='`${debug}`' editable='false' desc='' />
+    <ParamBool id='toClkIsToLow' name='toClkIsToLow' group='Timeout Detection' default='`${toClkFreq &lt; toClkMinFreq}`' visible='`${debug}`' editable='false' desc='' />
+    <ParamRange id='toClkRefMultiplier' name='toClkRefMultiplier' group='Timeout Detection' default='`${toClkMinFreq / toClkFreq}`' min='0' max='10000000000' resolution='0.001' visible='`${debug}`' editable='false' desc='' />
+    <ParamRange id='toClkFreq_MHz' name='toClkFreq(MHz)' group='Timeout Detection' default='`${toClkFreq * 1e-6}`' min='0.0' max='1000.0' resolution='0.001' visible='`${debug}`' editable='false' desc='' />
+    <ParamString id='toClkAccu'  name='toClkAccu'  group='Timeout Detection' default='`${toClkUsed ? getExposedMember(toClkRes, "accuracy") : 0}`' visible='`${debug}`' editable='false' desc='' />
+    <ParamString id='toClkFreqInfo' name='Clock Frequency' group='Timeout Detection' default='`${formatFrequency(toClkFreq,toClkAccu)}`' visible='`${toClkUsed}`' editable='false' desc='The clock frequency of the timeout detection timer. ' />
+
+    <!-- Timeout Timer Period Calculation -->
+    <ParamRange id='toTmrWidthBit' name="toTmrWidth(bit's)" group='Timeout Detection' default='`${toTmrResIsTCPWM ? tcpwmTimer.pCntWidth : tgsTmrWidth}`' min='16' max='32' resolution='1' visible='`${debug}`' editable='false' desc='' />
+    <ParamRange id='toTmrWidthCnt' name="toTmrWidth(counts)" group='Timeout Detection' default='`${1 &lt;&lt; toTmrWidthBit}`' min='65536' max='4294967296' resolution='0.001' visible='`${debug}`' editable='false' desc='' />
+    <ParamRange id='toTmrRefPeriod' name='toTmrRefPeriod' group='Timeout Detection' default='`${$PMBUS_TIMEOUT_IN_SEC * toClkFreq}`' min='0' max='10000000000' resolution='1' visible='`${debug}`' editable='false' desc='The automatically-calculated reference period value for the timeout detection timer.' />
+    <ParamRange id='toTmrRefPresc' name='toTmrRefPresc' group='Timeout Detection' default='`${toTmrResIsTCPWM ? ceil(toTmrRefPeriod / toTmrWidthCnt) : 1}`' min='0' max='10000000000' resolution='1' visible='`${debug}`' editable='false' desc='The automatically-calculated reference value for the clock prescaler of the timeout detection timer.' />
+    <ParamRange id='toTmrCalcPresc' name='toTmrCalcPresc' group='Timeout Detection' default='`${((toTmrRefPresc &lt;=   1) || toClkIsToLow) ?   1 :
+                                                                                         (toTmrRefPresc &lt;=   2) ?   2 :
+                                                                                         (toTmrRefPresc &lt;=   4) ?   4 :
+                                                                                         (toTmrRefPresc &lt;=   8) ?   8 :
+                                                                                         (toTmrRefPresc &lt;=  16) ?  16 :
+                                                                                         (toTmrRefPresc &lt;=  32) ?  32 :
+                                                                                         (toTmrRefPresc &lt;=  64) ?  64 :
+                                                                                         (toTmrRefPresc &lt;= 128) ? 128 : 128 }`' min='0' max='128' resolution='1' visible='`${debug &amp;&amp; !toConfigIsManual}`' editable='false' desc='The automatically-calculated reference value for the clock prescaler of the timeout detection timer.' />
+    <ParamRange id='toTmrPrescClk' name='toTmrPrescClk' group='Timeout Detection' default='`${ceil(toClkFreq / toTmrCalcPresc)}`' min='0' max='10000000000' resolution='1' visible='`${debug}`' editable='false' desc='' />
+    <ParamBool id='toPrescClkIsToLow' name='toPrescClkIsToLow' group='Timeout Detection' default='`${(toTmrCalcPresc &gt; 1) &amp;&amp; (toTmrPrescClk &lt; toClkMinFreq)}`' visible='`${debug}`' editable='false' desc='' />
+    <ParamRange id='toTmrPeriod' name='toTmrPeriod' group='Timeout Detection' default='`${ceil(toTmrRefPeriod / toTmrCalcPresc)}`' min='0' max='10000000000' resolution='1' visible='`${debug}`' editable='false' desc='The automatically-calculated period value for the timeout detection timer.' />
+    <ParamBool id='toTmrWidtNotEnough' name='toTmrWidtNotEnough' group='Timeout Detection' default='`${toTmrPeriod &gt; toTmrWidthCnt}`' visible='`${debug}`' editable='false' desc='' />
+    <ParamRange id='toClkRefDivider' name='toClkRefDivider' group='Timeout Detection' default='`${toTmrPeriod / toTmrWidthCnt}`' min='0' max='10000000000' resolution='0.001' visible='`${debug}`' editable='false' desc='' />
+
+    <ParamChoice id="toTmrManPresc" name="toTmrManPresc" group="Timeout Detection/Manual Configuratios" default="1" visible="`${toConfigIsManual &amp;&amp; toTmrResIsTCPWM}`" editable="`${toConfigIsManual &amp;&amp; toTmrResIsTCPWM}`" desc="Divides down the input clock." >
+      <Entry name="Divide by 1"   value="1" visible="true" />
+      <Entry name="Divide by 2"   value="2" visible="true" />
+      <Entry name="Divide by 4"   value="4" visible="true" />
+      <Entry name="Divide by 8"   value="8" visible="true" />
+      <Entry name="Divide by 16"  value="16" visible="true" />
+      <Entry name="Divide by 32"  value="32" visible="true" />
+      <Entry name="Divide by 64"  value="64" visible="true" />
+      <Entry name="Divide by 128" value="128" visible="true" />
+    </ParamChoice>
+    <ParamRange id='toTmrPresc' name='toTmrCalcPresc' group='Timeout Detection' default='`${toConfigIsManual ? toTmrManPresc : toTmrCalcPresc}`' min='0' max='128' resolution='1' visible='`${debug}`' editable='false' desc='The timeout detection timer clock prescaler' />
+    <ParamString templateId='tcpwmTimer' id='ClockPrescaler' name='Clock Prescaler' group='Timeout Detection' default='CY_TCPWM_COUNTER_PRESCALER_DIVBY_`${pmbus_tcpwm.toTmrPresc}`' visible='`${pmbus_tcpwm.debug &amp;&amp; pmbus_tcpwm.toTmrResIsTCPWM}`' editable='false' desc='Divides down the input clock.' />
+    <ParamRange id='toTmrManPeriod' name='Period' group='Timeout Detection/Manual Configuratios' visible='`${toConfigIsManual}`' editable='true' min='1' max='`${toTmrWidthCnt - 1}`' resolution='1' default='`${(toTmrWidthCnt / 2) - 1}`' desc='Timeout period' />
+    <ParamBool templateId='tcpwmTimer' id='mxs40tcpwm' name='mxs40tcpwm' group='Timeout Detection/Manual Configuratios' default='`${"mxs40tcpwm" eq getIpBlockName()}`' visible='`${debug}`' editable='false' desc='' />
+    <ParamBool templateId='tcpwmTimer' id='gf_enable' name='Glitch Filter Enable' group='Timeout Detection/Manual Configuratios' default='false' visible='`${pmbus_tcpwm.toConfigIsManual &amp;&amp; pmbus_tcpwm.toTmrResIsTCPWM &amp;&amp; mxs40tcpwm}`' editable='`${pmbus_tcpwm.toConfigIsManual}`' 
+               desc='Enables the glitch filter for input triggers. The number of glitch filters is design-specific, and if a glitch filter is connected to this input trigger, it will be used.' />
+    <ParamChoice templateId='tcpwmTimer' id='gf_depth' name='Glitch Filter Depth' group='Timeout Detection/Manual Configuratios' default='CY_GLITCH_FILTER_DEPTH_SUPPORT_VALUE_0' visible='`${gf_enable}`' editable='`${gf_enable}`' desc='The supported glitch filter depth values.' >
+      <Entry name='Depth Value 0'   value='CY_GLITCH_FILTER_DEPTH_SUPPORT_VALUE_0'   visible='true' />
+      <Entry name='Depth Value 1'   value='CY_GLITCH_FILTER_DEPTH_SUPPORT_VALUE_1'   visible='true' />
+      <Entry name='Depth Value 2'   value='CY_GLITCH_FILTER_DEPTH_SUPPORT_VALUE_2'   visible='true' />
+      <Entry name='Depth Value 4'   value='CY_GLITCH_FILTER_DEPTH_SUPPORT_VALUE_4'   visible='true' />
+      <Entry name='Depth Value 8'   value='CY_GLITCH_FILTER_DEPTH_SUPPORT_VALUE_8'   visible='true' />
+      <Entry name='Depth Value 16'  value='CY_GLITCH_FILTER_DEPTH_SUPPORT_VALUE_16'  visible='true' />
+      <Entry name='Depth Value 32'  value='CY_GLITCH_FILTER_DEPTH_SUPPORT_VALUE_32'  visible='true' />
+      <Entry name='Depth Value 64'  value='CY_GLITCH_FILTER_DEPTH_SUPPORT_VALUE_64'  visible='true' />
+      <Entry name='Depth Value 128' value='CY_GLITCH_FILTER_DEPTH_SUPPORT_VALUE_128' visible='true' />
+      <Entry name='Depth Value 256' value='CY_GLITCH_FILTER_DEPTH_SUPPORT_VALUE_256' visible='true' />
+      <Entry name='Depth Value 512' value='CY_GLITCH_FILTER_DEPTH_SUPPORT_VALUE_512' visible='true' />
+    </ParamChoice>
+
+    <ParamRange id='toSampleInterval' name='Sample Interval (us)' group='Timeout Detection' default='`${((toTmrPresc * 1e10 / toClkFreq) + 0.5) * 1e-4}`' min='0' max='10000000000' resolution='0.0001' visible='true' editable='false' desc='Sample time (µs based on resolution).' />
+    <ParamPlacement templateId='tcpwmTimer' name='Timer Placement' group='Timeout Detection/Routing' desc='Timeout timer consumed by this solution' visible='`${pmbus_tcpwm.toTmrResIsTCPWM}`' />
+
+    <!-- Internal Routing -->
+    <ParamBool id='routingIsManual' name='Route signal "tr_i2c_scl_filtered"' group='Internal Routing' default='false' visible='`${!pmbus_tcpwm.toTmrResIsTCPWM}`' editable='`${!pmbus_tcpwm.toTmrResIsTCPWM}`' desc='Route the "tr_i2c_scl_filtered" I2C trigger output signal' />
+    <ParamSignal templateId='i2c_hw'     port='tr_i2c_scl_filtered[0]' name='I2C "tr_i2c_scl_filtered" output' group='Internal Routing' visible='`${pmbus_tcpwm.toTmrResIsTCPWM || pmbus_tcpwm.routingIsManual}`' editable='`${pmbus_tcpwm.toTmrResIsTCPWM || pmbus_tcpwm.routingIsManual}`' desc='I2C trigger output signal' canBeEmpty='false' />
+    <ParamSignal templateId='tcpwmTimer' port='reload[0]'              name='Timeout Timer "reload" input'     group='Internal Routing' visible='`${pmbus_tcpwm.toTmrResIsTCPWM}`' editable='`${pmbus_tcpwm.debug}`' desc='This parameter is set automatically' canBeEmpty='`${!pmbus_tcpwm.toTmrResIsTCPWM}`' />
+    <ParamSignal templateId='tcpwmTimer' port='stop[0]'                name='Timeout Timer "stop" input'       group='Internal Routing' visible='`${pmbus_tcpwm.toTmrResIsTCPWM}`' editable='`${pmbus_tcpwm.debug}`' desc='This parameter is set automatically' canBeEmpty='`${!pmbus_tcpwm.toTmrResIsTCPWM}`' />
+
+    <!-- Physical Layer Extensions -->
+    <!-- Physical Layer Extensions / Defauld Extra Lines -->
+    <Repeat count='$NUM_OF_DEFAULT_EXTRA_LINES' >
+      <ParamString id='defSignalName$idx' name='defSignalName$idx' group='PHY Extensions/debug'
+                   default='`${($idx == 0) ? "SMBALERT" :
+                               ($idx == 1) ? "CONTROL"  :
+                               ($idx == 2) ? "SMBSUS"   :
+                                             "WP"}`'     visible='`${debug}`' editable='false' desc='The default signal name' />
+      <ParamBool id='defLine$idxEn' name='Enable' group='PHY Extensions/`${defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='false' visible='`${!ctrlEna &amp;&amp; !(!pmbusEna &amp;&amp; ($idx == 1 || $idx == 3)) &amp;&amp; !(!smbalertEna &amp;&amp; ($idx == 0))}`' editable='`${!ctrlEna &amp;&amp; !(!pmbusEna &amp;&amp; ($idx == 1 || $idx == 3)) &amp;&amp; !(!smbalertEna &amp;&amp; ($idx == 0))}`' desc='Controls whether this signal line is present in the physical interface or not' />
+      <ParamPlacement templateId='defLine$idx' name='Placement' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' desc='GPIO consumed by this solution' visible='`${pmbus_tcpwm.defLine$idxEn}`' />
+      <ParamString templateId='defLine$idx' id='signalInstName' name='signalInstName' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='`${pmbus_tcpwm.instName}`_`${pmbus_tcpwm.defSignalName$idx}`' visible='`${pmbus_tcpwm.debug &amp;&amp; pmbus_tcpwm.defLine$idxEn}`' editable='false' desc='' />
+      <ParamString templateId='defLine$idx' id='location' name='Location' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='`${INST_LOC}`' visible='false' editable='false' desc='' />
+      <ParamBool templateId='defLine$idx' id='isSmbalert' name='isSmbalert' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='`${(pmbus_tcpwm.defSignalName$idx eq "SMBALERT") ? "true" : "false"}`' visible='false' editable='false' desc='Indicates that the current signal is "SMBALERT"' />
+      <ParamChoice templateId='defLine$idx' id='DriveModes' name='Drive Mode' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='`${isSmbalert ? "CY_GPIO_DM_OD_DRIVESLOW" : "CY_GPIO_DM_HIGHZ"}`' visible='`${pmbus_tcpwm.defLine$idxEn}`' editable='false' desc="Configures the pin drive mode for the signal's predefined functional purpose." >
+        <Entry name='Open Drain, Drives Low. Input buffer on' value='CY_GPIO_DM_OD_DRIVESLOW' visible='true' />
+        <Entry name='Digital High-Z. Input buffer on'         value='CY_GPIO_DM_HIGHZ'        visible='true' />
+      </ParamChoice>
+      <ParamChoice templateId='defLine$idx' id='initialState' name='Initial State' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='`${isSmbalert ? "1" : "0"}`' visible='`${pmbus_tcpwm.defLine$idxEn}`' editable='false' desc="Configures the pin state after a device reset or power-on." >
+        <Entry name='High (1)' value='1' visible='true' />
+        <Entry name='Low (0)'  value='0' visible='true' />
+      </ParamChoice>
+      <ParamBool templateId='defLine$idx' id='isIpVerEq1' name='Is IP version Eq 1' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='`${getVersion() eq 1}`' visible='false' editable='false' desc='' />
+      <ParamBool templateId='defLine$idx' id='isMXS40SIOSS' name='Is This MXS40SIOSS' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='`${pmbus_tcpwm.defLine$idxEn &amp;&amp; (getIpBlockName() eq "mxs40sioss")}`' visible='false' editable='false' desc='' />
+      <ParamString templateId='defLine$idx' id='secExtAvailable' name='Secure Extension' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='`${lookupExpression("GPIO.SECEXT", lookupExpression("SECEXT", -1))}`' visible='false' editable='false' desc='' />
+      <ParamString templateId='defLine$idx' id='nonSecVisibility' name='Non Sec Visibility' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='`${pmbus_tcpwm.defLine$idxEn &amp;&amp; (secExtAvailable eq 1)}`' visible='false' editable='false' desc='' />
+      <ParamChoice templateId='defLine$idx' id='nonSec' name='Secure attribute' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='`${(isMXS40SIOSS &amp;&amp; isIpVerEq1) ? 0 : 1}`' visible='`${nonSecVisibility}`' editable='`${nonSecVisibility}`' desc='The common secure attribute for all default extra lines.' >
+        <Entry name='Non-secure access (1)' value='1' visible='true' />
+        <Entry name='Secure access (0)'  value='0' visible='true' />
+      </ParamChoice>
+      <ParamChoice templateId='defLine$idx' id='isrTrigger' name='Interrupt Trigger Type' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='CY_GPIO_INTR_DISABLE' visible='`${pmbus_tcpwm.defLine$idxEn}`' editable='`${pmbus_tcpwm.defLine$idxEn}`' desc='Selects the interrupt trigger type.' >
+        <Entry name='None'         value='CY_GPIO_INTR_DISABLE' visible='true' />
+        <Entry name='Rising Edge'  value='CY_GPIO_INTR_RISING'  visible='true' />
+        <Entry name='Falling Edge' value='CY_GPIO_INTR_FALLING' visible='true' />
+        <Entry name='Both Edges'   value='CY_GPIO_INTR_BOTH'    visible='true' />
+      </ParamChoice>
+      <ParamBool templateId='defLine$idx' id='isrEnable' name='Interrupt Enable' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='`${isrTrigger ne "CY_GPIO_INTR_DISABLE"}`' visible='false' editable='false' desc='Check this to enable the Interrupt configurations.' />
+      <ParamBool templateId='defLine$idx' id='intr' name='intr' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='`${isrEnable}`' visible='`${pmbus_tcpwm.debug &amp;&amp; isrEnable}`' editable='false' desc='' />
+      <ParamRange templateId='defLine$idx' id='port' name='port' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='`${getInstNumber(&quot;port&quot;)}`' min='0' max='127' resolution='1' visible='false' editable='false' desc='' />
+      <ParamRange templateId='defLine$idx' id='pin' name='pin' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='`${getInstNumber(&quot;pin&quot;)}`' min='0' max='7' resolution='1' visible='false' editable='false' desc='' />
+      <ParamString templateId='defLine$idx' id='blockName' name='Block name' group='PHY Extensions/`${pmbus_tcpwm.defSignalName$idx . ($idx != 0 ? " (only initialization)" : "")}`' default='`${"ioss_0_port_" . port . "_pin_" . pin}`' visible='false' editable='false' desc='' />
+    </Repeat>
+
+    <!-- Physical Layer Extensions / Custom  Extra Lines -->
+    <ParamRange id='custLineCnt' name='Lines Number' group='PHY Extensions/Custom' default='0' min='0' max='$NUM_OF_CUSTOM_EXTRA_LINES' resolution='1' visible='`${!ctrlEna}`' editable='`${!ctrlEna}`' desc='The total number of custom extra lines in the physical interface' />
+    <Repeat count='$NUM_OF_CUSTOM_EXTRA_LINES' >
+      <ParamBool id='custLine$idxEn' name='custLine$idxEn' group='PHY Extensions/Custom/Line$idx' default='`${$idx &lt; custLineCnt}`' visible='`${debug}`' editable='false' desc='Controls whether this signal line is present in the physical interface or not.' />
+      <ParamString id='custSignalName$idx' name='Signal Name' group='PHY Extensions/Custom/Line$idx' default='Signal$idx' visible='`${custLine$idxEn}`' editable='true' desc='The default Signal name' />
+      <ParamBool id='custSignalNameOk$idx' name='Signal Name Ok' group='PHY Extensions/Custom/Line$idx' default='`${hasMatch(custSignalName$idx, "(^[_]+[0-9a-zA-Z]|^[a-zA-Z])[0-9a-zA-Z_]*$")}`' visible='`${debug &amp;&amp; custLine$idxEn}`' editable='false' desc='' />
+      <ParamPlacement templateId='custLine$idx' name='Placement' group='PHY Extensions/Custom/Line$idx' desc='GPIO consumed by this solution' visible='`${pmbus_tcpwm.custLine$idxEn}`' />
+      <ParamString templateId='custLine$idx' id='signalInstName' name='signalInstName' group='PHY Extensions/Custom/Line$idx' default='`${pmbus_tcpwm.instName}`_`${pmbus_tcpwm.custSignalName$idx}`' visible='`${pmbus_tcpwm.debug &amp;&amp; pmbus_tcpwm.custLine$idxEn}`' editable='false' desc='' />
+      <ParamString templateId='custLine$idx' id='location' name='Location' group='PHY Extensions/Custom/Line$idx' default='`${INST_LOC}`' visible='false' editable='false' desc='' />
+      <ParamChoice templateId='custLine$idx' id='DriveModes' name='Drive Mode' group='PHY Extensions/Custom/Line$idx' default='CY_GPIO_DM_STRONG' visible='`${pmbus_tcpwm.custLine$idxEn}`' editable='`${pmbus_tcpwm.custLine$idxEn}`' desc='The Drive Mode parameter configures the pin provided to one of the eight available pin drive modes.' >
+        <Entry name='Strong Drive. Input buffer on'                                                    value='CY_GPIO_DM_STRONG'                       visible='true' />
+        <Entry name='Strong Drive. Input buffer off'                                                   value='CY_GPIO_DM_STRONG_IN_OFF'                visible='true' />
+        <Entry name='Open Drain, Drives Low. Input buffer off'                                         value='CY_GPIO_DM_OD_DRIVESLOW_IN_OFF'          visible='true' />
+        <Entry name='Open Drain, Drives High. Input buffer off'                                        value='CY_GPIO_DM_OD_DRIVESHIGH_IN_OFF'         visible='true' />
+        <Entry name='Open Drain, Drives Low. Input buffer on'                                          value='CY_GPIO_DM_OD_DRIVESLOW'                 visible='true' />
+        <Entry name='Open Drain, Drives High. Input buffer on'                                         value='CY_GPIO_DM_OD_DRIVESHIGH'                visible='true' />
+        <Entry name='Resistive Pull-Up. Input buffer off'                                              value='CY_GPIO_DM_PULLUP_IN_OFF'                visible='true' />
+        <Entry name='Resistive Pull-Down. Input buffer off'                                            value='CY_GPIO_DM_PULLDOWN_IN_OFF'              visible='true' />
+        <Entry name='Resistive Pull-Up/Down. Input buffer off'                                         value='CY_GPIO_DM_PULLUP_DOWN_IN_OFF'           visible='true' />
+        <Entry name='Resistive Pull-Up. Input buffer on'                                               value='CY_GPIO_DM_PULLUP'                       visible='true' />
+        <Entry name='Resistive Pull-Down. Input buffer on'                                             value='CY_GPIO_DM_PULLDOWN'                     visible='true' />
+        <Entry name='Resistive Pull-Up/Down. Input buffer on'                                          value='CY_GPIO_DM_PULLUP_DOWN'                  visible='true' />
+        <Entry name='Digital High-Z. Input buffer on'                                                  value='CY_GPIO_DM_HIGHZ'                        visible='true' />
+        <Entry name='Analog High-Z. Input buffer off'                                                  value='CY_GPIO_DM_ANALOG'                       visible='true' />
+      </ParamChoice>
+      <ParamChoice templateId='custLine$idx' id='initialState' name='Initial State' group='PHY Extensions/Custom/Line$idx' default='0' visible='`${pmbus_tcpwm.custLine$idxEn}`' editable='true' desc="Specifies the initial value written to the pin's OUT register after a device reset or power-on." >
+        <Entry name='High (1)' value='1' visible='true' />
+        <Entry name='Low (0)'  value='0' visible='true' />
+      </ParamChoice>
+      <ParamBool templateId='custLine$idx' id='isIpVerEq1' name='Is IP version Eq 1' group='PHY Extensions/Custom/Line$idx' default='`${getVersion() eq 1}`' visible='false' editable='false' desc='' />
+      <ParamBool templateId='custLine$idx' id='isMXS40SIOSS' name='Is This MXS40SIOSS' group='PHY Extensions/Custom/Line$idx' default='`${pmbus_tcpwm.custLine$idxEn &amp;&amp; (getIpBlockName() eq "mxs40sioss")}`' visible='false' editable='false' desc='' />
+      <ParamString templateId='custLine$idx' id='secExtAvailable' name='Secure Extension' group='PHY Extensions/Custom/Line$idx' default='`${lookupExpression("GPIO.SECEXT", lookupExpression("SECEXT", -1))}`' visible='false' editable='false' desc='' />
+      <ParamString templateId='custLine$idx' id='nonSecVisibility' name='Non Sec Visibility' group='PHY Extensions/Custom/Line$idx' default='`${pmbus_tcpwm.custLine$idxEn &amp;&amp; (secExtAvailable eq 1)}`' visible='false' editable='false' desc='' />
+      <ParamChoice templateId='custLine$idx' id='nonSec' name='Secure attribute' group='PHY Extensions/Custom/Line$idx' default='`${(isMXS40SIOSS &amp;&amp; isIpVerEq1) ? 0 : 1}`' visible='`${nonSecVisibility}`' editable='`${nonSecVisibility}`' desc='The common secure attribute for all custom extra lines.' >
+        <Entry name='Non-secure access (1)' value='1' visible='true' />
+        <Entry name='Secure access (0)'  value='0' visible='true' />
+      </ParamChoice>
+      <ParamChoice templateId='custLine$idx' id='isrTrigger' name='Interrupt Trigger Type' group='PHY Extensions/Custom/Line$idx' default='CY_GPIO_INTR_DISABLE' visible='`${pmbus_tcpwm.custLine$idxEn}`' editable='`${pmbus_tcpwm.custLine$idxEn}`' desc='Selects the interrupt trigger type.' >
+        <Entry name='None'         value='CY_GPIO_INTR_DISABLE' visible='true' />
+        <Entry name='Rising Edge'  value='CY_GPIO_INTR_RISING'  visible='true' />
+        <Entry name='Falling Edge' value='CY_GPIO_INTR_FALLING' visible='true' />
+        <Entry name='Both Edges'   value='CY_GPIO_INTR_BOTH'    visible='true' />
+      </ParamChoice>
+      <ParamBool templateId='custLine$idx' id='isrEnable' name='Interrupt Enable' group='PHY Extensions/Custom/Line$idx' default='`${isrTrigger ne "CY_GPIO_INTR_DISABLE"}`' visible='false' editable='false' desc='Check this to enable the Interrupt configurations.' />
+      <ParamBool templateId='custLine$idx' id='intr' name='intr' group='PHY Extensions/Custom/Line$idx' default='`${isrEnable}`' visible='`${pmbus_tcpwm.debug &amp;&amp; isrEnable}`' editable='false' desc='' />
+      <ParamRange templateId='custLine$idx' id='port' name='port' group='PHY Extensions/Custom/Line$idx' default='`${getInstNumber(&quot;port&quot;)}`' min='0' max='127' resolution='1' visible='false' editable='false' desc='' />
+      <ParamRange templateId='custLine$idx' id='pin' name='pin' group='PHY Extensions/Custom/Line$idx' default='`${getInstNumber(&quot;pin&quot;)}`' min='0' max='7' resolution='1' visible='false' editable='false' desc='' />
+      <ParamString templateId='custLine$idx' id='blockName' name='Block name' group='PHY Extensions/Custom/Line$idx' default='`${"ioss_0_port_" . port . "_pin_" . pin}`' visible='false' editable='false' desc='' />
+    </Repeat>
+
+    <!-- Advanced -->
+    <ParamBool id='inFlash' name='Store Config in Flash' group='Advanced' default='true' visible='true' editable='true' desc='Controls whether the configuration structure is stored in flash (const, true) or SRAM (not const, false).' />
+  </Parameters>
+  <Variables>
+    <Variable id='space'  value=' ' />
+    <Variable id='tab'  value='    ' />
+    <Variable id='ntab' value='&#13;    ' />
+
+    <!-- "impl_cmd_mask" field components -->
+    <Variable id='pageCmdBitMask'          value='`${pageCmdEna ? ntab . tab . tab . tab . tab . " MTB_PMBUS_IMPL_CMD_PAGE_EN |" : null}`' />
+    <Variable id='phaseCmdBitMask'         value='`${phaseCmdEna ? ntab . tab . tab . tab . tab . " MTB_PMBUS_IMPL_CMD_PHASE_EN |" : null}`' />
+    <Variable id='capabilityCmdBitMask'    value='`${capabilityCmdEna ? ntab . tab . tab . tab . tab . " MTB_PMBUS_IMPL_CMD_CAPABILITY_EN |" : null}`' />
+    <Variable id='queryCmdBitMask'         value='`${queryCmdEna ? ntab . tab . tab . tab . tab . " MTB_PMBUS_IMPL_CMD_QUERY_EN |" : null}`' />
+    <Variable id='revisionCmdBitMask'      value='`${revisionCmdEna ? ntab . tab . tab . tab . tab . " MTB_PMBUS_IMPL_CMD_REVISION_EN |" : null}`' />
+    <Variable id='zoneConfigCmdBitMask'    value='`${zoneConfigCmdEna ? ntab . tab . tab . tab . tab . " MTB_PMBUS_IMPL_CMD_ZONE_CONFIG_EN |" : null}`' />
+    <Variable id='zoneActiveCmdBitMask'    value='`${zoneActiveCmdEna ? ntab . tab . tab . tab . tab . " MTB_PMBUS_IMPL_CMD_ZONE_ACTIVE_EN |" : null}`' />
+    <Variable id='pagePlusWriteCmdBitMask' value='`${pagePlusWriteCmdEna ? ntab . tab . tab . tab . tab . " MTB_PMBUS_IMPL_CMD_PAGE_PLUS_WRITE_EN |" : null}`' />
+    <Variable id='pagePlusReadCmdBitMask'  value='`${pagePlusReadCmdEna ? ntab . tab . tab . tab . tab . " MTB_PMBUS_IMPL_CMD_PAGE_PLUS_READ_EN |" : null}`' />
+    <Variable id='p2PlusWriteCmdBitMask'   value='`${p2PlusWriteCmdEna ? ntab . tab . tab . tab . tab . " MTB_PMBUS_IMPL_CMD_P2_PLUS_WRITE_EN |" : null}`' />
+    <Variable id='p2PlusReadCmdBitMask'    value='`${p2PlusReadCmdEna ? ntab . tab . tab . tab . tab . " MTB_PMBUS_IMPL_CMD_P2_PLUS_READ_EN |" : null}`' />
+    <Variable id='implCmdMask'              value='`${pageCmdBitMask . phaseCmdBitMask . capabilityCmdBitMask . queryCmdBitMask .
+                                                      revisionCmdBitMask . zoneConfigCmdBitMask . zoneActiveCmdBitMask . pagePlusWriteCmdBitMask .
+                                                      pagePlusReadCmdBitMask . p2PlusWriteCmdBitMask . p2PlusReadCmdBitMask . " 0UL"}`' />
+
+    <!-- "cmd_cap" field components for standard command-->
+    <Variable id='stdCmd$idxDirWrBitMask'    value='`${(stdCmd$idxEna &amp;&amp; (stdCmd$idxBinCap &amp; $PMBUS_CMD_CAP_DIR_WR)) ? ntab . tab . tab . tab . tab . "MTB_PMBUS_CMD_CAP_DIR_WR |" : null}`' repeatCount='$PMBUS_STD_CMD_MAX' />
+    <Variable id='stdCmd$idxDirRdBitMask'    value='`${(stdCmd$idxEna &amp;&amp; (stdCmd$idxBinCap &amp; $PMBUS_CMD_CAP_DIR_RD)) ? ntab . tab . tab . tab . tab . "MTB_PMBUS_CMD_CAP_DIR_RD |" : null}`' repeatCount='$PMBUS_STD_CMD_MAX' />
+    <Variable id='stdCmd$idxProcCallBitMask' value='`${(stdCmd$idxEna &amp;&amp; (stdCmd$idxBinCap &amp; $PMBUS_CMD_CAP_DIR_PROCESS_CALL)) ? ntab . tab . tab . tab . tab . "MTB_PMBUS_CMD_CAP_DIR_PROCESS_CALL |" : null}`' repeatCount='$PMBUS_STD_CMD_MAX' />
+    <Variable id='stdCmd$idxBlockBitMask'    value='`${(stdCmd$idxEna &amp;&amp; (stdCmd$idxBinCap &amp; $PMBUS_CMD_CAP_BLOCK)) ? ntab . tab . tab . tab . tab . "MTB_PMBUS_CMD_CAP_BLOCK |" : null}`' repeatCount='$PMBUS_STD_CMD_MAX' />
+    <Variable id='stdCmd$idxPageBitMask'     value='`${(stdCmd$idxEna &amp;&amp; (stdCmd$idxBinCap &amp; $PMBUS_CMD_CAP_PAGE)) ? ntab . tab . tab . tab . tab . "MTB_PMBUS_CMD_CAP_PAGE |" : null}`' repeatCount='$PMBUS_STD_CMD_MAX' />
+    <Variable id='stdCmd$idxPhaseBitMask'    value='`${(stdCmd$idxEna &amp;&amp; (stdCmd$idxBinCap &amp; $PMBUS_CMD_CAP_PHASE)) ? ntab . tab . tab . tab . tab . "MTB_PMBUS_CMD_CAP_PHASE |" : null}`' repeatCount='$PMBUS_STD_CMD_MAX' />
+    <Variable id='stdCmd$idxFormatBitField'  value='`${stdCmd$idxEna ? space . stdCmd$idxFormat . " |" : null}`' repeatCount='$PMBUS_STD_CMD_MAX' />
+    <Variable id='stdCmd$idxMask' value='`${stdCmd$idxFormatBitField . stdCmd$idxDirWrBitMask . stdCmd$idxDirRdBitMask . stdCmd$idxProcCallBitMask . stdCmd$idxBlockBitMask . stdCmd$idxPageBitMask . stdCmd$idxPhaseBitMask . " 0UL"}`' repeatCount='$PMBUS_STD_CMD_MAX' />
+
+    <!-- "cmd_cap" field components for extended command-->
+    <Variable id='extCmd$idxDirWrBitMask'    value='`${(extCmd$idxEna &amp;&amp; (extCmd$idxBinCap &amp; $PMBUS_CMD_CAP_DIR_WR)) ? ntab . tab . tab . tab . tab . "MTB_PMBUS_CMD_CAP_DIR_WR |" : null}`' repeatCount='$PMBUS_EXT_CMD_MAX' />
+    <Variable id='extCmd$idxDirRdBitMask'    value='`${(extCmd$idxEna &amp;&amp; (extCmd$idxBinCap &amp; $PMBUS_CMD_CAP_DIR_RD)) ? ntab . tab . tab . tab . tab . "MTB_PMBUS_CMD_CAP_DIR_RD |" : null}`' repeatCount='$PMBUS_EXT_CMD_MAX' />
+    <Variable id='extCmd$idxProcCallBitMask' value='`${(extCmd$idxEna &amp;&amp; (extCmd$idxBinCap &amp; $PMBUS_CMD_CAP_DIR_PROCESS_CALL)) ? ntab . tab . tab . tab . tab . "MTB_PMBUS_CMD_CAP_DIR_PROCESS_CALL |" : null}`' repeatCount='$PMBUS_EXT_CMD_MAX' />
+    <Variable id='extCmd$idxBlockBitMask'    value='`${(extCmd$idxEna &amp;&amp; (extCmd$idxBinCap &amp; $PMBUS_CMD_CAP_BLOCK)) ? ntab . tab . tab . tab . tab . "MTB_PMBUS_CMD_CAP_BLOCK |" : null}`' repeatCount='$PMBUS_EXT_CMD_MAX' />
+    <Variable id='extCmd$idxPageBitMask'     value='`${(extCmd$idxEna &amp;&amp; (extCmd$idxBinCap &amp; $PMBUS_CMD_CAP_PAGE)) ? ntab . tab . tab . tab . tab . "MTB_PMBUS_CMD_CAP_PAGE |" : null}`' repeatCount='$PMBUS_EXT_CMD_MAX' />
+    <Variable id='extCmd$idxPhaseBitMask'    value='`${(extCmd$idxEna &amp;&amp; (extCmd$idxBinCap &amp; $PMBUS_CMD_CAP_PHASE)) ? ntab . tab . tab . tab . tab . "MTB_PMBUS_CMD_CAP_PHASE |" : null}`' repeatCount='$PMBUS_EXT_CMD_MAX' />
+    <Variable id='extCmd$idxFormatBitField'  value='`${extCmd$idxEna ? space . extCmd$idxFormat . " |" : null}`' repeatCount='$PMBUS_EXT_CMD_MAX' />
+    <Variable id='extCmd$idxMask' value='`${extCmd$idxFormatBitField . extCmd$idxDirWrBitMask . extCmd$idxDirRdBitMask . extCmd$idxProcCallBitMask . extCmd$idxBlockBitMask . extCmd$idxPageBitMask . extCmd$idxPhaseBitMask . " 0UL"}`' repeatCount='$PMBUS_EXT_CMD_MAX' />
+  </Variables>
+  <DRCs>
+    <!-- Example DRCs for error/warning/notes, expand as needed -->
+    <DRC type='ERROR' text='SCB block must be selected' condition='`${scb eq null}`' />
+    <DRC type='ERROR' text='SDA pin must be selected' condition='`${sda eq null}`' />
+    <DRC type='ERROR' text='SCL pin must be selected' condition='`${scl eq null}`' />
+    <DRC type='WARNING' text='Timeout sample interval does not meet minimum required duration' condition='`${timeoutSampleInterval &lt; minSampleInterval}`' />
+
+    <DRC type='ERROR' text='Custom signal name is invalid. It contains one or more unallowed symbols' condition='`${!custSignalNameOk$idx}`' paramId='custSignalName$idx' repeatCount='$NUM_OF_CUSTOM_EXTRA_LINES' />
+
+    <DRC type='ERROR' text='Timeout detection timer width is not enough, select timer with resolution higher then `${toTmrWidthBit}`-bit, or reduce the "Data Rate (kbps)" value' condition='`${((toClkIsToLow &amp;&amp; toTmrWidtNotEnough) || toPrescClkIsToLow) &amp;&amp;  pmbus_tcpwm.toTmrResIsTCPWM}`' paramId='tcpwmTimer#tcpwmTimer' />
+    <DRC type='ERROR' text='Timeout detection timer width is not enough, select timer with resolution higher then `${toTmrWidthBit}`-bit, or reduce the "Data Rate (kbps)" value' condition='`${toClkIsToLow &amp;&amp; toTmrWidtNotEnough &amp;&amp; !pmbus_tcpwm.toTmrResIsTCPWM}`' paramId='toTmrRes' />
+    <DRC type='ERROR' text='The minimum allowed timeout detection timer frequency should be at least `${toClkRefMultiplier}` times higher. Decrease the divider value' condition='`${toClkIsToLow &amp;&amp; !toTmrWidtNotEnough}`' location='`${toClkRes}`' paramId='intDivider' >
+      <FixIt action='SET_PARAM' target='`${toClkRes . ".intDivider"}`' value='`${floor(getExposedMember(toClkRes, "divider") / toClkRefMultiplier)}`' valid='true' />
+    </DRC>
+    <DRC type='ERROR' text="The timeout detection timer frequency is to high. It's clock frequency divider should be at least `${toClkRefDivider}` times lower. Increase the divider value" condition='`${!toClkIsToLow &amp;&amp; toTmrWidtNotEnough}`' location='`${toClkRes}`' paramId='intDivider' >
+      <FixIt action='SET_PARAM' target='`${toClkRes . ".intDivider"}`' value='`${ceil(getExposedMember(toClkRes, "divider") * toClkRefDivider)}`' valid='true' />
+    </DRC>
+    <DRC type='INFO' text='Extended commands are enabled, but no commands are defined. Configure commands to start using this feature.' condition='`${(extCmdNum eq 0) &amp;&amp; extCmdEna}`' paramId='extCmdEna' />
+    <DRC type='ERROR' text="The target address `${targetAddr}` is reserved." condition='`${(smbalertEna &amp;&amp; (targetAddr eq 0x0C)) || (zoneEna &amp;&amp; ((targetAddr eq 0x28) || (targetAddr eq 0x37)))}`' paramId='targetAddr' >
+      <FixIt action='SET_PARAM' target='targetAddr' value='`${$PMBUS_TARGET_ADDRESS + instNum}`' valid='true' />
+    </DRC>
+    <DRC type='INFO' text='The PMBus instance number has changed. Launch the PMBus Configurator to update the configuration.' condition='`${isFirstInstance &amp;&amp; (instCount lt expectedInstCount)}`' />
+    <DRC type='INFO' text='A new PMBus instance has been created and needs to be configured. Launch the PMBus Configurator to set up its parameters.' condition='`${!isFirstInstance &amp;&amp; !isConfigured}`' />
+
+  </DRCs>
+  <ConfigFirmware>
+    <ConfigInclude value='cycfg_peripherals.h' include='true' />
+    <ConfigInclude value='cycfg_routing.h' include='true' />
+    <ConfigInclude value='cy_sysclk.h' include='true' />
+    <ConfigInclude value='mtb_pmbus.h' include='true' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigDefine name='CYCFG_PMBUS_CFG' value='true' public='true' include='true' />
+
+    <ConfigArray name='`${instName . stdCmdTableName}`' type='mtb_pmbus_stc_config_cmd_t' const='false' public='false' include='`${(stdCmdNum ne 0) &amp;&amp; !ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' >
+      <ConfigStruct name='empty' type='nested' const='false' public='true' repeatCount='$PMBUS_STD_CMD_MAX' include='`${stdCmd$idxEna}`' >
+        <Member name='cmd_code' value='`${stdCmd$idxCode}`' />
+        <Member name='cmd_cap' value='`${stdCmd$idxMask}`' />
+        <Member name='data_buf' value='`${stdCmd$idxDataBuf}`' />
+        <Member name='data_size' value='`${stdCmd$idxDataSize}`' />
+        <Member name='callback' value='`${stdCmd$idxCallback}`' />
+      </ConfigStruct>
+    </ConfigArray>
+
+    <ConfigArray name='`${instName . extCmdTableName}`' type='mtb_pmbus_stc_config_cmd_t' const='false' public='false' include='`${extCmdEna &amp;&amp; !ctrlEna}`' guard='defined(MTB_PMBUS_SUPPORT_EXT_CMD) &amp;&amp; (MTB_PMBUS_SUPPORT_EXT_CMD != 0U) &amp;&amp; defined(COMPONENT_MW_MTB_PMBUS)' >
+      <ConfigStruct name='empty' type='nested' const='false' public='true' repeatCount='$PMBUS_EXT_CMD_MAX' include='`${extCmd$idxEna}`' >
+        <Member name='cmd_code' value='`${extCmd$idxCode}`' />
+        <Member name='cmd_cap' value='`${extCmd$idxMask}`' />
+        <Member name='data_buf' value='`${extCmd$idxDataBuf}`' />
+        <Member name='data_size' value='`${extCmd$idxDataSize}`' />
+        <Member name='callback' value='`${extCmd$idxCallback}`' />
+      </ConfigStruct>
+    </ConfigArray>
+
+    <ConfigStruct name='`${hwCfgStructName}`' type='mtb_pmbus_stc_config_hw_t' const='false' public='false' include='`${!ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' >
+      <Member name='hal_config' value='&amp;`${instName . halCfgStructName}`' />
+      <Member name='hw_resource_ctrl_callback' value='`${instName . hwResCtrlCallName}`' />
+      <Member name='enable_hw_irq_callback' value='`${instName . hwIrqEnaCallName}`' />
+      <Member name='disable_hw_irq_callback' value='`${instName . hwIrqDisCallName}`' />
+    </ConfigStruct>
+
+    <ConfigStruct name='`${instName}`_config' type='mtb_pmbus_stc_config_t' const='`${inFlash}`' public='true' include='`${!ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' >
+      <Member name='hw_config' value='&amp;`${hwCfgStructName}`' />
+      <Member name='address' value='`${targetAddr}`' />
+      <Member name='enable_pec' value='`${pecEna}`' guard='defined(MTB_PMBUS_SUPPORT_PEC) &amp;&amp; (MTB_PMBUS_SUPPORT_PEC != 0U)' />
+      <Member name='enable_smbalert' value='`${smbalertEna}`' guard='defined(MTB_PMBUS_SUPPORT_SMBALERT) &amp;&amp; (MTB_PMBUS_SUPPORT_SMBALERT != 0U)' />
+      <Member name='enable_gen_call_addr' value='`${genCallAddrRespEna}`' guard='defined(MTB_PMBUS_SUPPORT_GEN_CALL_ADDR) &amp;&amp; (MTB_PMBUS_SUPPORT_GEN_CALL_ADDR != 0U)' />
+      <Member name='enable_pmbus' value='`${pmbusEna}`' guard='defined(MTB_PMBUS_SUPPORT_PMBUS) &amp;&amp; (MTB_PMBUS_SUPPORT_PMBUS != 0U)' />
+      <Member name='num_pages' value='`${pagesNum}`' guard='defined(MTB_PMBUS_PAGES_NUM) &amp;&amp; (MTB_PMBUS_PAGES_NUM != 0U)' />
+      <Member name='page_callback' value='NULL' guard='defined(MTB_PMBUS_IMPL_CMD_PAGE_SEL_ADV) &amp;&amp; (MTB_PMBUS_IMPL_CMD_PAGE_SEL_ADV != 0U)' />
+      <Member name='num_phases' value='`${phasesNum}`' guard='defined(MTB_PMBUS_PHASES_NUM) &amp;&amp; (MTB_PMBUS_PHASES_NUM != 0U)' />
+      <Member name='phase_callback' value='NULL' guard='defined(MTB_PMBUS_IMPL_CMD_PHASE_SEL_ADV) &amp;&amp; (MTB_PMBUS_IMPL_CMD_PHASE_SEL_ADV != 0U)' />
+      <Member name='enable_zone' value='`${zoneEna}`' guard='defined(MTB_PMBUS_SUPPORT_ZONE) &amp;&amp; (MTB_PMBUS_SUPPORT_ZONE != 0U)' />
+      <Member name='zone_callback' value='`${zoneEna ? instName . zoneCallName : "NULL"}`' guard='defined(MTB_PMBUS_SUPPORT_ZONE) &amp;&amp; (MTB_PMBUS_SUPPORT_ZONE != 0U)' />
+      <Member name='impl_cmd_mask' value='`${implCmdMask}`' guard='MTB_PMBUS_IMPL_CMD_NUM != 0U' />
+      <Member name='cmd_table' value='`${stdCmdNum ne 0 ? instName . stdCmdTableName : "NULL"}`' />
+      <Member name='cmd_num' value='`${stdCmdNum}`' />
+      <Member name='enable_ext_cmd' value='`${extCmdEna}`' guard='defined(MTB_PMBUS_SUPPORT_EXT_CMD) &amp;&amp; (MTB_PMBUS_SUPPORT_EXT_CMD != 0U)' />
+      <Member name='ext_cmd_table' value='`${extCmdEna ? instName . extCmdTableName : "NULL"}`' guard='defined(MTB_PMBUS_SUPPORT_EXT_CMD) &amp;&amp; (MTB_PMBUS_SUPPORT_EXT_CMD != 0U)' />
+      <Member name='ext_cmd_num' value='`${extCmdEna ? extCmdNum : 0U}`' guard='defined(MTB_PMBUS_SUPPORT_EXT_CMD) &amp;&amp; (MTB_PMBUS_SUPPORT_EXT_CMD != 0U)' />
+      <Member name='hnp_callback' value='`${trgtHnpEna ? instName . trgtHnpCallName : "NULL"}`' guard='defined(MTB_PMBUS_SUPPORT_HOST_NOTIFY) &amp;&amp; (MTB_PMBUS_SUPPORT_HOST_NOTIFY != 0U)' />
+      <Member name='gen_callback' value='`${instName . genCallName}`' />
+      <Member name='errors_callback' value='`${instName . errCallName}`' />
+      <Member name='revision' value='`${revNum}`' guard='defined(MTB_PMBUS_IMPL_CMD_REVISION) &amp;&amp; (MTB_PMBUS_IMPL_CMD_REVISION != 0U)' />
+      <Member name='speed' value='MTB_PMBUS_SPEED_`${pmbusSpeed}`' guard='defined(MTB_PMBUS_IMPL_CMD_CAPABILITY) &amp;&amp; (MTB_PMBUS_IMPL_CMD_CAPABILITY != 0U)' />  
+      <Member name='enable_ieee_format' value='`${ieeeEna}`' guard='defined(MTB_PMBUS_IMPL_CMD_CAPABILITY) &amp;&amp; (MTB_PMBUS_IMPL_CMD_CAPABILITY != 0U)' />
+    </ConfigStruct>
+
+    <ConfigStruct name='`${instName}`_ctrl_config' type='mtb_pmbus_ctrl_cfg_t' const='false' public='true' include='`${ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' >
+      <Member name='callback_events' value='`${instName . ctrlHwResEventCallName}`' />
+      <Member name='callback_hnp' value='`${ctrlHnpEna ? instName . ctrlHnpCallName : "NULL"}`' guard='defined(MTB_PMBUS_CTRL_SUPPORT_HOST_NOTIFY) &amp;&amp; (MTB_PMBUS_CTRL_SUPPORT_HOST_NOTIFY != 0U)' />
+      <Member name='hal_cfg' value='&amp;`${instName . ctrlHalCfgStructName}`' />
+      <Member name='callback_hw' value='`${instName . ctrlHwResCtrlCallName}`' />
+      <Member name='callback_isr_enable' value='`${instName . ctrlHwIrqEnaCallName}`' />
+      <Member name='callback_isr_disable' value='`${instName . ctrlHwIrqDisCallName}`' />
+    </ConfigStruct>
+
+    <ConfigExternVariable type='mtb_pmbus_stc_config_hal_t' name='`${instName . halCfgStructName}`' const='false' public='true' include='`${!ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigExternVariable type='mtb_pmbus_ctrl_stc_config_hal_t' name='`${instName . ctrlHalCfgStructName}`' const='false' public='true' include='`${ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+
+    <ConfigVariable type='uint8_t' name='`${stdCmd$idxDataBuf . stdCmd$idxPagesNumArr . stdCmd$idxPhasesNumArr . "[" . stdCmd$idxDataSize . "U]"}`' const='false' public='true' include='`${!ctrlEna &amp;&amp; (stdCmd$idxDataBuf ne "NULL") &amp;&amp; (stdCmd$idxDataBuf ne "null") &amp;&amp; (stdCmd$idxDataBuf ne "0") &amp;&amp; (stdCmd$idxDataSize != 0)}`' repeatCount='$PMBUS_STD_CMD_MAX' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigVariable type='uint8_t' name='`${extCmd$idxDataBuf . extCmd$idxPagesNumArr . extCmd$idxPhasesNumArr . "[" . extCmd$idxDataSize . "U]"}`' const='false' public='true' include='`${!ctrlEna &amp;&amp; (extCmd$idxDataBuf ne "NULL") &amp;&amp; (extCmd$idxDataBuf ne "null") &amp;&amp; (extCmd$idxDataBuf ne "0") &amp;&amp; (extCmd$idxDataSize != 0)}`' repeatCount='$PMBUS_EXT_CMD_MAX' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+
+    <ConfigExternFunction signature='void `${instName . hwResCtrlCallName}`(mtb_pmbus_hw_resources_ctrl_action_t)' public='true' include='`${!ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigExternFunction signature='void `${instName . hwIrqEnaCallName}`(void)' public='true' include='`${!ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigExternFunction signature='void `${instName . hwIrqDisCallName}`(void)' public='true' include='`${!ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigExternFunction signature='uint8_t `${instName . zoneCallName}`(mtb_pmbus_zone_events_t, uint8_t, int32_t)' public='true' include='`${zoneEna &amp;&amp; !ctrlEna}`' guard='defined(MTB_PMBUS_SUPPORT_ZONE) &amp;&amp; (MTB_PMBUS_SUPPORT_ZONE != 0U) &amp;&amp; defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigExternFunction signature='void `${instName . genCallName}`(mtb_pmbus_events_t)' public='true' include='`${!ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigExternFunction signature='void `${instName . errCallName}`(uint32_t, uint8_t, bool)' public='true' include='`${!ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigExternFunction signature='void `${instName . trgtHnpCallName}`(mtb_pmbus_host_notify_events_t)' public='true' include='`${trgtHnpEna &amp;&amp; !ctrlEna}`' guard='defined(MTB_PMBUS_SUPPORT_HOST_NOTIFY) &amp;&amp; (MTB_PMBUS_SUPPORT_HOST_NOTIFY != 0U) &amp;&amp; defined(COMPONENT_MW_MTB_PMBUS)' />
+
+    <ConfigExternFunction signature='bool `${stdCmd$idxCallback}`(mtb_pmbus_cmd_events_t event, int32_t page, int32_t phase, uint8_t byte)' public='true' include='`${!ctrlEna &amp;&amp; (stdCmd$idxCallback ne "NULL") &amp;&amp; (stdCmd$idxCallback ne "null") &amp;&amp; (stdCmd$idxCallback ne "0") &amp;&amp; (!ctoCmdCallbackAdv)}`' repeatCount='$PMBUS_STD_CMD_MAX' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigExternFunction signature='bool `${stdCmd$idxCallback}`(mtb_pmbus_cmd_events_t event, int32_t page, int32_t phase, uint8_t byte, uint8_t idx)' public='true' include='`${!ctrlEna &amp;&amp; (stdCmd$idxCallback ne "NULL") &amp;&amp; (stdCmd$idxCallback ne "null") &amp;&amp; (stdCmd$idxCallback ne "0") &amp;&amp; (ctoCmdCallbackAdv)}`' repeatCount='$PMBUS_STD_CMD_MAX' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigExternFunction signature='bool `${extCmd$idxCallback}`(mtb_pmbus_cmd_events_t event, int32_t page, int32_t phase, uint8_t byte)' public='true' include='`${!ctrlEna &amp;&amp; (extCmd$idxCallback ne "NULL") &amp;&amp; (extCmd$idxCallback ne "null") &amp;&amp; (extCmd$idxCallback ne "0") &amp;&amp; (!ctoCmdCallbackAdv)}`' repeatCount='$PMBUS_EXT_CMD_MAX' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigExternFunction signature='bool `${extCmd$idxCallback}`(mtb_pmbus_cmd_events_t event, int32_t page, int32_t phase, uint8_t byte, uint8_t idx)' public='true' include='`${!ctrlEna &amp;&amp; (extCmd$idxCallback ne "NULL") &amp;&amp; (extCmd$idxCallback ne "null") &amp;&amp; (extCmd$idxCallback ne "0") &amp;&amp; (ctoCmdCallbackAdv)}`' repeatCount='$PMBUS_EXT_CMD_MAX' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+
+    <ConfigExternFunction signature='void `${instName . ctrlHwResEventCallName}`(mtb_pmbus_ctrl_events_t)' public='true' include='`${ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigExternFunction signature='void `${instName . ctrlHnpCallName}`(mtb_pmbus_ctrl_host_notify_events_t)' public='true' include='`${ctrlHnpEna &amp;&amp; ctrlEna}`' guard='defined(MTB_PMBUS_CTRL_SUPPORT_HOST_NOTIFY) &amp;&amp; (MTB_PMBUS_CTRL_SUPPORT_HOST_NOTIFY != 0U) &amp;&amp; defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigExternFunction signature='void `${instName . ctrlHwResCtrlCallName}`(mtb_pmbus_ctrl_hw_resources_ctrl_action_t)' public='true' include='`${ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigExternFunction signature='void `${instName . ctrlHwIrqEnaCallName}`(void)' public='true' include='`${ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigExternFunction signature='void `${instName . ctrlHwIrqDisCallName}`(void)' public='true' include='`${ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+
+    <!-- Compile time options header -->
+    <ConfigFile name='mtb_pmbus_conf.h' include='`${isFirstInstance}`'>
+      <Line value='/***************************************************************************//**'/>
+      <Line value='* \\file mtb_pmbus_conf.h'/>
+      <Line value='* \\brief Auto-generated compile time options configuration file.'/>
+      <Line value='*******************************************************************************/'/>
+      <Line value=''/>
+      <Line value='/* The option to configure the PMBus without using a personality. */'/>
+      <Line value='#ifndef MTB_PMBUS_MANUAL_CONFIG'/>
+      <Line value=''/>
+      <Line value='#ifndef MTB_PMBUS_CONF_H'/>
+      <Line value='#define MTB_PMBUS_CONF_H'/>
+      <Line value=''/>
+      <Line value='#if defined(COMPONENT_MW_MTB_PMBUS)'/>
+      <Line value='#include "mtb_pmbus_log_level.h"'/>
+      <Line value=''/>
+      <Line value='/* The compile time options generated from the PMBus Configurator */'/>
+      <Line value='#define MTB_PMBUS_LOG_LEVEL                (`${ctoLogLevel}`)'/>
+      <Line value='#define MTB_PMBUS_CUSTOM_LOG               (`${ctoCustomLog ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_SUPPORT_PMBUS            (`${ctoSupportPmbus ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_SUPPORT_ZONE             (`${ctoSupportZone ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_SUPPORT_SMBALERT         (`${ctoSupportSmbalert ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_SUPPORT_GEN_CALL_ADDR    (`${ctoSupportGenCallAddr ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_SUPPORT_EXT_CMD          (`${ctoSupportExtCmd ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_SUPPORT_PEC              (`${ctoSupportPec ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_PAGES_NUM                (`${ctoPagesNum}`U)'/>
+      <Line value='#define MTB_PMBUS_PHASES_NUM               (`${ctoPhasesNum}`U)'/>
+      <Line value='#define MTB_PMBUS_ENABLE_CONFIG_CHECK      (`${ctoEnableConfigCheck ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_CONFIG_FULL_CHECK        (`${ctoConfigFullCheck ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_ENABLE_TIMEOUT           (`${ctoEnableTimeout ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_HAL_USE_TGS              (`${(ctoEnableTimeout &amp;&amp; ctoEnableTimeoutTGS) ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_TGS_TIMER_NUM            (0U)' include='`${ctoEnableTimeout &amp;&amp; ctoEnableTimeoutTGS}`'/>
+      <Line value='#define MTB_PMBUS_HAL_USE_TCPWM            (`${(ctoEnableTimeout  &amp;&amp; ctoEnableTimeoutTCPWM) ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_ZONE_MAX_NUM             (`${ctoZoneMaxNum}`U)'/>
+      <Line value='#define MTB_PMBUS_ZONE_SEL_ADV             (`${ctoZoneSelAdv ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_ENABLE_CMD_CALLBACK_ADV  (`${ctoCmdCallbackAdv ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_IMPL_CMD_REVISION        (`${ctoImplCmdRevision ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_IMPL_CMD_CAPABILITY      (`${ctoImplCmdCapability ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_IMPL_CMD_QUERY           (`${ctoImplCmdQuery ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_IMPL_CMD_PAGE            (`${ctoImplCmdPage ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_IMPL_CMD_PAGE_SEL_ADV    (`${ctoImplCmdPageSelAdv ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_IMPL_CMD_PHASE           (`${ctoImplCmdPhase ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_IMPL_CMD_PHASE_SEL_ADV   (`${ctoImplCmdPhaseSelAdv ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_IMPL_CMD_ZONE_CONFIG     (`${ctoImplCmdZoneConfig ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_IMPL_CMD_ZONE_ACTIVE     (`${ctoImplCmdZoneActive ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_IMPL_CMD_PAGE_PLUS_WRITE (`${ctoImplCmdPagePlusWrite ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_IMPL_CMD_PAGE_PLUS_READ  (`${ctoImplCmdPagePlusRead ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_IMPL_CMD_P2_PLUS_WRITE   (`${ctoImplCmdP2PlusWrite ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_IMPL_CMD_P2_PLUS_READ    (`${ctoImplCmdP2PlusRead ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_SUPPORT_HOST_NOTIFY      (`${ctoTrgtHNP ? 1 : 0}`U)'/>
+      <Line value='#define MTB_PMBUS_CTRL_SUPPORT_HOST_NOTIFY (`${ctoCtrlHNP ? 1 : 0}`U)'/>
+      <Line value=''/>
+      <Line value='#endif /* defined(COMPONENT_MW_MTB_PMBUS) */'/>
+      <Line value=''/>
+      <Line value='#endif /* MTB_PMBUS_CONF_H */'/>
+      <Line value=''/>
+      <Line value='#endif /* MTB_PMBUS_MANUAL_CONFIG */'/>
+    </ConfigFile>
+
+  </ConfigFirmware>
+
+  <!-- I2C -->
+  <PersonalityTemplate id='i2c_hw' valid='true' >
+    <FittingRules>
+      <MappingRules>
+        <IpBlock name='mxscb' >
+           <Version major="4"/>
+           <Param name='GENERATED.IP_MINOR_VERSION' value='2' />
+        </IpBlock>
+        <Resource name='scb' />
+      </MappingRules>
+    </FittingRules>
+    <ExposedMembers />
+    <Parameters>
+      <ParamRange id='pScbInst' name='pScbInst' group='Internal' default='`${getInstNumber("scb")}`' min='0' max='65535' resolution='1' visible='false' editable='false' desc='SCB instance number.' />
+      <ParamString id='pScbDst' name='SCBCLK Destination' group='Internal' default='PCLK_SCB`${pScbInst}`_CLOCK_SCB_EN' visible='false' editable='false' desc='Generates SCBCLK connection define.' />
+      <ParamString id='pTgsDst' name='TGSCLK Destination' group='Internal' default='PCLK_SCB`${pScbInst}`_CLOCK_TGS_EN' visible='false' editable='false' desc='Generates TGSCLK connection define.' />
+    </Parameters>
+    <DRCs>
+    </DRCs>
+    <ConfigFirmware>
+      <ConfigInclude value='cy_scb_i2c.h' include='true' />
+      <ConfigInclude value='cy_sysclk.h' include='true' />
+
+      <ConfigDefine name='`${instName}`_HW' value='SCB`${pScbInst}`' public='true' include='true' />
+      <ConfigDefine name='`${instName}`_IRQ' value='scb_`${pScbInst}`_interrupt_IRQn' public='true' include='true' />
+
+      <ConfigStruct name='`${instName}`_config' type='cy_stc_scb_i2c_config_t' const='`${pmbus_tcpwm.inFlash}`' public='true' include='true' >
+        <Member name='i2cMode' value='`${ModeUser eq "Master" ? "CY_SCB_I2C_MASTER" : (ModeUser eq "Slave" ? "CY_SCB_I2C_SLAVE" : "CY_SCB_I2C_MASTER_SLAVE")}`' />
+        <Member name='useRxFifo' value='false' />
+        <Member name='useTxFifo' value='`${pmbus_tcpwm.ctrlEna ? true : false}`' />
+        <Member name='slaveAddress' value='`${!pmbus_tcpwm.ctrlEna ? pmbus_tcpwm.targetAddr : (pmbus_tcpwm.ctrlEna &amp;&amp; pmbus_tcpwm.ctrlHnpEna ? "8U" : "0U")}`' />
+        <Member name='slaveAddressMask' value='`${pmbus_tcpwm.ctrlEna &amp;&amp; pmbus_tcpwm.ctrlHnpEna ? "254U" : "0U"}`' />
+        <Member name='multipleSlaveAddress' value='{0UL, 0UL, 0UL, 0UL, 0UL}' guard='((CY_IP_MXSCB_VERSION>=4) &amp;&amp; (CY_IP_MXSCB_VERSION_MINOR>=4))' />
+        <Member name='multipleSlaveAddressMask' value='{0UL, 0UL, 0UL, 0UL, 0UL}' guard='((CY_IP_MXSCB_VERSION>=4) &amp;&amp; (CY_IP_MXSCB_VERSION_MINOR>=4))' />
+        <Member name='acceptAddrInFifo' value='`${pmbus_tcpwm.ctrlEna ? false :  true}`' />
+        <Member name='ackGeneralAddr' value='`${(!pmbus_tcpwm.ctrlEna &amp;&amp; pmbus_tcpwm.genCallAddrRespEna) ? true : false}`' />
+        <Member name='enableWakeFromSleep' value='false' />
+        <Member name='enableDigitalFilter' value='false' />
+        <Member name='lowPhaseDutyCycle' value='0' />
+        <Member name='highPhaseDutyCycle' value='0' />
+      </ConfigStruct>
+
+      <ConfigStruct name='`${instName}`_tgs_config' type='cy_stc_scb_tgs_config_t' const='`${pmbus_tcpwm.inFlash}`' public='true' include='`${!pmbus_tcpwm.toTmrResIsTCPWM}`' >
+        <Member name='count' value='0' />
+        <Member name='reload' value='`${pmbus_tcpwm.toConfigIsManual ? pmbus_tcpwm.toTmrManPeriod : pmbus_tcpwm.toTmrPeriod - 1}`' />
+        <Member name='reloadTx' value='false' />
+        <Member name='reloadRx' value='false' />
+        <Member name='reloadClkFall' value='true' />
+        <Member name='reloadClkRise' value='false' />
+        <Member name='reloadUartStart' value='false' />
+        <Member name='reloadSpiSel' value='false' />
+        <Member name='reloadI2cStart' value='false' />
+        <Member name='reloadI2cAckRise' value='false' />
+        <Member name='reloadI2cAckFall' value='false' />
+        <Member name='reloadWakeup' value='false' />
+        <Member name='gateClkHigh' value='true' />
+        <Member name='gateClkLow' value='false' />
+        <Member name='gateFrame' value='false' />
+        <Member name='gateFrameN' value='false' />
+        <Member name='stopClkFall' value='false' />
+        <Member name='stopClkRise' value='true' />
+        <Member name='stopUartStop' value='false' />
+        <Member name='stopSpiSel' value='false' />
+        <Member name='stopI2cStop' value='false' />
+        <Member name='uartDirection' value='false' />
+        <Member name='enableReset' value='false' />
+      </ConfigStruct>
+
+      <ConfigInstruction purpose='INITIALIZE' value='Cy_SysClk_PeriPclkAssignDivider(`${pScbDst}`, `${getExposedMember(pmbus_tcpwm.scbClkRes, "clockSel")}`);' include='true' />
+      <ConfigInstruction purpose='INITIALIZE' value='Cy_SysClk_PeriPclkAssignDivider(`${pTgsDst}`, `${getExposedMember(pmbus_tcpwm.tgsClkRes, "clockSel")}`);' include='`${!pmbus_tcpwm.toTmrResIsTCPWM}`' />
+
+    </ConfigFirmware>
+  </PersonalityTemplate>
+
+  <PersonalityTemplate id='tcpwmTimer' valid='`${pmbus_tcpwm.toTmrRes eq "TCPWM"}`' >
+    <FittingRules>
+      <MappingRules>
+        <IpBlock name='mxs40tcpwm' />
+        <Resource name='tcpwm\[0\]\.group\[[0-9]\]\.cnt\[[0-9]+\]' />
+      </MappingRules>
+    </FittingRules>
+    <Parameters>
+      <ParamBool id='debug' name='debug' group='Internal' default='false' visible='false' editable='false' desc='' />
+      <ParamRange id='pCntGroup' name='pCntGroup' desc='pCntGroup' group='Internal'  default='`${getInstNumber("group")}`' min='0' max='3' resolution='1' visible='false' editable='false' />
+      <ParamRange id='pCntInst' name='pCntInst' group='Internal' default='`${getInstNumber("cnt") + pCntGroup * 256}`' min='0' max='1023' resolution='1' visible='false' editable='false' desc='' />
+      <ParamRange id='pTcpwmInst' name='pTcpwmInst' group='Internal' default='`${getInstNumber("tcpwm")}`' min='0' max='65535' resolution='1' visible='false' editable='false' desc='' />
+      <ParamRange id='pMaxGroupCount' name='pMaxGroupCount' desc='pMaxGroupCount' group='Internal'  default='4' min='0' max='4' resolution='1' visible='false' editable='false' />
+
+      <ParamString id='clkDst' name='clkDst' group='codegen' default='`${"PCLK_TCPWM" . pTcpwmInst . "_CLOCK_COUNTER_EN" . pCntInst}`' visible='false' editable='false' desc='' />
+      <ParamString id='definePrefix' name='Define prefix' group='Internal' default='`${"TCPWM" . pTcpwmInst . "_GRP" . pCntGroup . "_CNT" . getInstNumber("cnt")}`' visible='`${debug}`' editable='false' desc='' />
+    </Parameters>
+    <ConfigFirmware>
+      <ConfigInclude value='cy_tcpwm_counter.h' include='true' />
+      <ConfigInclude value='cycfg_routing.h' include='true' />
+      <ConfigDefine name='`${instName}`_ENABLED' value='`${INST_NAME}`_ENABLED' public='true' include='`${instName ne INST_NAME}`' />
+      <ConfigDefine name='`${instName}`_HW' value='TCPWM`${pTcpwmInst}`' public='true' include='true' />
+      <ConfigDefine name='`${instName}`_NUM' value='`${pCntInst}`UL' public='true' include='true' />
+      <ConfigDefine name='`${instName}`_IRQ' value='tcpwm_`${pTcpwmInst}`_interrupts_`${pCntInst}`_IRQn' public='true' include='true' />
+      <ConfigDefine name='`${instName}`_INPUT_DISABLED' value='0x7U' public='false' include='true' />
+      <ConfigStruct name='`${instName}`_config' type='cy_stc_tcpwm_counter_config_t' const='`${pmbus_tcpwm.inFlash}`' public='true' include='true' >
+        <Member name='period' value='`${pmbus_tcpwm.toConfigIsManual ? pmbus_tcpwm.toTmrManPeriod : pmbus_tcpwm.toTmrPeriod - 1}`' />
+        <Member name='clockPrescaler' value='`${ClockPrescaler}`' />
+        <Member name='runMode' value='CY_TCPWM_COUNTER_ONESHOT' />
+        <Member name='countDirection' value='CY_TCPWM_COUNTER_COUNT_UP' />
+        <Member name='compareOrCapture' value='CY_TCPWM_COUNTER_MODE_COMPARE' />
+        <Member name='compare0' value='`${pmbus_tcpwm.toConfigIsManual ? pmbus_tcpwm.toTmrManPeriod : pmbus_tcpwm.toTmrPeriod - 1}`' />
+        <Member name='compare1' value='`${pmbus_tcpwm.toConfigIsManual ? pmbus_tcpwm.toTmrManPeriod : pmbus_tcpwm.toTmrPeriod - 1}`' />
+        <Member name='enableCompareSwap' value='false' />
+        <Member name='interruptSources' value='CY_TCPWM_INT_ON_CC0' />
+        <Member name='captureInputMode' value='CY_TCPWM_INPUT_RISINGEDGE' />
+        <Member name='captureInput' value='CY_TCPWM_INPUT_0' />
+        <Member name='reloadInputMode' value='CY_TCPWM_INPUT_FALLINGEDGE' />
+        <Member name='reloadInput' value='`${definePrefix . "_RELOAD_VALUE"}`' />
+        <Member name='startInputMode' value='CY_TCPWM_INPUT_RISINGEDGE' />
+        <Member name='startInput' value='CY_TCPWM_INPUT_0' />
+        <Member name='stopInputMode' value='CY_TCPWM_INPUT_RISINGEDGE' />
+        <Member name='stopInput' value='`${definePrefix . "_STOP_VALUE"}`' />
+        <Member name='countInputMode' value='CY_TCPWM_INPUT_LEVEL' />
+        <Member name='countInput' value='CY_TCPWM_INPUT_1' />
+        <Member name='capture1InputMode' value='CY_TCPWM_INPUT_RISINGEDGE' />
+        <Member name='capture1Input' value='CY_TCPWM_INPUT_0' />
+        <Member name='compare2' value='0U' />
+        <Member name='compare3' value='0U' />
+        <Member name='enableCompare1Swap' value='false' />
+        <Member name='trigger0Event' value='CY_TCPWM_CNT_TRIGGER_ON_DISABLED' />
+        <Member name='trigger1Event' value='CY_TCPWM_CNT_TRIGGER_ON_DISABLED' />
+        <Member name='buffer_swap_enable' value='false' guard='defined (CY_IP_MXS40TCPWM)' />
+        <Member name='direction_mode' value='CY_TCPWM_COUNTER_DIRECTION_DISABLE' guard='defined (CY_IP_MXS40TCPWM)' />
+        <Member name='glitch_filter_enable' value='`${(gf_enable)}`' guard='defined (CY_IP_MXS40TCPWM)' />
+        <Member name='gf_depth' value='`${(gf_depth)}`' guard='defined (CY_IP_MXS40TCPWM)' />
+      </ConfigStruct>
+
+    <ConfigInstruction purpose='INITIALIZE' value='Cy_SysClk_PeriphAssignDivider(`${clkDst}`, `${getExposedMember(getBlockFromSignal("clock_counter_en[0]"), "clockSel")}`);' include='true' />
+
+    </ConfigFirmware>
+  </PersonalityTemplate>
+
+  <PersonalityTemplate id='defLine$idx' valid='`${pmbus_tcpwm.defLine$idxEn}`' repeatCount='$NUM_OF_DEFAULT_EXTRA_LINES'>
+    <FittingRules>
+      <MappingRules>
+        <IpBlock name='mxs40ioss,mxs40sioss' />
+        <Resource name='ioss\.port\.pin' />
+      </MappingRules>
+    </FittingRules>
+    <ExposedMembers>
+      <!-- <ExposedMember key='intr' paramId='intr' /> -->
+      <!-- <ExposedMember key='cb' paramId='cb' /> -->
+    </ExposedMembers>
+    <Parameters>
+      <ParamBool id='debug' name='debug' group='Internal' default='false' visible='false' editable='false' desc='' />
+      <!-- <ParamBool id='intr' name='intr' group='Internal' default='false' visible='`${debug}`' editable='false' desc='' /> -->
+      <ParamString id='cb' name='cb' group='Internal' default='port_`${getInstNumber("port")}`_pin_`${getInstNumber("pin")}`_cb' visible='`${debug}`' editable='false' desc='' />
+      <ParamRange id='pullUpResAvailable' name='Pull-up resistor' group='Internal' default='`${lookupExpression("GPIO.GPIO_PORT_NR[3].GPIO_PRT.RES_CFG", 0)}`' min='-1' max='1' resolution='1' visible='false' editable='false' desc='The pull-up resistor configuration' />
+      <ParamBool id='hasSIO' name='HasSIO' group='Misc' default='`${lookupExpression("GPIO.GPIO_PORT_NR[" . getInstNumber("port") . "].GPIO_PRT.SIO") &gt; 0}`' visible='false' editable='false' desc='Has SIO' />
+      <ParamBool id='hasPullUpRes' name='HasPullUpRes' group='Misc' default='`${pullUpResAvailable ? (lookupExpression("GPIO.GPIO_PORT_NR[" . getInstNumber("port") . "].GPIO_PRT.RES_CFG") &gt; 0) : 0}`' visible='false' editable='false' desc='Has pull-up resistor' />
+      <ParamBool id='hasIRQ' name='HasIRQ' group='Misc' default='`${lookupExpression("GPIO.GPIO_PORT_NR[" . getInstNumber("port") . "].GPIO_PRT.IRQ", 0) &gt; 0}`' visible='false' editable='false' desc='Has dedicated IRQ' />
+
+      <ParamChoice id='vtrip' name='Threshold' group='Input' default='CY_GPIO_VTRIP_CMOS' visible='`${debug}`' editable='`${debug}`' desc='This parameter selects the threshold levels that define a logic high (1) and a logic low (0).' >
+        <Entry name='CMOS' value='CY_GPIO_VTRIP_CMOS' visible='true' />
+        <Entry name='TTL'  value='CY_GPIO_VTRIP_TTL'  visible='true' />
+      </ParamChoice>
+      <ParamBool id='sioInputBuffer' name='SIO Input Buffer Differential' group='Input' default='false' visible='`${hasSIO}`' editable='`${hasSIO}`' desc='Selects the input buffer mode' />
+      <ParamChoice id='sioTrip' name='SIO Input Buffer Trip Mode' group='Input' default='CY_SIO_VTRIP_CMOS' visible='`${hasSIO}`' editable='`${hasSIO}`' desc='Selects the input buffer trip point in single-ended input buffer mode.' >
+        <Entry name='CMOS (single-ended)'                 value='CY_SIO_VTRIP_CMOS'             visible='true' />
+        <Entry name='TTL (single-ended)'                  value='CY_SIO_VTRIP_TTL'              visible='true' />
+        <Entry name='0.5xVddio or 0.5xVoh (differential)' value='CY_SIO_VTRIP_0_5VDDIO_0_5VOH'  visible='true' />
+        <Entry name='0.4xVddio or 0.4xVoh (differential)' value='CY_SIO_VTRIP_0_4VDDIO_1_0VREF' visible='true' />
+      </ParamChoice>
+      <ParamChoice id='sioRef' name='SIO Reference Voltage' group='Input' default='CY_SIO_VREF_PINREF' visible='`${hasSIO}`' editable='`${hasSIO}`' desc='Selects the reference voltage (Vref) trip point of the input buffer.' >
+        <Entry name='Analog Pin'              value='CY_SIO_VREF_PINREF' visible='true' />
+        <Entry name='Internal 1.2V Reference' value='CY_SIO_VREF_1_2V'   visible='true' />
+        <Entry name='AMUXBUS A'               value='CY_SIO_VREF_AMUX_A' visible='true' />
+        <Entry name='AMUXBUS B'               value='CY_SIO_VREF_AMUX_B' visible='true' />
+      </ParamChoice>
+      <ParamChoice id='sioVoltage'  name='Regulated Output Voltage Level (Voh)' group='Input' default='CY_SIO_VOH_1_00' visible='`${hasSIO}`' editable='`${hasSIO}`' desc='Selects the regulated Voh output level and trip point of the input buffer for a specific SIO pin pair. Voh depends on the selected reference voltage.' >
+        <Entry name='1 x Reference'    value='CY_SIO_VOH_1_00' visible='true' />
+        <Entry name='1.25 x Reference' value='CY_SIO_VOH_1_25' visible='true' />
+        <Entry name='1.49 x Reference' value='CY_SIO_VOH_1_49' visible='true' />
+        <Entry name='1.67 x Reference' value='CY_SIO_VOH_1_67' visible='true' />
+        <Entry name='2.08 x Reference' value='CY_SIO_VOH_2_08' visible='true' />
+        <Entry name='2.50 x Reference' value='CY_SIO_VOH_2_50' visible='true' />
+        <Entry name='2.78 x Reference' value='CY_SIO_VOH_2_78' visible='true' />
+        <Entry name='4.16 x Reference' value='CY_SIO_VOH_4_16' visible='true' />
+      </ParamChoice>
+      <ParamBool id='sioOutputBuffer'  name='SIO Output Buffer Regulated' group='Output' default='true' visible='`${hasSIO &amp;&amp; DigitalOutput}`' editable='`${hasSIO &amp;&amp; DigitalOutput}`' desc='Selects the output buffer mode' />
+      <ParamChoice id='pullUpRes' name='Pull-up resistor' group='Output' default='CY_GPIO_PULLUP_RES_DISABLE' visible='`${pullUpResAvailable &amp;&amp; (DriveModes eq CY_GPIO_DM_CFGOUT3_STRONG_PULLUP_HIGHZ)}`' editable='`${pullUpResAvailable &amp;&amp; (DriveModes eq CY_GPIO_DM_CFGOUT3_STRONG_PULLUP_HIGHZ)}`' desc='The Pull-up resistor parameter configures additional pull-up resistors.' >
+        <Entry name='Disable additional Pull-up resistors' value='CY_GPIO_PULLUP_RES_DISABLE' visible='true' />
+        <Entry name='570Ω pull-up resistance'              value='CY_GPIO_PULLUP_RES_570'     visible='`${hasPullUpRes}`' />
+        <Entry name='720Ω pull-up resistance'              value='CY_GPIO_PULLUP_RES_720'     visible='`${hasPullUpRes}`' />
+        <Entry name='840Ω pull-up resistance'              value='CY_GPIO_PULLUP_RES_840'     visible='`${hasPullUpRes}`' />
+        <Entry name='1100Ω pull-up resistance'             value='CY_GPIO_PULLUP_RES_1100'    visible='`${hasPullUpRes}`' />
+        <Entry name='1200Ω pull-up resistance'             value='CY_GPIO_PULLUP_RES_1200'    visible='`${hasPullUpRes}`' />
+        <Entry name='1800Ω pull-up resistance'             value='CY_GPIO_PULLUP_RES_1800'    visible='`${hasPullUpRes}`' />
+        <Entry name='2800Ω pull-up resistance'             value='CY_GPIO_PULLUP_RES_2800'    visible='`${hasPullUpRes}`' />
+      </ParamChoice>
+    </Parameters>
+    <ConfigFirmware>
+      <ConfigInclude value='cy_gpio.h' include='true' />
+      <!-- <ConfigInclude value='cy_sysint.h' include='`${isrEnable}`' /> -->
+      <ConfigInclude value='cycfg_routing.h' include='true' />
+
+      <ConfigDefine name='`${signalInstName}`_PORT' value='`${"GPIO_PRT". port}`' public='true' include='true' />
+      <ConfigDefine name='`${signalInstName}`_PORT_NUM' value='`${port}`U' public='true' include='true' />
+      <ConfigDefine name='`${signalInstName}`_PIN' value='`${pin}`U' public='true' include='true' />
+      <ConfigDefine name='`${signalInstName}`_NUM' value='`${pin}`U' public='true' include='true' />
+      <ConfigDefine name='`${signalInstName}`_DRIVEMODE' value='`${DriveModes}`' public='true' include='true' />
+      <ConfigDefine name='`${signalInstName}`_INIT_DRIVESTATE' value='`${initialState}`' public='true' include='true' />
+      <ConfigDefine name='`${signalInstName}`_IRQ' value='`${(nonSec eq 1) ? "ioss_interrupts_" : "ioss_interrupts_sec_"}`gpio_`${port}`_IRQn' public='true' include='`${hasIRQ}`' />
+
+      <ConfigStruct name='`${signalInstName}`_config' type='cy_stc_gpio_pin_config_t' const='`${pmbus_tcpwm.inFlash}`' public='true' include='true' >
+        <Member name='outVal' value='`${initialState}`' />
+        <Member name='driveMode' value='`${DriveModes}`' />
+        <Member name='hsiom' value='HSIOM_SEL_GPIO' />
+        <Member name='intEdge' value='`${isrTrigger}`' />
+        <Member name='intMask' value='`${isrEnable ? 1 : 0}`UL' />
+        <Member name='vtrip' value='`${vtrip}`' />
+        <Member name='slewRate' value='CY_GPIO_SLEW_FAST' />
+        <Member name='driveSel' value='CY_GPIO_DRIVE_FULL' />
+        <Member name='vregEn' value='`${(!hasSIO) ? "0UL" :
+                                      sioOutputBuffer ? "1UL" : "0UL"}`' />
+        <Member name='ibufMode' value='`${(!hasSIO) ? "0UL" :
+                                        sioInputBuffer ? "1UL" : "0UL"}`' />
+        <Member name='vtripSel' value='`${hasSIO ? sioTrip : "0UL"}`' />
+        <Member name='vrefSel' value='`${hasSIO ? sioRef : "0UL"}`' />
+        <Member name='vohSel' value='`${hasSIO ? sioVoltage : "0UL"}`' />
+        <Member name='pullUpRes' value='`${pullUpRes}`' include='`${pullUpResAvailable}`'/>
+        <Member name='nonSec' value='`${(secExtAvailable eq 1) ? nonSec : "1UL"}`' include='`${secExtAvailable ne -1}`'/>
+      </ConfigStruct>
+
+      <ConfigInstruction purpose='INITIALIZE' value='Cy_GPIO_Pin_Init(`${signalInstName}`_PORT, `${signalInstName}`_PIN, &amp;`${signalInstName}`_config);' include='true' />
+    </ConfigFirmware>
+  </PersonalityTemplate>
+
+  <PersonalityTemplate id='custLine$idx' valid='`${$idx &lt; pmbus_tcpwm.custLineCnt}`' repeatCount='$NUM_OF_CUSTOM_EXTRA_LINES'>
+    <FittingRules>
+      <MappingRules>
+        <IpBlock name='mxs40ioss,mxs40sioss' />
+        <Resource name='ioss\.port\.pin' />
+      </MappingRules>
+    </FittingRules>
+    <ExposedMembers>
+      <!-- <ExposedMember key='intr' paramId='intr' /> -->
+      <!-- <ExposedMember key='cb' paramId='cb' /> -->
+    </ExposedMembers>
+    <Parameters>
+      <ParamBool id='debug' name='debug' group='Internal' default='false' visible='false' editable='false' desc='' />
+      <!-- <ParamBool id='intr' name='intr' group='Internal' default='false' visible='`${debug}`' editable='false' desc='' /> -->
+      <ParamString id='cb' name='cb' group='Internal' default='port_`${getInstNumber("port")}`_pin_`${getInstNumber("pin")}`_cb' visible='`${debug}`' editable='false' desc='' />
+      <ParamRange id='pullUpResAvailable' name='Pull-up resistor' group='Internal' default='`${lookupExpression("GPIO.GPIO_PORT_NR[3].GPIO_PRT.RES_CFG", 0)}`' min='-1' max='1' resolution='1' visible='false' editable='false' desc='The pull-up resistor configuration' />
+      <ParamBool id='hasSIO' name='HasSIO' group='Misc' default='`${lookupExpression("GPIO.GPIO_PORT_NR[" . getInstNumber("port") . "].GPIO_PRT.SIO") &gt; 0}`' visible='false' editable='false' desc='Has SIO' />
+      <ParamBool id='hasPullUpRes' name='HasPullUpRes' group='Misc' default='`${pullUpResAvailable ? (lookupExpression("GPIO.GPIO_PORT_NR[" . getInstNumber("port") . "].GPIO_PRT.RES_CFG") &gt; 0) : 0}`' visible='false' editable='false' desc='Has pull-up resistor' />
+      <ParamBool id='hasIRQ' name='HasIRQ' group='Misc' default='`${lookupExpression("GPIO.GPIO_PORT_NR[" . getInstNumber("port") . "].GPIO_PRT.IRQ", 0) &gt; 0}`' visible='false' editable='false' desc='Has dedicated IRQ' />
+
+      <ParamChoice id='vtrip' name='Threshold' group='Input' default='CY_GPIO_VTRIP_CMOS' visible='`${debug}`' editable='`${debug}`' desc='This parameter selects the threshold levels that define a logic high (1) and a logic low (0).' >
+        <Entry name='CMOS' value='CY_GPIO_VTRIP_CMOS' visible='true' />
+        <Entry name='TTL'  value='CY_GPIO_VTRIP_TTL'  visible='true' />
+      </ParamChoice>
+      <ParamBool id='sioInputBuffer' name='SIO Input Buffer Differential' group='Input' default='false' visible='`${hasSIO}`' editable='`${hasSIO}`' desc='Selects the input buffer mode' />
+      <ParamChoice id='sioTrip' name='SIO Input Buffer Trip Mode' group='Input' default='CY_SIO_VTRIP_CMOS' visible='`${hasSIO}`' editable='`${hasSIO}`' desc='Selects the input buffer trip point in single-ended input buffer mode.' >
+        <Entry name='CMOS (single-ended)'                 value='CY_SIO_VTRIP_CMOS'             visible='true' />
+        <Entry name='TTL (single-ended)'                  value='CY_SIO_VTRIP_TTL'              visible='true' />
+        <Entry name='0.5xVddio or 0.5xVoh (differential)' value='CY_SIO_VTRIP_0_5VDDIO_0_5VOH'  visible='true' />
+        <Entry name='0.4xVddio or 0.4xVoh (differential)' value='CY_SIO_VTRIP_0_4VDDIO_1_0VREF' visible='true' />
+      </ParamChoice>
+      <ParamChoice id='sioRef' name='SIO Reference Voltage' group='Input' default='CY_SIO_VREF_PINREF' visible='`${hasSIO}`' editable='`${hasSIO}`' desc='Selects the reference voltage (Vref) trip point of the input buffer.' >
+        <Entry name='Analog Pin'              value='CY_SIO_VREF_PINREF' visible='true' />
+        <Entry name='Internal 1.2V Reference' value='CY_SIO_VREF_1_2V'   visible='true' />
+        <Entry name='AMUXBUS A'               value='CY_SIO_VREF_AMUX_A' visible='true' />
+        <Entry name='AMUXBUS B'               value='CY_SIO_VREF_AMUX_B' visible='true' />
+      </ParamChoice>
+      <ParamChoice id='sioVoltage'  name='Regulated Output Voltage Level (Voh)' group='Input' default='CY_SIO_VOH_1_00' visible='`${hasSIO}`' editable='`${hasSIO}`' desc='Selects the regulated Voh output level and trip point of the input buffer for a specific SIO pin pair. Voh depends on the selected reference voltage.' >
+        <Entry name='1 x Reference'    value='CY_SIO_VOH_1_00' visible='true' />
+        <Entry name='1.25 x Reference' value='CY_SIO_VOH_1_25' visible='true' />
+        <Entry name='1.49 x Reference' value='CY_SIO_VOH_1_49' visible='true' />
+        <Entry name='1.67 x Reference' value='CY_SIO_VOH_1_67' visible='true' />
+        <Entry name='2.08 x Reference' value='CY_SIO_VOH_2_08' visible='true' />
+        <Entry name='2.50 x Reference' value='CY_SIO_VOH_2_50' visible='true' />
+        <Entry name='2.78 x Reference' value='CY_SIO_VOH_2_78' visible='true' />
+        <Entry name='4.16 x Reference' value='CY_SIO_VOH_4_16' visible='true' />
+      </ParamChoice>
+      <ParamBool id='sioOutputBuffer'  name='SIO Output Buffer Regulated' group='Output' default='true' visible='`${hasSIO &amp;&amp; DigitalOutput}`' editable='`${hasSIO &amp;&amp; DigitalOutput}`' desc='Selects the output buffer mode' />
+      <ParamChoice id='pullUpRes' name='Pull-up resistor' group='Output' default='CY_GPIO_PULLUP_RES_DISABLE' visible='`${pullUpResAvailable &amp;&amp; (DriveModes eq CY_GPIO_DM_CFGOUT3_STRONG_PULLUP_HIGHZ)}`' editable='`${pullUpResAvailable &amp;&amp; (DriveModes eq CY_GPIO_DM_CFGOUT3_STRONG_PULLUP_HIGHZ)}`' desc='The Pull-up resistor parameter configures additional pull-up resistors.' >
+        <Entry name='Disable additional Pull-up resistors' value='CY_GPIO_PULLUP_RES_DISABLE' visible='true' />
+        <Entry name='570Ω pull-up resistance'              value='CY_GPIO_PULLUP_RES_570'     visible='`${hasPullUpRes}`' />
+        <Entry name='720Ω pull-up resistance'              value='CY_GPIO_PULLUP_RES_720'     visible='`${hasPullUpRes}`' />
+        <Entry name='840Ω pull-up resistance'              value='CY_GPIO_PULLUP_RES_840'     visible='`${hasPullUpRes}`' />
+        <Entry name='1100Ω pull-up resistance'             value='CY_GPIO_PULLUP_RES_1100'    visible='`${hasPullUpRes}`' />
+        <Entry name='1200Ω pull-up resistance'             value='CY_GPIO_PULLUP_RES_1200'    visible='`${hasPullUpRes}`' />
+        <Entry name='1800Ω pull-up resistance'             value='CY_GPIO_PULLUP_RES_1800'    visible='`${hasPullUpRes}`' />
+        <Entry name='2800Ω pull-up resistance'             value='CY_GPIO_PULLUP_RES_2800'    visible='`${hasPullUpRes}`' />
+      </ParamChoice>
+    </Parameters>
+    <ConfigFirmware>
+      <ConfigInclude value='cy_gpio.h' include='true' />
+      <!-- <ConfigInclude value='cy_sysint.h' include='`${isrEnable}`' /> -->
+      <ConfigInclude value='cycfg_routing.h' include='true' />
+
+      <ConfigDefine name='`${signalInstName}`_PORT' value='`${"GPIO_PRT". port}`' public='true' include='true' />
+      <ConfigDefine name='`${signalInstName}`_PORT_NUM' value='`${port}`U' public='true' include='true' />
+      <ConfigDefine name='`${signalInstName}`_PIN' value='`${pin}`U' public='true' include='true' />
+      <ConfigDefine name='`${signalInstName}`_NUM' value='`${pin}`U' public='true' include='true' />
+      <ConfigDefine name='`${signalInstName}`_DRIVEMODE' value='`${DriveModes}`' public='true' include='true' />
+      <ConfigDefine name='`${signalInstName}`_INIT_DRIVESTATE' value='`${initialState}`' public='true' include='true' />
+      <ConfigDefine name='`${signalInstName}`_IRQ' value='`${(nonSec eq 1) ? "ioss_interrupts_" : "ioss_interrupts_sec_"}`gpio_`${port}`_IRQn' public='true' include='`${hasIRQ}`' />
+
+      <ConfigStruct name='`${signalInstName}`_config' type='cy_stc_gpio_pin_config_t' const='`${pmbus_tcpwm.inFlash}`' public='true' include='true' >
+        <Member name='outVal' value='`${initialState}`' />
+        <Member name='driveMode' value='`${DriveModes}`' />
+        <Member name='hsiom' value='HSIOM_SEL_GPIO' />
+        <Member name='intEdge' value='`${isrTrigger}`' />
+        <Member name='intMask' value='`${isrEnable ? 1 : 0}`UL' />
+        <Member name='vtrip' value='`${vtrip}`' />
+        <Member name='slewRate' value='CY_GPIO_SLEW_FAST' />
+        <Member name='driveSel' value='CY_GPIO_DRIVE_FULL' />
+        <Member name='vregEn' value='`${(!hasSIO) ? "0UL" :
+                                        sioOutputBuffer ? "1UL" : "0UL"}`' />
+        <Member name='ibufMode' value='`${(!hasSIO) ? "0UL" :
+                                        sioInputBuffer ? "1UL" : "0UL"}`' />
+        <Member name='vtripSel' value='`${hasSIO ? sioTrip : "0UL"}`' />
+        <Member name='vrefSel' value='`${hasSIO ? sioRef : "0UL"}`' />
+        <Member name='vohSel' value='`${hasSIO ? sioVoltage : "0UL"}`' />
+        <Member name='pullUpRes' value='`${pullUpRes}`' include='`${pullUpResAvailable}`'/>
+        <Member name='nonSec' value='`${(secExtAvailable eq 1) ? nonSec : "1UL"}`' include='`${secExtAvailable ne -1}`'/>
+      </ConfigStruct>
+
+      <ConfigInstruction purpose='INITIALIZE' value='Cy_GPIO_Pin_Init(`${signalInstName}`_PORT, `${signalInstName}`_PIN, &amp;`${signalInstName}`_config);' include='true' />
+    </ConfigFirmware>
+  </PersonalityTemplate>
+
+</PersonalityTemplate>

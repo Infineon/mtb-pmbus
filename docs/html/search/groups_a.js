@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['zone_20functions_0',['Zone Functions',['../group__group__pmbus__zone__func.html',1,'']]]
+  ['page_20phase_20functions_0',['Page/Phase Functions',['../group__group__pmbus__page__phase__func.html',1,'']]],
+  ['phase_20functions_1',['Page/Phase Functions',['../group__group__pmbus__page__phase__func.html',1,'']]]
 ];

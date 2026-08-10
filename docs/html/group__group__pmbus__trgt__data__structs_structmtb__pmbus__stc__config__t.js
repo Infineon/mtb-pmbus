@@ -1,0 +1,27 @@
+var group__group__pmbus__trgt__data__structs_structmtb__pmbus__stc__config__t =
+[
+    [ "hw_config", "group__group__pmbus__trgt__data__structs.html#a3e613b86feb21a5cf5db6c425ff0ef99", null ],
+    [ "address", "group__group__pmbus__trgt__data__structs.html#a0c378a0c5119f97cbe83612a48b915dc", null ],
+    [ "enable_pec", "group__group__pmbus__trgt__data__structs.html#ac6ee99196564e5ab772952f5ef93ae81", null ],
+    [ "enable_smbalert", "group__group__pmbus__trgt__data__structs.html#af3a98f3f5cedfcba5f0a5b5d3ade0125", null ],
+    [ "enable_gen_call_addr", "group__group__pmbus__trgt__data__structs.html#a58a99484b7c9230210bf5ab586a27463", null ],
+    [ "enable_pmbus", "group__group__pmbus__trgt__data__structs.html#ab0696ae11f984bd21e49dbd7b376ad6e", null ],
+    [ "num_pages", "group__group__pmbus__trgt__data__structs.html#a97f37a4379f497fd61977691b8f3d4ed", null ],
+    [ "page_callback", "group__group__pmbus__trgt__data__structs.html#a0d8dc658e793dd707e0d71c4b525f9b2", null ],
+    [ "num_phases", "group__group__pmbus__trgt__data__structs.html#ae96785d99460cf26d8873a5fcd5fbd18", null ],
+    [ "phase_callback", "group__group__pmbus__trgt__data__structs.html#a1a0878dcfe8dc00c2c5bcca8f44c29af", null ],
+    [ "enable_zone", "group__group__pmbus__trgt__data__structs.html#ad16f0e442359da4a589714002103b592", null ],
+    [ "zone_callback", "group__group__pmbus__trgt__data__structs.html#a0483d076cd2a3f2565e0098455566da5", null ],
+    [ "impl_cmd_mask", "group__group__pmbus__trgt__data__structs.html#af822df70d0e5f72d13d79dd9212f09c3", null ],
+    [ "cmd_table", "group__group__pmbus__trgt__data__structs.html#af076975422d848e83603cbdd58bd79c9", null ],
+    [ "cmd_num", "group__group__pmbus__trgt__data__structs.html#a7a4023d35715dd8efee11f109ef2cf0a", null ],
+    [ "enable_ext_cmd", "group__group__pmbus__trgt__data__structs.html#a9dc894b3a4a209f9af599c5e541b58fa", null ],
+    [ "ext_cmd_table", "group__group__pmbus__trgt__data__structs.html#a797d08b27d01bf057eb25f2a9ffc1dd4", null ],
+    [ "ext_cmd_num", "group__group__pmbus__trgt__data__structs.html#a83f21af5a09c1fa52730741048d3c2d6", null ],
+    [ "hnp_callback", "group__group__pmbus__trgt__data__structs.html#aeec44c6721661713e87aaa27fbaf27e2", null ],
+    [ "gen_callback", "group__group__pmbus__trgt__data__structs.html#a9f24428d797902acba38fc8854665523", null ],
+    [ "errors_callback", "group__group__pmbus__trgt__data__structs.html#ab5fb348b8750cfa042270be0b443313c", null ],
+    [ "revision", "group__group__pmbus__trgt__data__structs.html#aa2cbb26b86367ce398c334723624c9fc", null ],
+    [ "speed", "group__group__pmbus__trgt__data__structs.html#aeb33473b67f29ff0253738da1c247b5b", null ],
+    [ "enable_ieee_format", "group__group__pmbus__trgt__data__structs.html#a00acac891a66d0232c6acc6750fa4891", null ]
+];

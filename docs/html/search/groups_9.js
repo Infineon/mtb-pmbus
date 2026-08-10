@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['smbalert_20functions_0',['SMBALERT Functions',['../group__group__pmbus__smbalert__func.html',1,'']]]
+  ['options_20macros_0',['Options Macros',['../group__group__pmbus__trgt__macro__conf.html',1,'Compile Time Options Macros'],['../group__group__pmbus__common__macro__conf.html',1,'Compile Time Options Macros']]]
 ];

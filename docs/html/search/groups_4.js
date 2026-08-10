@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['hardware_20specific_20apis_0',['Hardware Specific APIs',['../group__group__pmbus__hal__apis.html',1,'']]],
-  ['helper_20functions_1',['Helper Functions',['../group__group__pmbus__helper__func.html',1,'']]]
+  ['functions_0',['Functions',['../group__group__pmbus__cmd__func.html',1,'Command Handler Functions'],['../group__group__pmbus__trgt__functions.html',1,'Functions'],['../group__group__pmbus__ctrl__functions.html',1,'Functions'],['../group__group__pmbus__helper__func.html',1,'Helper Functions'],['../group__group__pmbus__ctrl__init__func.html',1,'Initialization Functions'],['../group__group__pmbus__init__func.html',1,'Initialization Functions'],['../group__group__pmbus__ctrl__isr__func.html',1,'Interrupt Functions'],['../group__group__pmbus__isr__func.html',1,'ISR Functions'],['../group__group__pmbus__miscellaneous__func.html',1,'Miscellaneous Functions'],['../group__group__pmbus__page__phase__func.html',1,'Page/Phase Functions'],['../group__group__pmbus__smbalert__func.html',1,'SMBALERT Functions'],['../group__group__pmbus__ctrl__status__func.html',1,'Status Functions'],['../group__group__pmbus__ctrl__transfer__func.html',1,'Transfer Functions'],['../group__group__pmbus__zone__func.html',1,'Zone Functions']]]
 ];

@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['logging_20level_0',['Logging level',['../group__group__pmbus__macro__log.html',1,'']]]
+  ['implemented_20commands_20macro_0',['Implemented Commands macro',['../group__group__pmbus__macro__impl__cmd.html',1,'']]],
+  ['initialization_20functions_1',['Initialization Functions',['../group__group__pmbus__ctrl__init__func.html',1,'Initialization Functions'],['../group__group__pmbus__init__func.html',1,'Initialization Functions']]],
+  ['interrupt_20functions_2',['Interrupt Functions',['../group__group__pmbus__ctrl__isr__func.html',1,'']]],
+  ['isr_20functions_3',['ISR Functions',['../group__group__pmbus__isr__func.html',1,'']]]
 ];

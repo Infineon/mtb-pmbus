@@ -16,9 +16,13 @@ var group__group__pmbus__cmd__func =
     [ "mtb_pmbus_cmd_is_active", "group__group__pmbus__cmd__func.html#gab7d3693d5bcedcc4afd98bafa914de70", null ],
     [ "mtb_pmbus_cmd_enable_disable_isr", "group__group__pmbus__cmd__func.html#ga4a195268a5e6d90619ee907aa5d36e6f", null ],
     [ "mtb_pmbus_cmd_enable_disable", "group__group__pmbus__cmd__func.html#gad90569264a7d7a2713fc4b27f4cf19d3", null ],
+    [ "mtb_pmbus_cmd_ext_enable_disable", "group__group__pmbus__cmd__func.html#ga86d7ed3d88c395dfb0d594e781387476", null ],
     [ "mtb_pmbus_cmd_all_enable_disable", "group__group__pmbus__cmd__func.html#ga38aa808f9818d988f62d10cc50ccbef3", null ],
     [ "mtb_pmbus_cmd_get_status", "group__group__pmbus__cmd__func.html#ga0a11c793c65c41fde5d85d05b7aed20c", null ],
     [ "mtb_pmbus_cmd_wr_protect_isr", "group__group__pmbus__cmd__func.html#ga23515719c552f37d16b701d8f0a9d83e", null ],
     [ "mtb_pmbus_cmd_wr_protect", "group__group__pmbus__cmd__func.html#ga3e39a34004452723e3ee086540001dbe", null ],
-    [ "mtb_pmbus_cmd_all_wr_protect", "group__group__pmbus__cmd__func.html#gae3184e520f9fe373ce42ec8ed6efe665", null ]
+    [ "mtb_pmbus_cmd_all_wr_protect", "group__group__pmbus__cmd__func.html#gae3184e520f9fe373ce42ec8ed6efe665", null ],
+    [ "mtb_pmbus_cmd_exit_isr", "group__group__pmbus__cmd__func.html#ga2cd9b75531839c0304bf6195ad580ac8", null ],
+    [ "mtb_pmbus_cmd_complete_transfer", "group__group__pmbus__cmd__func.html#gadb07f9153183ec06e9d2af84469ca950", null ],
+    [ "mtb_pmbus_cmd_process_call_wr_done", "group__group__pmbus__cmd__func.html#gaba5127a2200d5c62d1b34002af1f0f0d", null ]
 ];

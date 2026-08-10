@@ -1,5 +1,9 @@
 var searchData=
 [
-  ['num_5fpages_0',['num_pages',['../group__group__pmbus__data__structs.html#a97f37a4379f497fd61977691b8f3d4ed',1,'mtb_pmbus_stc_config_t']]],
-  ['num_5fphases_1',['num_phases',['../group__group__pmbus__data__structs.html#ae96785d99460cf26d8873a5fcd5fbd18',1,'mtb_pmbus_stc_config_t']]]
+  ['feature_20target_20mode_0',['Limitations and Exceptions of the Zone Feature (Target Mode)',['../index.html#limitations-and-exceptions-of-the-zone-feature-target-mode',1,'']]],
+  ['features_1',['Features',['../index.html#features',1,'']]],
+  ['for_20timeout_20handling_2',['Frequency Selection for Timeout Handling',['../index.html#frequency-selection-for-timeout-handling',1,'']]],
+  ['format_20conversion_20functions_3',['Data Format Conversion Functions',['../index.html#data-format-conversion-functions',1,'']]],
+  ['frequency_20selection_20for_20timeout_20handling_4',['Frequency Selection for Timeout Handling',['../index.html#frequency-selection-for-timeout-handling',1,'']]],
+  ['functions_5',['Functions',['../group__group__pmbus__cmd__func.html',1,'Command Handler Functions'],['../index.html#data-format-conversion-functions',1,'Data Format Conversion Functions'],['../group__group__pmbus__trgt__functions.html',1,'Functions'],['../group__group__pmbus__ctrl__functions.html',1,'Functions'],['../group__group__pmbus__helper__func.html',1,'Helper Functions'],['../group__group__pmbus__ctrl__init__func.html',1,'Initialization Functions'],['../group__group__pmbus__init__func.html',1,'Initialization Functions'],['../group__group__pmbus__ctrl__isr__func.html',1,'Interrupt Functions'],['../group__group__pmbus__isr__func.html',1,'ISR Functions'],['../group__group__pmbus__miscellaneous__func.html',1,'Miscellaneous Functions'],['../group__group__pmbus__page__phase__func.html',1,'Page/Phase Functions'],['../group__group__pmbus__smbalert__func.html',1,'SMBALERT Functions'],['../group__group__pmbus__ctrl__status__func.html',1,'Status Functions'],['../group__group__pmbus__ctrl__transfer__func.html',1,'Transfer Functions'],['../group__group__pmbus__zone__func.html',1,'Zone Functions']]]
 ];

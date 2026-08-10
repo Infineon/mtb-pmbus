@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['implemented_20commands_20macro_0',['Implemented Commands macro',['../group__group__pmbus__macro__impl__cmd.html',1,'']]],
-  ['initialization_20functions_1',['Initialization Functions',['../group__group__pmbus__init__func.html',1,'']]],
-  ['isr_20functions_2',['ISR Functions',['../group__group__pmbus__isr__func.html',1,'']]]
+  ['handler_20functions_0',['Command Handler Functions',['../group__group__pmbus__cmd__func.html',1,'']]],
+  ['hardware_20specific_20apis_1',['Hardware Specific APIs',['../group__group__pmbus__common__hal__apis.html',1,'Common Hardware Specific APIs'],['../group__group__pmbus__trgt__hal__apis.html',1,'Hardware Specific APIs'],['../group__group__pmbus__ctrl__hal__apis.html',1,'Hardware Specific APIs']]],
+  ['helper_20functions_2',['Helper Functions',['../group__group__pmbus__helper__func.html',1,'']]]
 ];
