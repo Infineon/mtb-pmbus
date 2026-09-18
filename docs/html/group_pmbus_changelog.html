@@ -34,7 +34,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign">
-   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.2.0.1772</span>
+   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.3.0.1943</span>
    </div>
   </td>
     <td>        <div id="MSearchBox" class="MSearchBoxInactive">
@@ -111,9 +111,11 @@ $(function(){initNavTree('group_pmbus_changelog.html',''); initResizable(true); 
 <tr>
 <th>Version</th><th>Changes</th><th>Reason for Change </th></tr>
 <tr>
+<td rowspan="1">1.3.0 </td><td>Add support for the WRITE_PROTECT, ACCESS_CONTROL and PASSKEY commands. </td><td>New functionality  </td></tr>
+<tr>
 <td rowspan="4">1.2.0 </td><td><ul>
 <li>
-<b>Extended Commands Support</b> (see <a class="el" href="index.html#extended-commands-support">Extended Commands Support</a>) <ul>
+<b>Extended Commands Support</b> (see <a class="el" href="guide_design_considerations_protocols_and_features.html#extended-commands-support">Extended Commands Support</a>) <ul>
 <li>
 <a class="el" href="group__group__pmbus__trgt__macro__conf.html#ga5a67f5d404a0bdb38b480da5bf968198">MTB_PMBUS_SUPPORT_EXT_CMD</a>  </li>
 <li>
@@ -123,13 +125,13 @@ $(function(){initNavTree('group_pmbus_changelog.html',''); initResizable(true); 
 </ul>
 </li>
 <li>
-<b>Support TGS timeout handling</b> (see <a class="el" href="index.html#timeout-handling">Timeout Handling</a>) <ul>
+<b>Support TGS timeout handling</b> (see <a class="el" href="guide_design_considerations_protocols_and_features.html#timeout-handling">Timeout Handling</a>) <ul>
 <li>
 <a class="el" href="group__group__pmbus__common__hal__apis.html#ga4869c32bb384c8fc1fe6ca364e2cb868">MTB_PMBUS_HAL_USE_TGS</a>  </li>
 </ul>
 </li>
 <li>
-<b>New pre-implemented commands</b> (see <a class="el" href="index.html#implemented-commands">Implemented Commands</a>) <ul>
+<b>New pre-implemented commands</b> (see <a class="el" href="guide_design_considerations_protocols_and_features.html#implemented-commands">Implemented Commands</a>) <ul>
 <li>
 <a class="el" href="group__group__pmbus__trgt__macro__conf.html#gab048a796cfe832d069855be91dc21123">MTB_PMBUS_IMPL_CMD_PAGE_PLUS_WRITE</a>  </li>
 <li>
@@ -149,7 +151,7 @@ $(function(){initNavTree('group_pmbus_changelog.html',''); initResizable(true); 
 </ul>
 </li>
 <li>
-<b>Host Notify Protocol support</b> (see <a class="el" href="index.html#host-notify-protocol">Host Notify Protocol</a>) <ul>
+<b>Host Notify Protocol support</b> (see <a class="el" href="guide_design_considerations_hardware_and_timeout.html#host-notify-protocol">Host Notify Protocol</a>) <ul>
 <li>
 <a class="el" href="group__group__pmbus__miscellaneous__func.html#ga10b6af9ff3835fc845d5ec8ffc8f6e2b">mtb_pmbus_send_host_notify</a>  </li>
 <li>

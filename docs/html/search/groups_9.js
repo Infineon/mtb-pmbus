@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['options_20macros_0',['Options Macros',['../group__group__pmbus__trgt__macro__conf.html',1,'Compile Time Options Macros'],['../group__group__pmbus__common__macro__conf.html',1,'Compile Time Options Macros']]]
+  ['level_20macros_0',['Logging level Macros',['../group__group__pmbus__macro__log.html',1,'']]],
+  ['logging_20level_20macros_1',['Logging level Macros',['../group__group__pmbus__macro__log.html',1,'']]]
 ];

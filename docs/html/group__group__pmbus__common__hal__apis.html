@@ -34,7 +34,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign">
-   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.2.0.1772</span>
+   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.3.0.1943</span>
    </div>
   </td>
     <td>        <div id="MSearchBox" class="MSearchBoxInactive">
@@ -138,7 +138,7 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Use TGS HW features of SCB block for timeout detection. </p>
-<p>This macro is enabled by default for a device that supports TGS. The macro can be redefined in the mtb_pmbus_conf.h file. </p>
+<p>This macro is enabled by default when the SCB supports a TGS counter. The PMBus Solution Personality generates this macro automatically. For manual configuration, to use a TCPWM counter instead, redefine this macro to (0U) and define <a class="el" href="#ga132fa9a2172e46895610acbe4b64d59c">MTB_PMBUS_HAL_USE_TCPWM</a> as (1U) in the mtb_pmbus_conf.h file. </p>
 
 </div>
 </div>
@@ -155,7 +155,7 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Use one of the TCPWM counters for the timeout detection. </p>
-<p>This macro is enabled by default for a device that does not support TGS. The macro can be redefined in mtb_pmbus_conf.h file. </p>
+<p>This macro is enabled by default when the SCB does not support a TGS counter. The PMBus Solution Personality generates this macro automatically. For manual configuration, when enabling this macro on an SCB that supports a TGS counter, redefine <a class="el" href="#ga4869c32bb384c8fc1fe6ca364e2cb868">MTB_PMBUS_HAL_USE_TGS</a> as (0U) in the mtb_pmbus_conf.h file. </p>
 
 </div>
 </div>

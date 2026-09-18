@@ -18,6 +18,7 @@ var group__group__pmbus__trgt__data__structs_structmtb__pmbus__stc__config__t =
     [ "enable_ext_cmd", "group__group__pmbus__trgt__data__structs.html#a9dc894b3a4a209f9af599c5e541b58fa", null ],
     [ "ext_cmd_table", "group__group__pmbus__trgt__data__structs.html#a797d08b27d01bf057eb25f2a9ffc1dd4", null ],
     [ "ext_cmd_num", "group__group__pmbus__trgt__data__structs.html#a83f21af5a09c1fa52730741048d3c2d6", null ],
+    [ "ext_acl_table", "group__group__pmbus__trgt__data__structs.html#a04b9fb5696538edac2509c73de3864ae", null ],
     [ "hnp_callback", "group__group__pmbus__trgt__data__structs.html#aeec44c6721661713e87aaa27fbaf27e2", null ],
     [ "gen_callback", "group__group__pmbus__trgt__data__structs.html#a9f24428d797902acba38fc8854665523", null ],
     [ "errors_callback", "group__group__pmbus__trgt__data__structs.html#ab5fb348b8750cfa042270be0b443313c", null ],

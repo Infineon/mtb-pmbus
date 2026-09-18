@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['verification_20environment_0',['Verification Environment',['../index.html#verification-environment',1,'']]],
-  ['verify_20controller_20mode_20workability_1',['Verify Controller Mode Workability',['../guide_controller_mode_quick_start.html#autotoc_md4-verify-controller-mode-workability',1,'4. Verify Controller Mode Workability'],['../guide_controller_mode_personality.html#autotoc_md5-verify-controller-mode-workability',1,'5. Verify Controller Mode Workability'],['../guide_verify_controller_mode.html',1,'Verify Controller Mode Workability']]],
-  ['verify_20target_20mode_20workability_2',['Verify Target Mode Workability',['../guide_target_mode_quick_start.html#autotoc_md4-verify-target-mode-workability',1,'4. Verify Target Mode Workability'],['../guide_target_mode_personality.html#autotoc_md5-verify-target-mode-workability',1,'5. Verify Target Mode Workability'],['../guide_verify_target_mode.html',1,'Verify Target Mode Workability']]]
+  ['use_0',['When to Use',['../index.html#when-to-use',1,'']]],
+  ['using_20solution_20personality_1',['Using Solution Personality',['../guide_controller_mode_personality.html',1,'Controller Mode Quick Start Guide (Using Solution Personality)'],['../guide_target_mode_personality.html',1,'Target Mode Quick Start Guide (Using Solution Personality)']]]
 ];

@@ -14,5 +14,6 @@ var group__group__pmbus__trgt__hal__apis =
     [ "MTB_PMBUS_HAL_STATUS_BAD_PARAM", "group__group__pmbus__trgt__hal__apis.html#gaff840877e5f8bfa42df3fc65eb2750d1", null ],
     [ "MTB_PMBUS_HAL_STATUS_TOO_MANY_BYTES", "group__group__pmbus__trgt__hal__apis.html#ga345b871b0e76dc4797748f31500ac1e6", null ],
     [ "MTB_PMBUS_HAL_STATUS_CMD_IS_ACTIVE", "group__group__pmbus__trgt__hal__apis.html#ga97f036930ff5a390a26273c1ad21bb40", null ],
-    [ "MTB_PMBUS_HAL_STATUS_IS_BUSY", "group__group__pmbus__trgt__hal__apis.html#ga5ae9e4e3af1dce738fd1d8ecaa0826af", null ]
+    [ "MTB_PMBUS_HAL_STATUS_IS_BUSY", "group__group__pmbus__trgt__hal__apis.html#ga5ae9e4e3af1dce738fd1d8ecaa0826af", null ],
+    [ "MTB_PMBUS_HAL_STATUS_L0_CMDS_MISSING", "group__group__pmbus__trgt__hal__apis.html#gaaa5cba4ad2cb2f78c409be6f1833a9b8", null ]
 ];

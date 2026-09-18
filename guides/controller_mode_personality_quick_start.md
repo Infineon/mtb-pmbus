@@ -20,6 +20,9 @@ Namely: how to set up the PMBus middleware in your project, configure the necess
 
 1. Open the Device Configurator and go to the Solutions tab (#1.0).
 2. Add a new PMBus instance to your project (#1.1).
+
+> **Note:** If this project previously used manual PMBus configuration, follow the [migration steps](../README.md#migration-steps-from-manual-configuration).
+
 3. Select a name for the newly created PMBus instance (e.g., PMBUS, #1.2).
 4. "I2C_HW" section (#1.3) - select:
    - the desired SCB block

@@ -188,6 +188,31 @@
     #define MTB_PMBUS_SUPPORT_PEC               (1U)
 #endif /* #ifndef (MTB_PMBUS_SUPPORT_PEC) */
 
+#if !defined (MTB_PMBUS_SUPPORT_SECURITY) || defined (MTB_PMBUS_DOXYGEN)
+/** Enable or disable PMBus Security feature support.
+ *
+ * When enabled, the Middleware enforces the Security Level defined by
+ * \ref MTB_PMBUS_SEC_LEVEL and exposes the related APIs.
+ *
+ * Default: 0U (Disabled)
+ */
+    #define MTB_PMBUS_SUPPORT_SECURITY          (0U)
+#endif /* #ifndef MTB_PMBUS_SUPPORT_SECURITY */
+
+#if !defined (MTB_PMBUS_SEC_LEVEL) || defined (MTB_PMBUS_DOXYGEN)
+/** Select the PMBus Security Level.
+ *
+ * Supported values:
+ * - 0 — Security Level 0 (supported, except for the FW update)
+ * - 1 — Security Level 1 (not currently supported)
+ * - 2 — Security Level 2 (not currently supported)
+ * - 3 — Security Level 3 (not currently supported)
+ *
+ * Default: 0U (Level 0)
+ */
+    #define MTB_PMBUS_SEC_LEVEL                 (0U)
+#endif /* #ifndef MTB_PMBUS_SEC_LEVEL */
+
 #if !defined (MTB_PMBUS_PAGES_NUM) || defined (MTB_PMBUS_DOXYGEN)
 /** Set the maximum number of pages. The valid range is 0x0-0x20.
  * If set to 0x0, the pages are disabled.
@@ -511,4 +536,14 @@
     (MTB_PMBUS_IMPL_CMD_P2_PLUS != 0U)))
     #error "MTB_PMBUS_PHASES_NUM must be greater than 0 to use implemented commands for Phases"
 #endif /* #if (MTB_PMBUS_PHASES_NUM == 0U) && ... */
+
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U)) && \
+    (defined(MTB_PMBUS_SUPPORT_PEC) && (MTB_PMBUS_SUPPORT_PEC == 0U))
+    #error "MTB_PMBUS_SUPPORT_SECURITY requires MTB_PMBUS_SUPPORT_PEC to be enabled"
+#endif
+
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY == 0U)) && \
+    (defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL != 0U))
+    #error "MTB_PMBUS_SEC_LEVEL must be 0 when MTB_PMBUS_SUPPORT_SECURITY is disabled"
+#endif
 #endif /* MTB_PMBUS_CONF_DEF_H */

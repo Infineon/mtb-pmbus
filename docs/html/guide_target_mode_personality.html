@@ -34,7 +34,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign">
-   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.2.0.1772</span>
+   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.3.0.1943</span>
    </div>
   </td>
     <td>        <div id="MSearchBox" class="MSearchBoxInactive">
@@ -123,6 +123,11 @@ $(function(){initNavTree('guide_target_mode_personality.html',''); initResizable
 <ol type="1">
 <li>Open the Device Configurator and go to the Solutions tab (#1.0).</li>
 <li>Add a new PMBus instance to your project (#1.1).</li>
+</ol>
+<blockquote class="doxtable">
+<p><b>Note:</b> If this project previously used manual PMBus configuration, follow the <a class="el" href="index.html#migration-steps-from-manual-configuration">migration steps</a>. </p>
+</blockquote>
+<ol type="1">
 <li>Select a name for the newly created PMBus instance (e.g., PMBUS, #1.2).</li>
 <li>"I2C_HW" section (#1.3) - select:<ul>
 <li>the desired SCB block</li>
@@ -216,7 +221,7 @@ $(function(){initNavTree('guide_target_mode_personality.html',''); initResizable
 <div class="fragment"><div class="line"><span class="keyword">static</span> cy_stc_scb_i2c_context_t  i2c_pdl_context;</div>
 </div><!-- fragment --><p>PMBus instance:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_struct" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> qsg_pmbus_inst;</div>
-<div class="ttc" id="agroup__group__pmbus__trgt__data__structs_html_structmtb__pmbus__stc__t"><div class="ttname"><a href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a></div><div class="ttdoc">Instance structure.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:858</div></div>
+<div class="ttc" id="agroup__group__pmbus__trgt__data__structs_html_structmtb__pmbus__stc__t"><div class="ttname"><a href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a></div><div class="ttdoc">Instance structure.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:993</div></div>
 </div><!-- fragment --><p>Example data:</p>
 <div class="fragment"><div class="line"><span class="keyword">volatile</span> uint32_t user_led_toggled_cnt = 0U;</div>
 <div class="line"><span class="keyword">volatile</span> uint16_t user_data = 0U;</div>
@@ -232,8 +237,8 @@ $(function(){initNavTree('guide_target_mode_personality.html',''); initResizable
 <div class="line">        printf(<span class="stringliteral">&quot;User LED toggled\n\r&quot;</span>); </div>
 <div class="line">    }</div>
 <div class="line">}</div>
-<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_ga58111478da7ce36de344157aba68a84a"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#ga58111478da7ce36de344157aba68a84a">mtb_pmbus_events_t</a></div><div class="ttdeci">mtb_pmbus_events_t</div><div class="ttdoc">General events for PMBus Middleware.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:322</div></div>
-<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_gga58111478da7ce36de344157aba68a84aab16ca94792a17019ae2679d9acc18fef"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#gga58111478da7ce36de344157aba68a84aab16ca94792a17019ae2679d9acc18fef">MTB_PMBUS_QUICK_CMD_WR_EVENT</a></div><div class="ttdeci">@ MTB_PMBUS_QUICK_CMD_WR_EVENT</div><div class="ttdoc">Quick command event with Write bit.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:327</div></div>
+<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_ga58111478da7ce36de344157aba68a84a"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#ga58111478da7ce36de344157aba68a84a">mtb_pmbus_events_t</a></div><div class="ttdeci">mtb_pmbus_events_t</div><div class="ttdoc">General events for PMBus Middleware.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:438</div></div>
+<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_gga58111478da7ce36de344157aba68a84aab16ca94792a17019ae2679d9acc18fef"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#gga58111478da7ce36de344157aba68a84aab16ca94792a17019ae2679d9acc18fef">MTB_PMBUS_QUICK_CMD_WR_EVENT</a></div><div class="ttdeci">@ MTB_PMBUS_QUICK_CMD_WR_EVENT</div><div class="ttdoc">Quick command event with Write bit.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:443</div></div>
 </div><!-- fragment --><p><b>Step 5.</b> Implement the error event callback function:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> PMBUS_error_callback(uint32_t events, uint8_t cmd_code, <span class="keywordtype">bool</span> cmd_is_ext)</div>
 <div class="line">{</div>
@@ -267,9 +272,9 @@ $(function(){initNavTree('guide_target_mode_personality.html',''); initResizable
 <div class="line">    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line">}</div>
 <div class="ttc" id="agroup__group__pmbus__cmd__func_html_ga2ee92e6204967467b456585b3473b645"><div class="ttname"><a href="group__group__pmbus__cmd__func.html#ga2ee92e6204967467b456585b3473b645">mtb_pmbus_cmd_update_data_isr</a></div><div class="ttdeci">void mtb_pmbus_cmd_update_data_isr(mtb_pmbus_stc_t *inst, uint32_t code, uint8_t *data, uint32_t data_size)</div><div class="ttdoc">Update the data buffer for the selected command with new data.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt_cmd.c:235</div></div>
-<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_ga426197c6d8c9f79a45b1acf2325238c8"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#ga426197c6d8c9f79a45b1acf2325238c8">mtb_pmbus_cmd_events_t</a></div><div class="ttdeci">mtb_pmbus_cmd_events_t</div><div class="ttdoc">Command specific events.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:352</div></div>
-<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_gga426197c6d8c9f79a45b1acf2325238c8a2221605e4042e7241a8912e5f3791947"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#gga426197c6d8c9f79a45b1acf2325238c8a2221605e4042e7241a8912e5f3791947">MTB_PMBUS_CMD_MATCH</a></div><div class="ttdeci">@ MTB_PMBUS_CMD_MATCH</div><div class="ttdoc">Command match event.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:359</div></div>
-<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_gga426197c6d8c9f79a45b1acf2325238c8a3e4f64ae46718c85a8584b73733b9143"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#gga426197c6d8c9f79a45b1acf2325238c8a3e4f64ae46718c85a8584b73733b9143">MTB_PMBUS_CMD_READ_REQ</a></div><div class="ttdeci">@ MTB_PMBUS_CMD_READ_REQ</div><div class="ttdoc">Read data is requested.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:377</div></div>
+<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_ga426197c6d8c9f79a45b1acf2325238c8"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#ga426197c6d8c9f79a45b1acf2325238c8">mtb_pmbus_cmd_events_t</a></div><div class="ttdeci">mtb_pmbus_cmd_events_t</div><div class="ttdoc">Command specific events.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:468</div></div>
+<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_gga426197c6d8c9f79a45b1acf2325238c8a2221605e4042e7241a8912e5f3791947"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#gga426197c6d8c9f79a45b1acf2325238c8a2221605e4042e7241a8912e5f3791947">MTB_PMBUS_CMD_MATCH</a></div><div class="ttdeci">@ MTB_PMBUS_CMD_MATCH</div><div class="ttdoc">Command match event.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:475</div></div>
+<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_gga426197c6d8c9f79a45b1acf2325238c8a3e4f64ae46718c85a8584b73733b9143"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#gga426197c6d8c9f79a45b1acf2325238c8a3e4f64ae46718c85a8584b73733b9143">MTB_PMBUS_CMD_READ_REQ</a></div><div class="ttdeci">@ MTB_PMBUS_CMD_READ_REQ</div><div class="ttdoc">Read data is requested.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:493</div></div>
 </div><!-- fragment --><div class="fragment"><div class="line"><span class="keywordtype">bool</span> cmd_mfr_specific_c5_callback(<a class="code hl_enumeration" href="group__group__pmbus__trgt__enums.html#ga426197c6d8c9f79a45b1acf2325238c8">mtb_pmbus_cmd_events_t</a> event, int32_t page, int32_t phase, uint8_t <span class="keywordtype">byte</span>)</div>
 <div class="line">{</div>
 <div class="line">    <span class="comment">/* Avoid compiler warnings */</span></div>
@@ -299,7 +304,7 @@ $(function(){initNavTree('guide_target_mode_personality.html',''); initResizable
 <div class="line">}</div>
 <div class="ttc" id="agroup__group__pmbus__cmd__func_html_ga5cfb6169e12446fc8cf3486e2a88520e"><div class="ttname"><a href="group__group__pmbus__cmd__func.html#ga5cfb6169e12446fc8cf3486e2a88520e">mtb_pmbus_cmd_read_data_ext_isr</a></div><div class="ttdeci">void mtb_pmbus_cmd_read_data_ext_isr(mtb_pmbus_stc_t *inst, uint32_t code, int32_t page, int32_t phase, uint8_t *data, uint32_t data_size)</div><div class="ttdoc">Read the data from the buffer for the selected command, page and phase.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt_cmd.c:248</div></div>
 <div class="ttc" id="agroup__group__pmbus__cmd__func_html_gada7b6bff00efe6c564644e14ad9f8b5f"><div class="ttname"><a href="group__group__pmbus__cmd__func.html#gada7b6bff00efe6c564644e14ad9f8b5f">mtb_pmbus_cmd_update_data_ext_isr</a></div><div class="ttdeci">void mtb_pmbus_cmd_update_data_ext_isr(mtb_pmbus_stc_t *inst, uint32_t code, int32_t page, int32_t phase, uint8_t *data, uint32_t data_size)</div><div class="ttdoc">Update the data buffer for the selected command, page and phase with the new data.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt_cmd.c:172</div></div>
-<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_gga426197c6d8c9f79a45b1acf2325238c8aeac77695ce7791720400a69447b86efa"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#gga426197c6d8c9f79a45b1acf2325238c8aeac77695ce7791720400a69447b86efa">MTB_PMBUS_CMD_WRITE_DONE</a></div><div class="ttdeci">@ MTB_PMBUS_CMD_WRITE_DONE</div><div class="ttdoc">Write is completed.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:372</div></div>
+<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_gga426197c6d8c9f79a45b1acf2325238c8aeac77695ce7791720400a69447b86efa"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#gga426197c6d8c9f79a45b1acf2325238c8aeac77695ce7791720400a69447b86efa">MTB_PMBUS_CMD_WRITE_DONE</a></div><div class="ttdeci">@ MTB_PMBUS_CMD_WRITE_DONE</div><div class="ttdoc">Write is completed.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:488</div></div>
 </div><!-- fragment --><p><b>Step 7.</b> Implement the I2C interrupt handler function:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> PMBUS_i2c_isr(<span class="keywordtype">void</span>)</div>
 <div class="line">{</div>
@@ -319,9 +324,9 @@ $(function(){initNavTree('guide_target_mode_personality.html',''); initResizable
 <div class="line">        Cy_SCB_I2C_Disable(PMBUS_I2C_HW, &amp;i2c_pdl_context);</div>
 <div class="line">    }</div>
 <div class="line">}</div>
-<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_ga1bb31edd0dd7bfd77d22956fcdaf3802"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#ga1bb31edd0dd7bfd77d22956fcdaf3802">mtb_pmbus_hw_resources_ctrl_action_t</a></div><div class="ttdeci">mtb_pmbus_hw_resources_ctrl_action_t</div><div class="ttdoc">I2C HW actions.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:527</div></div>
-<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_gga1bb31edd0dd7bfd77d22956fcdaf3802a2bd4765c4afa7ef8263729155820889d"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#gga1bb31edd0dd7bfd77d22956fcdaf3802a2bd4765c4afa7ef8263729155820889d">MTB_PMBUS_HW_RESOURCES_ENABLE</a></div><div class="ttdeci">@ MTB_PMBUS_HW_RESOURCES_ENABLE</div><div class="ttdoc">Enable the I2C HW.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:529</div></div>
-<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_gga1bb31edd0dd7bfd77d22956fcdaf3802a8c752fb6cef0df60b2bcd0463da83e84"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#gga1bb31edd0dd7bfd77d22956fcdaf3802a8c752fb6cef0df60b2bcd0463da83e84">MTB_PMBUS_HW_RESOURCES_DISABLE</a></div><div class="ttdeci">@ MTB_PMBUS_HW_RESOURCES_DISABLE</div><div class="ttdoc">Disable the I2C HW.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:531</div></div>
+<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_ga1bb31edd0dd7bfd77d22956fcdaf3802"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#ga1bb31edd0dd7bfd77d22956fcdaf3802">mtb_pmbus_hw_resources_ctrl_action_t</a></div><div class="ttdeci">mtb_pmbus_hw_resources_ctrl_action_t</div><div class="ttdoc">I2C HW actions.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:643</div></div>
+<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_gga1bb31edd0dd7bfd77d22956fcdaf3802a2bd4765c4afa7ef8263729155820889d"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#gga1bb31edd0dd7bfd77d22956fcdaf3802a2bd4765c4afa7ef8263729155820889d">MTB_PMBUS_HW_RESOURCES_ENABLE</a></div><div class="ttdeci">@ MTB_PMBUS_HW_RESOURCES_ENABLE</div><div class="ttdoc">Enable the I2C HW.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:645</div></div>
+<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_gga1bb31edd0dd7bfd77d22956fcdaf3802a8c752fb6cef0df60b2bcd0463da83e84"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#gga1bb31edd0dd7bfd77d22956fcdaf3802a8c752fb6cef0df60b2bcd0463da83e84">MTB_PMBUS_HW_RESOURCES_DISABLE</a></div><div class="ttdeci">@ MTB_PMBUS_HW_RESOURCES_DISABLE</div><div class="ttdoc">Disable the I2C HW.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:647</div></div>
 </div><!-- fragment --><p>Enabling and disabling I2C interrupts:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> PMBUS_hw_irq_enable(<span class="keywordtype">void</span>)</div>
 <div class="line">{</div>
@@ -338,7 +343,7 @@ $(function(){initNavTree('guide_target_mode_personality.html',''); initResizable
 <div class="line">    .hw_ptr = PMBUS_I2C_HW,</div>
 <div class="line">    .pdl_i2c_context = &amp;i2c_pdl_context,</div>
 <div class="line">};</div>
-<div class="ttc" id="agroup__group__pmbus__trgt__hal__apis_html_structmtb__pmbus__stc__config__hal__t"><div class="ttname"><a href="group__group__pmbus__trgt__hal__apis.html#structmtb__pmbus__stc__config__hal__t">mtb_pmbus_stc_config_hal_t</a></div><div class="ttdoc">HAL Configuration structure.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt_hal.h:78</div></div>
+<div class="ttc" id="agroup__group__pmbus__trgt__hal__apis_html_structmtb__pmbus__stc__config__hal__t"><div class="ttname"><a href="group__group__pmbus__trgt__hal__apis.html#structmtb__pmbus__stc__config__hal__t">mtb_pmbus_stc_config_hal_t</a></div><div class="ttdoc">HAL Configuration structure.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt_hal.h:84</div></div>
 </div><!-- fragment --><p><b>Step 10.</b> (From this step add code to the main() function) Create variables for the result statuses:</p>
 <div class="fragment"><div class="line">cy_rslt_t result;</div>
 <div class="line">cy_en_scb_uart_status_t init_status;</div>
@@ -426,11 +431,11 @@ $(function(){initNavTree('guide_target_mode_personality.html',''); initResizable
 <div class="line">        <span class="comment">/* Handle the error status */</span></div>
 <div class="line">    }</div>
 <div class="line">}</div>
-<div class="ttc" id="agroup__group__pmbus__init__func_html_ga40d197f96ee476a10483faa647dd620b"><div class="ttname"><a href="group__group__pmbus__init__func.html#ga40d197f96ee476a10483faa647dd620b">mtb_pmbus_enable</a></div><div class="ttdeci">mtb_pmbus_status_t mtb_pmbus_enable(mtb_pmbus_stc_t *inst)</div><div class="ttdoc">Enable PMBus Middleware.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.c:268</div></div>
+<div class="ttc" id="agroup__group__pmbus__init__func_html_ga40d197f96ee476a10483faa647dd620b"><div class="ttname"><a href="group__group__pmbus__init__func.html#ga40d197f96ee476a10483faa647dd620b">mtb_pmbus_enable</a></div><div class="ttdeci">mtb_pmbus_status_t mtb_pmbus_enable(mtb_pmbus_stc_t *inst)</div><div class="ttdoc">Enable PMBus Middleware.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.c:295</div></div>
 <div class="ttc" id="agroup__group__pmbus__init__func_html_ga58fc671fe346d9586014f301ece3c778"><div class="ttname"><a href="group__group__pmbus__init__func.html#ga58fc671fe346d9586014f301ece3c778">mtb_pmbus_init</a></div><div class="ttdeci">mtb_pmbus_status_t mtb_pmbus_init(mtb_pmbus_stc_t *inst, mtb_pmbus_stc_config_t const *config)</div><div class="ttdoc">Initialize the PMBus Middleware.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.c:58</div></div>
 <div class="ttc" id="agroup__group__pmbus__macro__log_html_gada1088ee6c7ef3a6ff26d7e750681240"><div class="ttname"><a href="group__group__pmbus__macro__log.html#gada1088ee6c7ef3a6ff26d7e750681240">MTB_PMBUS_LOG_DBG</a></div><div class="ttdeci">#define MTB_PMBUS_LOG_DBG(_fmt,...)</div><div class="ttdoc">Logs a debug message.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_log.h:120</div></div>
-<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_gacd0443505a96d8e7fb968dbaeb98d9e5"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#gacd0443505a96d8e7fb968dbaeb98d9e5">mtb_pmbus_status_t</a></div><div class="ttdeci">mtb_pmbus_status_t</div><div class="ttdoc">Used to return the statuses of most PMBus APIs.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:280</div></div>
-<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_ggacd0443505a96d8e7fb968dbaeb98d9e5acce0d6c18a098f3cec4020f1d36ec6c5"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5acce0d6c18a098f3cec4020f1d36ec6c5">MTB_PMBUS_STATUS_SUCCESS</a></div><div class="ttdeci">@ MTB_PMBUS_STATUS_SUCCESS</div><div class="ttdoc">Correct status.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:282</div></div>
+<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_gacd0443505a96d8e7fb968dbaeb98d9e5"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#gacd0443505a96d8e7fb968dbaeb98d9e5">mtb_pmbus_status_t</a></div><div class="ttdeci">mtb_pmbus_status_t</div><div class="ttdoc">Used to return the statuses of most PMBus APIs.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:368</div></div>
+<div class="ttc" id="agroup__group__pmbus__trgt__enums_html_ggacd0443505a96d8e7fb968dbaeb98d9e5acce0d6c18a098f3cec4020f1d36ec6c5"><div class="ttname"><a href="group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5acce0d6c18a098f3cec4020f1d36ec6c5">MTB_PMBUS_STATUS_SUCCESS</a></div><div class="ttdeci">@ MTB_PMBUS_STATUS_SUCCESS</div><div class="ttdoc">Correct status.</div><div class="ttdef"><b>Definition</b> mtb_pmbus_trgt.h:370</div></div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md5-verify-target-mode-workability"></a>
 5. Verify Target Mode Workability</h1>
 <p>See <a class="el" href="guide_verify_target_mode.html#md_guides_2verify__target__mode">Verify Target Mode Workability</a> for verification steps. </p>

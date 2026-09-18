@@ -68,6 +68,11 @@
  * <table class="doxtable">
  *   <tr><th>Version</th><th>Changes</th><th>Reason for Change</th></tr>
  *   <tr>
+ *     <td rowspan="1">1.3.0</td>
+ *     <td>Add support for the WRITE_PROTECT, ACCESS_CONTROL and PASSKEY commands.</td>
+ *     <td>New functionality</td>
+ *   </tr>
+ *   <tr>
  *     <td rowspan="4">1.2.0</td>
  *     <td>
  *       <ul>
@@ -183,10 +188,10 @@ extern "C" {
 #define MTB_PMBUS_MW_VERSION_MAJOR                (1U)
 
 /** PMBus middleware minor version */
-#define MTB_PMBUS_MW_VERSION_MINOR                (2U)
+#define MTB_PMBUS_MW_VERSION_MINOR                (3U)
 
 /** PMBus middleware version */
-#define MTB_PMBUS_MW_VERSION                      (12U)
+#define MTB_PMBUS_MW_VERSION                      (13U)
 
 
 /**

@@ -51,12 +51,15 @@
  * \{
  */
 
-#if defined (CY_DEVICE_PSC3_P8) || defined (CY_DEVICE_PSC3M6) || defined (MTB_PMBUS_DOXYGEN)
+#if (defined (CY_IP_MXSCB_VERSION) && (CY_IP_MXSCB_VERSION >= 4U) && \
+    (CY_IP_MXSCB_VERSION_MINOR >= 4U)) || defined (MTB_PMBUS_DOXYGEN)
 #if !defined (MTB_PMBUS_HAL_USE_TGS) || defined (MTB_PMBUS_DOXYGEN)
 /** Use TGS HW features of SCB block for timeout detection
  *
- * This macro is enabled by default for a device that supports TGS.
- * The macro can be redefined in the mtb_pmbus_conf.h file.
+ * This macro is enabled by default when the SCB supports a TGS counter.
+ * The PMBus Solution Personality generates this macro automatically. For manual
+ * configuration, to use a TCPWM counter instead, redefine this macro to (0U)
+ * and define \ref MTB_PMBUS_HAL_USE_TCPWM as (1U) in the mtb_pmbus_conf.h file.
  */
     #define MTB_PMBUS_HAL_USE_TGS               (1U)
 #endif /* #ifndef (MTB_PMBUS_HAL_USE_TGS) */
@@ -64,18 +67,23 @@
  * The number of TGS timer used for SMBus timeout handling by PMBus Middleware.
  */
     #define MTB_PMBUS_TGS_TIMER_NUM             (0U)
-#endif /* #if defined (CY_DEVICE_PSC3_P8) || defined (CY_DEVICE_PSC3M6) || defined (MTB_PMBUS_DOXYGEN) */
+#endif /* #if (defined (CY_IP_MXSCB_VERSION) && (CY_IP_MXSCB_VERSION >= 4U) &&
+              (CY_IP_MXSCB_VERSION_MINOR >= 4U)) || defined (MTB_PMBUS_DOXYGEN) */
 
-#if defined (CY_DEVICE_PSC3) || defined (MTB_PMBUS_DOXYGEN)
+#if !(defined (CY_IP_MXSCB_VERSION) && (CY_IP_MXSCB_VERSION >= 4U) && \
+    (CY_IP_MXSCB_VERSION_MINOR >= 4U)) || defined (MTB_PMBUS_DOXYGEN)
 #if !defined (MTB_PMBUS_HAL_USE_TCPWM) || defined (MTB_PMBUS_DOXYGEN)
 /** Use one of the TCPWM counters for the timeout detection
  *
- * This macro is enabled by default for a device that does not support TGS.
- * The macro can be redefined in mtb_pmbus_conf.h file.
+ * This macro is enabled by default when the SCB does not support a TGS counter.
+ * The PMBus Solution Personality generates this macro automatically. For manual
+ * configuration, when enabling this macro on an SCB that supports a TGS counter,
+ * redefine \ref MTB_PMBUS_HAL_USE_TGS as (0U) in the mtb_pmbus_conf.h file.
  */
     #define MTB_PMBUS_HAL_USE_TCPWM             (1U)
 #endif /* #ifndef (MTB_PMBUS_HAL_USE_TCPWM) */
-#endif /* #if defined (CY_DEVICE_PSC3_P8))*/
+#endif /* #if !(defined (CY_IP_MXSCB_VERSION) && (CY_IP_MXSCB_VERSION >= 4U) &&
+               (CY_IP_MXSCB_VERSION_MINOR >= 4U)) || defined (MTB_PMBUS_DOXYGEN) */
 
 /** \} group_pmbus_common_hal_apis */
 #endif /* MTB_PMBUS_HAL_H */

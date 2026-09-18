@@ -21,5 +21,9 @@ var group__group__pmbus__macro__error__evt =
     [ "MTB_PMBUS_ERR_REQ_WR_FOR_PC_ONLY", "group__group__pmbus__macro__error__evt.html#gafe88288691e0b74cb6812334c2608247", null ],
     [ "MTB_PMBUS_ERR_ZONE_VALUE_OUT_OF_RANGE", "group__group__pmbus__macro__error__evt.html#gad3bb55c9370ca271a0a8e9b6c329db1f", null ],
     [ "MTB_PMBUS_ERR_READ_REQ_FOR_FF", "group__group__pmbus__macro__error__evt.html#gaaa8d4a19daa2b961de117036e851cd22", null ],
-    [ "MTB_PMBUS_ERR_REQ_RD_FOR_WR_ONLY", "group__group__pmbus__macro__error__evt.html#ga00cbc6af7910fc94fefff4459ace1b13", null ]
+    [ "MTB_PMBUS_ERR_REQ_RD_FOR_WR_ONLY", "group__group__pmbus__macro__error__evt.html#ga00cbc6af7910fc94fefff4459ace1b13", null ],
+    [ "MTB_PMBUS_ERR_RD_FROM_PROT_CMD", "group__group__pmbus__macro__error__evt.html#ga8a90682ae4babfff919ae0947fdac695", null ],
+    [ "MTB_PMBUS_ERR_ACL_WR_REJECTED", "group__group__pmbus__macro__error__evt.html#ga3b226925adb4c332ff190ff1dec6135e", null ],
+    [ "MTB_PMBUS_ERR_PEC_REQUIRED", "group__group__pmbus__macro__error__evt.html#ga9308bb17ee7c75c0c6bdda26b3806e93", null ],
+    [ "MTB_PMBUS_ERR_PASSKEY_LOCKED_OUT", "group__group__pmbus__macro__error__evt.html#ga86843e3766958fb202328b5441e2ac1e", null ]
 ];

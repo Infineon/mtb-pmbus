@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['level_20macros_0',['Logging level Macros',['../group__group__pmbus__macro__log.html',1,'']]],
-  ['logging_20level_20macros_1',['Logging level Macros',['../group__group__pmbus__macro__log.html',1,'']]]
+  ['handler_20functions_0',['Command Handler Functions',['../group__group__pmbus__cmd__func.html',1,'']]],
+  ['hardware_20specific_20apis_1',['Hardware Specific APIs',['../group__group__pmbus__common__hal__apis.html',1,'Common Hardware Specific APIs'],['../group__group__pmbus__trgt__hal__apis.html',1,'Hardware Specific APIs'],['../group__group__pmbus__ctrl__hal__apis.html',1,'Hardware Specific APIs']]],
+  ['helper_20functions_2',['Helper Functions',['../group__group__pmbus__helper__func.html',1,'']]]
 ];

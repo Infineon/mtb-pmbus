@@ -34,7 +34,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign">
-   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.2.0.1772</span>
+   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.3.0.1943</span>
    </div>
   </td>
     <td>        <div id="MSearchBox" class="MSearchBoxInactive">
@@ -145,7 +145,7 @@ Functions</h2></td></tr>
 
 <p>Set the data byte for the Receive Byte protocol. </p>
 <p>The middleware will automatically send this byte when it is requested by the controller.</p>
-<dl class="section note"><dt>Note</dt><dd>If the Quick Command with Read direction and Received Byte protocols must be used in the same application, set the first bit of the data byte to 1. See <a class="el" href="index.html#communication-protocols">Communication Protocols</a> for more information.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>If the Quick Command with Read direction and Received Byte protocols must be used in the same application, set the first bit of the data byte to 1. See <a class="el" href="guide_design_considerations_protocols_and_features.html#communication-protocols">Communication Protocols</a> for more information.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">inst</td><td>The pointer to the PMBus instance structure </td></tr>
@@ -177,7 +177,7 @@ Functions</h2></td></tr>
 
 <p>Notifies an error to PMBus host as defined by Host Notify Protocol(HNP). </p>
 <p>It starts data transmission to the host as a controller device. During transmission, the PMBus instance becomes unavailable for operations as target. To check transmission results, use <a class="el" href="group__group__pmbus__trgt__data__structs.html#ga17949a3bc39294abe8945205be928e9e">mtb_pmbus_handle_host_notify_t</a> callback.</p>
-<dl class="section note"><dt>Note</dt><dd>It needs specific hardware settings. Refer to <a class="el" href="index.html#scb-i2c-configuration">SCB I2C Configuration</a></dd></dl>
+<dl class="section note"><dt>Note</dt><dd>It needs specific hardware settings. Refer to <a class="el" href="guide_design_considerations_hardware_and_timeout.html#scb-i2c-configuration">SCB I2C Configuration</a></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">inst</td><td>The pointer to the PMBus instance structure </td></tr>

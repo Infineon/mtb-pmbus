@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['macro_0',['macro',['../group__group__pmbus__macro__cmd__cap.html',1,'Command capabilities macro'],['../group__group__pmbus__macro__impl__cmd.html',1,'Implemented Commands macro']]],
-  ['macros_1',['Macros',['../group__group__pmbus__trgt__macro__conf.html',1,'Compile Time Options Macros'],['../group__group__pmbus__common__macro__conf.html',1,'Compile Time Options Macros'],['../group__group__pmbus__macro__log.html',1,'Logging level Macros'],['../group__group__pmbus__trgt__macro.html',1,'Macros']]],
-  ['miscellaneous_20functions_2',['Miscellaneous Functions',['../group__group__pmbus__miscellaneous__func.html',1,'']]]
+  ['implemented_20commands_20macro_0',['Implemented Commands macro',['../group__group__pmbus__macro__impl__cmd.html',1,'']]],
+  ['initialization_20functions_1',['Initialization Functions',['../group__group__pmbus__ctrl__init__func.html',1,'Initialization Functions'],['../group__group__pmbus__init__func.html',1,'Initialization Functions']]],
+  ['interrupt_20functions_2',['Interrupt Functions',['../group__group__pmbus__ctrl__isr__func.html',1,'']]],
+  ['isr_20functions_3',['ISR Functions',['../group__group__pmbus__isr__func.html',1,'']]]
 ];

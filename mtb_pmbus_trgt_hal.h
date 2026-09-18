@@ -72,6 +72,12 @@
 /** Wrapper over status requested action is aborted as the PMBus instance takes part in
    communication */
 #define MTB_PMBUS_HAL_STATUS_IS_BUSY            CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_MIDDLEWARE_PMBUS, 7U)
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U)) || defined(MTB_PMBUS_DOXYGEN)
+/** Wrapper over status one or more mandatory Security Level 0 commands are missing from the
+   command table */
+#define MTB_PMBUS_HAL_STATUS_L0_CMDS_MISSING    CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_MIDDLEWARE_PMBUS, 8U)
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
 
 /** HAL Configuration structure */
 typedef struct

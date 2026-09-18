@@ -10,6 +10,7 @@ var searchData=
   ['enable_5fzone_7',['enable_zone',['../group__group__pmbus__trgt__data__structs.html#ad16f0e442359da4a589714002103b592',1,'mtb_pmbus_stc_config_t']]],
   ['errors_5fcallback_8',['errors_callback',['../group__group__pmbus__trgt__data__structs.html#ab5fb348b8750cfa042270be0b443313c',1,'mtb_pmbus_stc_config_t']]],
   ['execute_5fstop_9',['execute_stop',['../group__group__pmbus__ctrl__data__structs.html#a400cae5736fcb81e6793bf1e359b1d73',1,'mtb_pmbus_ctrl_stc_transfer_cfg_t']]],
-  ['ext_5fcmd_5fnum_10',['ext_cmd_num',['../group__group__pmbus__trgt__data__structs.html#a83f21af5a09c1fa52730741048d3c2d6',1,'mtb_pmbus_stc_config_t']]],
-  ['ext_5fcmd_5ftable_11',['ext_cmd_table',['../group__group__pmbus__trgt__data__structs.html#a797d08b27d01bf057eb25f2a9ffc1dd4',1,'mtb_pmbus_stc_config_t']]]
+  ['ext_5facl_5ftable_10',['ext_acl_table',['../group__group__pmbus__trgt__data__structs.html#a04b9fb5696538edac2509c73de3864ae',1,'mtb_pmbus_stc_config_t']]],
+  ['ext_5fcmd_5fnum_11',['ext_cmd_num',['../group__group__pmbus__trgt__data__structs.html#a83f21af5a09c1fa52730741048d3c2d6',1,'mtb_pmbus_stc_config_t']]],
+  ['ext_5fcmd_5ftable_12',['ext_cmd_table',['../group__group__pmbus__trgt__data__structs.html#a797d08b27d01bf057eb25f2a9ffc1dd4',1,'mtb_pmbus_stc_config_t']]]
 ];

@@ -161,11 +161,16 @@
 #if defined(MTB_PMBUS_IMPL_CMD_REVISION) && (MTB_PMBUS_IMPL_CMD_REVISION != 0U)
 /* Value for 1.4 PMBus revision */
 #define MTB_PMBUS_REV_1_4_BITS                  (0x5U)
+/* Value for 1.5 PMBus revision */
+#define MTB_PMBUS_REV_1_5_BITS                  (0x6U)
 /* Shift between revision of PMBus Spec Part 1 and Part 2 */
 #define MTB_PMBUS_REV_SHIFT                     (4U)
 /* The 1.4 PMBus revision returned by REVISION command */
 #define MTB_PMBUS_REV_1_4                       \
     (MTB_PMBUS_REV_1_4_BITS | (MTB_PMBUS_REV_1_4_BITS << MTB_PMBUS_REV_SHIFT))
+/* The 1.5 PMBus revision returned by REVISION command */
+#define MTB_PMBUS_REV_1_5                       \
+    (MTB_PMBUS_REV_1_5_BITS | (MTB_PMBUS_REV_1_5_BITS << MTB_PMBUS_REV_SHIFT))
 #endif /* #if defined(MTB_PMBUS_IMPL_CMD_REVISION) && (MTB_PMBUS_IMPL_CMD_REVISION != 0U) */
 
 #if defined(MTB_PMBUS_IMPL_CMD_CAPABILITY) && (MTB_PMBUS_IMPL_CMD_CAPABILITY != 0U)
@@ -217,4 +222,17 @@ void mtb_pmbus_hal_hnp_abort(mtb_pmbus_stc_t *inst);
 #endif /* #if (defined (MTB_PMBUS_SUPPORT_HOST_NOTIFY) && (MTB_PMBUS_SUPPORT_HOST_NOTIFY != 0U)) */
 bool mtb_pmbus_hal_pause_tx(mtb_pmbus_stc_t *inst);
 bool mtb_pmbus_hal_resume_tx(mtb_pmbus_stc_t *inst);
+
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U))
+/** Returns true for the Protect Locks group: WRITE_PROTECT, ACCESS_CONTROL, and PASSKEY.
+ *  These commands must always remain writable regardless of WRITE_PROTECT level or
+ *  ACCESS_CONTROL settings so that a device can always unlock itself. */
+__STATIC_INLINE bool mtb_pmbus_int_is_wp_exempt(uint8_t cmd_code)
+{
+    return ((cmd_code == MTB_PMBUS_WRITE_PROTECT_CMD_CODE) ||
+            (cmd_code == MTB_PMBUS_ACCESS_CONTROL_CMD_CODE) ||
+            (cmd_code == MTB_PMBUS_PASSKEY_CMD_CODE));
+}
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
 #endif /* MTB_PMBUS_TRGT_INT_H */

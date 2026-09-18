@@ -34,7 +34,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign">
-   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.2.0.1772</span>
+   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.3.0.1943</span>
    </div>
   </td>
     <td>        <div id="MSearchBox" class="MSearchBoxInactive">
@@ -187,6 +187,39 @@ Functions</h2></td></tr>
 <tr class="memitem:gae3184e520f9fe373ce42ec8ed6efe665" id="r_gae3184e520f9fe373ce42ec8ed6efe665"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__group__pmbus__trgt__enums.html#gacd0443505a96d8e7fb968dbaeb98d9e5">mtb_pmbus_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gae3184e520f9fe373ce42ec8ed6efe665">mtb_pmbus_cmd_all_wr_protect</a> (<a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *inst, bool status)</td></tr>
 <tr class="memdesc:gae3184e520f9fe373ce42ec8ed6efe665"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enables or disables write protection for all PMBus commands.  <br /></td></tr>
 <tr class="separator:gae3184e520f9fe373ce42ec8ed6efe665"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga00295490ec3a6bb8f345d6af8b11be41" id="r_ga00295490ec3a6bb8f345d6af8b11be41"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga00295490ec3a6bb8f345d6af8b11be41">mtb_pmbus_get_acl</a> (const <a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *inst, uint32_t cmd_code)</td></tr>
+<tr class="memdesc:ga00295490ec3a6bb8f345d6af8b11be41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the Access Control Byte for the specified command code.  <br /></td></tr>
+<tr class="separator:ga00295490ec3a6bb8f345d6af8b11be41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga56b8f86b07404870d79015e4eabdef33" id="r_ga56b8f86b07404870d79015e4eabdef33"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga56b8f86b07404870d79015e4eabdef33">mtb_pmbus_set_acl_isr</a> (<a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *inst, uint32_t cmd_code, uint8_t acl_byte)</td></tr>
+<tr class="memdesc:ga56b8f86b07404870d79015e4eabdef33"><td class="mdescLeft">&#160;</td><td class="mdescRight">ISR-safe: stores the Access Control Byte for the specified command and synchronizes the write-access restriction with the IS_WR_PROTECTED flag.  <br /></td></tr>
+<tr class="separator:ga56b8f86b07404870d79015e4eabdef33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae94519d81fb6b824862b19fdc875dc37" id="r_gae94519d81fb6b824862b19fdc875dc37"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__group__pmbus__trgt__enums.html#gacd0443505a96d8e7fb968dbaeb98d9e5">mtb_pmbus_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gae94519d81fb6b824862b19fdc875dc37">mtb_pmbus_set_acl</a> (<a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *inst, uint32_t cmd_code, uint8_t acl_byte)</td></tr>
+<tr class="memdesc:gae94519d81fb6b824862b19fdc875dc37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Thread-safe variant of <a class="el" href="#ga56b8f86b07404870d79015e4eabdef33">mtb_pmbus_set_acl_isr</a>.  <br /></td></tr>
+<tr class="separator:gae94519d81fb6b824862b19fdc875dc37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga21b22a8fa87739dbea908cadbe606924" id="r_ga21b22a8fa87739dbea908cadbe606924"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__group__pmbus__trgt__enums.html#gaf8b939707aa3cb72ecfc2bc82bf9d968">mtb_pmbus_passkey_state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga21b22a8fa87739dbea908cadbe606924">mtb_pmbus_get_passkey_state_isr</a> (const <a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *inst)</td></tr>
+<tr class="memdesc:ga21b22a8fa87739dbea908cadbe606924"><td class="mdescLeft">&#160;</td><td class="mdescRight">ISR-safe: returns the current PASSKEY state.  <br /></td></tr>
+<tr class="separator:ga21b22a8fa87739dbea908cadbe606924"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3c62b8208be34846ba13c4ccba68ec11" id="r_ga3c62b8208be34846ba13c4ccba68ec11"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga3c62b8208be34846ba13c4ccba68ec11">mtb_pmbus_get_passkey_read_byte_isr</a> (const <a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *inst)</td></tr>
+<tr class="memdesc:ga3c62b8208be34846ba13c4ccba68ec11"><td class="mdescLeft">&#160;</td><td class="mdescRight">ISR-safe: returns the byte to send as the PASSKEY read response.  <br /></td></tr>
+<tr class="separator:ga3c62b8208be34846ba13c4ccba68ec11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab8a90a81185a7266b3f6b9147011b497" id="r_gab8a90a81185a7266b3f6b9147011b497"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gab8a90a81185a7266b3f6b9147011b497">mtb_pmbus_passkey_transition_isr</a> (<a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *inst, bool key_matched, bool is_zero_key)</td></tr>
+<tr class="memdesc:gab8a90a81185a7266b3f6b9147011b497"><td class="mdescLeft">&#160;</td><td class="mdescRight">ISR-safe: drives the PASSKEY state machine one step.  <br /></td></tr>
+<tr class="separator:gab8a90a81185a7266b3f6b9147011b497"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1bc94eb7965960388fe2f8eb491a857a" id="r_ga1bc94eb7965960388fe2f8eb491a857a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga1bc94eb7965960388fe2f8eb491a857a">mtb_pmbus_passkey_force_locked_isr</a> (<a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *inst, uint8_t fail_cnt)</td></tr>
+<tr class="memdesc:ga1bc94eb7965960388fe2f8eb491a857a"><td class="mdescLeft">&#160;</td><td class="mdescRight">ISR-safe: forces the PASSKEY state to Locked with an initial fail count.  <br /></td></tr>
+<tr class="separator:ga1bc94eb7965960388fe2f8eb491a857a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafa60ef311cf239091384e9b193a1dc43" id="r_gafa60ef311cf239091384e9b193a1dc43"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__group__pmbus__trgt__enums.html#gacd0443505a96d8e7fb968dbaeb98d9e5">mtb_pmbus_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gafa60ef311cf239091384e9b193a1dc43">mtb_pmbus_passkey_force_locked</a> (<a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *inst, uint8_t fail_cnt)</td></tr>
+<tr class="memdesc:gafa60ef311cf239091384e9b193a1dc43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Thread-safe variant of <a class="el" href="#ga1bc94eb7965960388fe2f8eb491a857a">mtb_pmbus_passkey_force_locked_isr</a>.  <br /></td></tr>
+<tr class="separator:gafa60ef311cf239091384e9b193a1dc43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2c5d51a9b0dd8d52c47bae85f0b2110d" id="r_ga2c5d51a9b0dd8d52c47bae85f0b2110d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga2c5d51a9b0dd8d52c47bae85f0b2110d">mtb_pmbus_set_acl_from_nvm</a> (<a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *inst, const uint8_t *nvm_acl, uint16_t count)</td></tr>
+<tr class="memdesc:ga2c5d51a9b0dd8d52c47bae85f0b2110d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bulk-initialises the ACL table from an NVM-stored array.  <br /></td></tr>
+<tr class="separator:ga2c5d51a9b0dd8d52c47bae85f0b2110d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga274f139a575d54c160d26226f8300fd8" id="r_ga274f139a575d54c160d26226f8300fd8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga274f139a575d54c160d26226f8300fd8">mtb_pmbus_apply_write_protect_isr</a> (<a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *inst, uint8_t value)</td></tr>
+<tr class="memdesc:ga274f139a575d54c160d26226f8300fd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">ISR-safe: applies a WRITE_PROTECT byte value to all registered commands.  <br /></td></tr>
+<tr class="separator:ga274f139a575d54c160d26226f8300fd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab5a4088b330bc688483e7b57bd1e51a8" id="r_gab5a4088b330bc688483e7b57bd1e51a8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__group__pmbus__trgt__enums.html#gacd0443505a96d8e7fb968dbaeb98d9e5">mtb_pmbus_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gab5a4088b330bc688483e7b57bd1e51a8">mtb_pmbus_apply_write_protect</a> (<a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *inst, uint8_t value)</td></tr>
+<tr class="memdesc:gab5a4088b330bc688483e7b57bd1e51a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Thread-safe variant of <a class="el" href="#ga274f139a575d54c160d26226f8300fd8">mtb_pmbus_apply_write_protect_isr</a>.  <br /></td></tr>
+<tr class="separator:gab5a4088b330bc688483e7b57bd1e51a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga2cd9b75531839c0304bf6195ad580ac8" id="r_ga2cd9b75531839c0304bf6195ad580ac8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__group__pmbus__trgt__enums.html#gacd0443505a96d8e7fb968dbaeb98d9e5">mtb_pmbus_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga2cd9b75531839c0304bf6195ad580ac8">mtb_pmbus_cmd_exit_isr</a> (<a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *inst)</td></tr>
 <tr class="memdesc:ga2cd9b75531839c0304bf6195ad580ac8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Requests to pause the Process Call protocol execution and exit from the ISR handler.  <br /></td></tr>
 <tr class="separator:ga2cd9b75531839c0304bf6195ad580ac8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1186,6 +1219,387 @@ Reading the command buffer is not an atomic operation and does not occur within 
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="group__group__pmbus__trgt__enums.html#gacd0443505a96d8e7fb968dbaeb98d9e5">mtb_pmbus_status_t</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga00295490ec3a6bb8f345d6af8b11be41" name="ga00295490ec3a6bb8f345d6af8b11be41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga00295490ec3a6bb8f345d6af8b11be41">&#9670;&#160;</a></span>mtb_pmbus_get_acl()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t mtb_pmbus_get_acl </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *</td>          <td class="paramname"><span class="paramname"><em>inst</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>cmd_code</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the Access Control Byte for the specified command code. </p>
+<p>Accepts a standard 8-bit code (0x00-0xFF) or an encoded extended code of the form produced by <a class="el" href="group__group__pmbus__trgt__macro.html#gac459838e5d256d7c585eec910ca26fa4">MTB_PMBUS_CONV_CMD_EXT_CMD_FORMAT</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">inst</td><td>The pointer to the PMBus instance structure. </td></tr>
+    <tr><td class="paramname">cmd_code</td><td>Command code whose ACL byte is queried. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Current ACL byte value (0x00 = all access permitted). </dd></dl>
+
+</div>
+</div>
+<a id="ga56b8f86b07404870d79015e4eabdef33" name="ga56b8f86b07404870d79015e4eabdef33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga56b8f86b07404870d79015e4eabdef33">&#9670;&#160;</a></span>mtb_pmbus_set_acl_isr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mtb_pmbus_set_acl_isr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *</td>          <td class="paramname"><span class="paramname"><em>inst</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>cmd_code</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>acl_byte</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>ISR-safe: stores the Access Control Byte for the specified command and synchronizes the write-access restriction with the IS_WR_PROTECTED flag. </p>
+<p>Must be called from the PMBus ISR context (e.g. in a CMD_WRITE_DONE callback). Enforces Never Again [0] and No More [1] permanence guards — updates are silently rejected with <a class="el" href="group__group__pmbus__macro__error__evt.html#ga3b226925adb4c332ff190ff1dec6135e">MTB_PMBUS_ERR_ACL_WR_REJECTED</a> if either bit is set.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">inst</td><td>The pointer to the PMBus instance structure. </td></tr>
+    <tr><td class="paramname">cmd_code</td><td>Target command code (standard or encoded extended). </td></tr>
+    <tr><td class="paramname">acl_byte</td><td>Access Control Byte value to store. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gae94519d81fb6b824862b19fdc875dc37" name="gae94519d81fb6b824862b19fdc875dc37"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae94519d81fb6b824862b19fdc875dc37">&#9670;&#160;</a></span>mtb_pmbus_set_acl()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__group__pmbus__trgt__enums.html#gacd0443505a96d8e7fb968dbaeb98d9e5">mtb_pmbus_status_t</a> mtb_pmbus_set_acl </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *</td>          <td class="paramname"><span class="paramname"><em>inst</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>cmd_code</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>acl_byte</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Thread-safe variant of <a class="el" href="#ga56b8f86b07404870d79015e4eabdef33">mtb_pmbus_set_acl_isr</a>. </p>
+<p>May be called from any non-ISR context. Disables the PMBus hardware IRQ around the update. Returns <a class="el" href="group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5a1beacb4946d6c7d299119d7484bd1591">MTB_PMBUS_STATUS_IS_BUSY</a> if the bus is active.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">inst</td><td>The pointer to the PMBus instance structure. </td></tr>
+    <tr><td class="paramname">cmd_code</td><td>Target command code (standard or encoded extended). </td></tr>
+    <tr><td class="paramname">acl_byte</td><td>Access Control Byte value to store. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5acce0d6c18a098f3cec4020f1d36ec6c5">MTB_PMBUS_STATUS_SUCCESS</a>, <a class="el" href="group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5a1beacb4946d6c7d299119d7484bd1591">MTB_PMBUS_STATUS_IS_BUSY</a>, or <a class="el" href="group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5abb942ed95de9fe8142e9fa50f20cdbf9">MTB_PMBUS_STATUS_BAD_PARAM</a> if the encoded extended code has no backing store or is out of range. </dd></dl>
+
+</div>
+</div>
+<a id="ga21b22a8fa87739dbea908cadbe606924" name="ga21b22a8fa87739dbea908cadbe606924"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga21b22a8fa87739dbea908cadbe606924">&#9670;&#160;</a></span>mtb_pmbus_get_passkey_state_isr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__group__pmbus__trgt__enums.html#gaf8b939707aa3cb72ecfc2bc82bf9d968">mtb_pmbus_passkey_state_t</a> mtb_pmbus_get_passkey_state_isr </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *</td>          <td class="paramname"><span class="paramname"><em>inst</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>ISR-safe: returns the current PASSKEY state. </p>
+<p>May be called from a command callback or any ISR context.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">inst</td><td>The pointer to the PMBus instance. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Current <code><a class="el" href="group__group__pmbus__trgt__enums.html#gaf8b939707aa3cb72ecfc2bc82bf9d968" title="PASSKEY state machine state.">mtb_pmbus_passkey_state_t</a></code> value. </dd></dl>
+
+</div>
+</div>
+<a id="ga3c62b8208be34846ba13c4ccba68ec11" name="ga3c62b8208be34846ba13c4ccba68ec11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3c62b8208be34846ba13c4ccba68ec11">&#9670;&#160;</a></span>mtb_pmbus_get_passkey_read_byte_isr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t mtb_pmbus_get_passkey_read_byte_isr </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *</td>          <td class="paramname"><span class="paramname"><em>inst</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>ISR-safe: returns the byte to send as the PASSKEY read response. </p>
+<p>Call from the <code>MTB_PMBUS_CMD_READ_REQ</code> event in the PASSKEY command callback.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">inst</td><td>The pointer to the PMBus instance. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>0x00</code> = Unlocked/SetNotLocked; <code>MTB_PMBUS_PASSKEY_STATE_BYTE_LOCKED_BASE</code> to (<code>MTB_PMBUS_PASSKEY_STATE_BYTE_LOCKED_BASE</code> + <code>MTB_PMBUS_PASSKEY_MAX_FAIL_CNT</code> - 1U) = Locked (fail count in bits [3:0], extractable with <code>MTB_PMBUS_PASSKEY_FAIL_CNT_MASK</code>); <code>MTB_PMBUS_PASSKEY_STATE_BYTE_LOCKED_OUT</code> = LockedOut. </dd></dl>
+
+</div>
+</div>
+<a id="gab8a90a81185a7266b3f6b9147011b497" name="gab8a90a81185a7266b3f6b9147011b497"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab8a90a81185a7266b3f6b9147011b497">&#9670;&#160;</a></span>mtb_pmbus_passkey_transition_isr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mtb_pmbus_passkey_transition_isr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *</td>          <td class="paramname"><span class="paramname"><em>inst</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>key_matched</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>is_zero_key</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>ISR-safe: drives the PASSKEY state machine one step. </p>
+<p>Must be called from the <code>MTB_PMBUS_CMD_WRITE_DONE</code> callback of the PASSKEY command.</p>
+<p>State transition rules:</p><ul>
+<li>Unlocked + non-zero key → SetNotLocked.</li>
+<li>SetNotLocked + matching key → Locked.</li>
+<li>SetNotLocked + all-zero key → Unlocked.</li>
+<li>SetNotLocked + non-matching non-zero key → stays SetNotLocked. The application must detect the mismatch in <code>MTB_PMBUS_CMD_WRITE_BYTE</code> and return <code>false</code> to NACK the last data byte; <code>MTB_PMBUS_CMD_WRITE_DONE</code> is not fired in that case (MW suppresses it when errors are set) and this function is not called.</li>
+<li>Locked + matching key → SetNotLocked (first unlock step).</li>
+<li>Locked + non-matching key → stays Locked; increments fail counter (stealth).</li>
+<li>Locked, fail counter ≥ <code>MTB_PMBUS_PASSKEY_MAX_FAIL_CNT</code> → LockedOut.</li>
+<li>LockedOut → no change.</li>
+</ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">inst</td><td>The pointer to the PMBus instance. </td></tr>
+    <tr><td class="paramname">key_matched</td><td><code>true</code> if the received passkey matches the application's stored key. </td></tr>
+    <tr><td class="paramname">is_zero_key</td><td><code>true</code> if all received passkey data bytes are <code>0x00</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga1bc94eb7965960388fe2f8eb491a857a" name="ga1bc94eb7965960388fe2f8eb491a857a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1bc94eb7965960388fe2f8eb491a857a">&#9670;&#160;</a></span>mtb_pmbus_passkey_force_locked_isr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mtb_pmbus_passkey_force_locked_isr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *</td>          <td class="paramname"><span class="paramname"><em>inst</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>fail_cnt</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>ISR-safe: forces the PASSKEY state to Locked with an initial fail count. </p>
+<p>Call after <a class="el" href="group__group__pmbus__init__func.html#ga58fc671fe346d9586014f301ece3c778">mtb_pmbus_init()</a> and before the PMBus HAL IRQ is enabled, when NVM indicates that a passkey was previously set.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">inst</td><td>The pointer to the PMBus instance. </td></tr>
+    <tr><td class="paramname">fail_cnt</td><td>Initial fail count. Clamped to <code>MTB_PMBUS_PASSKEY_MAX_FAIL_CNT</code> - 1. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gafa60ef311cf239091384e9b193a1dc43" name="gafa60ef311cf239091384e9b193a1dc43"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gafa60ef311cf239091384e9b193a1dc43">&#9670;&#160;</a></span>mtb_pmbus_passkey_force_locked()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__group__pmbus__trgt__enums.html#gacd0443505a96d8e7fb968dbaeb98d9e5">mtb_pmbus_status_t</a> mtb_pmbus_passkey_force_locked </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *</td>          <td class="paramname"><span class="paramname"><em>inst</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>fail_cnt</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Thread-safe variant of <a class="el" href="#ga1bc94eb7965960388fe2f8eb491a857a">mtb_pmbus_passkey_force_locked_isr</a>. </p>
+<p>Returns <a class="el" href="group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5a1beacb4946d6c7d299119d7484bd1591">MTB_PMBUS_STATUS_IS_BUSY</a> if a transaction is in progress.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">inst</td><td>The pointer to the PMBus instance. </td></tr>
+    <tr><td class="paramname">fail_cnt</td><td>Initial fail count. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5acce0d6c18a098f3cec4020f1d36ec6c5">MTB_PMBUS_STATUS_SUCCESS</a> or <a class="el" href="group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5a1beacb4946d6c7d299119d7484bd1591">MTB_PMBUS_STATUS_IS_BUSY</a>. </dd></dl>
+
+</div>
+</div>
+<a id="ga2c5d51a9b0dd8d52c47bae85f0b2110d" name="ga2c5d51a9b0dd8d52c47bae85f0b2110d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2c5d51a9b0dd8d52c47bae85f0b2110d">&#9670;&#160;</a></span>mtb_pmbus_set_acl_from_nvm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mtb_pmbus_set_acl_from_nvm </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *</td>          <td class="paramname"><span class="paramname"><em>inst</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint8_t *</td>          <td class="paramname"><span class="paramname"><em>nvm_acl</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t</td>          <td class="paramname"><span class="paramname"><em>count</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Bulk-initialises the ACL table from an NVM-stored array. </p>
+<p>Copies up to <code class="param">count</code> bytes from <code class="param">nvm_acl</code> into <code>acl_table</code>[], then synchronizes the IS_WR_PROTECTED flag for every entry with bit [7] set. Never Again [0] and No More [1] guards are bypassed — the NVM image is the authoritative source at power-on.</p>
+<p>Must be called after <a class="el" href="group__group__pmbus__init__func.html#ga58fc671fe346d9586014f301ece3c778">mtb_pmbus_init()</a> and before the PMBus HAL IRQ is enabled.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">inst</td><td>The pointer to the PMBus instance structure. </td></tr>
+    <tr><td class="paramname">nvm_acl</td><td>Pointer to the application NVM buffer (index = command code). </td></tr>
+    <tr><td class="paramname">count</td><td>Number of ACL bytes to restore. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga274f139a575d54c160d26226f8300fd8" name="ga274f139a575d54c160d26226f8300fd8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga274f139a575d54c160d26226f8300fd8">&#9670;&#160;</a></span>mtb_pmbus_apply_write_protect_isr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mtb_pmbus_apply_write_protect_isr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *</td>          <td class="paramname"><span class="paramname"><em>inst</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>ISR-safe: applies a WRITE_PROTECT byte value to all registered commands. </p>
+<p>Sets or clears the IS_WR_PROTECTED flag for every command in <code>inst-&gt;cfg-&gt;cmd_table</code> (and <code>ext_cmd_table</code> when <a class="el" href="group__group__pmbus__trgt__macro__conf.html#ga5a67f5d404a0bdb38b480da5bf968198">MTB_PMBUS_SUPPORT_EXT_CMD</a> is enabled) according to the protection level encoded in <code class="param">value:</code> </p>
+<ul>
+<li><code>MTB_PMBUS_WP_VAL_PROTECT_ALL</code> (<code>0x80</code>): protect all except the Protect Locks group (<code>MTB_PMBUS_WRITE_PROTECT_CMD_CODE</code>, <code>MTB_PMBUS_ACCESS_CONTROL_CMD_CODE</code>, <code>MTB_PMBUS_PASSKEY_CMD_CODE</code>).</li>
+<li><code>MTB_PMBUS_WP_VAL_PROTECT_IMMEDIATE</code> (<code>0x40</code>): protect all except Protect Locks and <code>MTB_PMBUS_OPERATION_CMD_CODE</code>.</li>
+<li><code>MTB_PMBUS_WP_VAL_PROTECT_VOLATILE</code> (<code>0x20</code>): protect all except Protect Locks, <code>MTB_PMBUS_OPERATION_CMD_CODE</code>, <code>MTB_PMBUS_ON_OFF_CONFIG_CMD_CODE</code>, and output voltage commands (<code>MTB_PMBUS_VOUT_FIRST_CMD_CODE–<code>MTB_PMBUS_VOUT_LAST_CMD_CODE</code>,</code> <code>MTB_PMBUS_VOUT_TRANS_FIRST_CMD_CODE–<code>MTB_PMBUS_VOUT_TRANS_LAST_CMD_CODE</code>)</code>.</li>
+<li><code>MTB_PMBUS_WP_VAL_NO_PROTECTION</code> (<code>0x00</code>): clear WRITE_PROTECT-sourced protection from all commands. Commands that are also protected by <code>MTB_PMBUS_ACL_BIT_WRITE_ACCESS</code> in the ACL table remain write-protected (most-restrictive-wins rule).</li>
+</ul>
+<p><b>Most-restrictive-wins</b>: WRITE_PROTECT level and <code>MTB_PMBUS_ACL_BIT_WRITE_ACCESS</code> are independent sources of write protection. IS_WR_PROTECTED is set when either source demands protection. Therefore, writing <code>MTB_PMBUS_WP_VAL_NO_PROTECTION</code> does NOT unprotect a command whose <code>acl_table</code> entry has <code>MTB_PMBUS_ACL_BIT_WRITE_ACCESS</code> set.</p>
+<p>Stores the new value in <code>inst-&gt;write_protect_val</code> for read-back by the user callback.</p>
+<p>Must be called from ISR context or with the PMBus HAL IRQ disabled.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">inst</td><td>The pointer to the PMBus instance. </td></tr>
+    <tr><td class="paramname">value</td><td>WRITE_PROTECT byte value. One of the <code>MTB_PMBUS_WP_VAL_*</code> macros. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gab5a4088b330bc688483e7b57bd1e51a8" name="gab5a4088b330bc688483e7b57bd1e51a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab5a4088b330bc688483e7b57bd1e51a8">&#9670;&#160;</a></span>mtb_pmbus_apply_write_protect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__group__pmbus__trgt__enums.html#gacd0443505a96d8e7fb968dbaeb98d9e5">mtb_pmbus_status_t</a> mtb_pmbus_apply_write_protect </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__group__pmbus__trgt__data__structs.html#structmtb__pmbus__stc__t">mtb_pmbus_stc_t</a> *</td>          <td class="paramname"><span class="paramname"><em>inst</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Thread-safe variant of <a class="el" href="#ga274f139a575d54c160d26226f8300fd8">mtb_pmbus_apply_write_protect_isr</a>. </p>
+<p>Disables the PMBus HAL IRQ, calls <a class="el" href="#ga274f139a575d54c160d26226f8300fd8">mtb_pmbus_apply_write_protect_isr</a>, then re-enables the IRQ. Returns <a class="el" href="group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5a1beacb4946d6c7d299119d7484bd1591">MTB_PMBUS_STATUS_IS_BUSY</a> if a transaction is in progress.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">inst</td><td>The pointer to the PMBus instance. </td></tr>
+    <tr><td class="paramname">value</td><td>WRITE_PROTECT byte value. One of the <code>MTB_PMBUS_WP_VAL_*</code> macros. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5acce0d6c18a098f3cec4020f1d36ec6c5">MTB_PMBUS_STATUS_SUCCESS</a> or <a class="el" href="group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5a1beacb4946d6c7d299119d7484bd1591">MTB_PMBUS_STATUS_IS_BUSY</a>. </dd></dl>
 
 </div>
 </div>

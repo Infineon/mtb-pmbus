@@ -52,6 +52,81 @@ extern "C" {
 
 /* Internal */
 #define MTB_PMBUS_CMD_MAX_NUM                   (256U)
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U)) || defined(MTB_PMBUS_DOXYGEN)
+/** The PASSKEY command code */
+#define MTB_PMBUS_PASSKEY_CMD_CODE              (0x0EU)
+/** The ACCESS_CONTROL command code */
+#define MTB_PMBUS_ACCESS_CONTROL_CMD_CODE       (0x0FU)
+/** The WRITE_PROTECT command code */
+#define MTB_PMBUS_WRITE_PROTECT_CMD_CODE        (0x10U)
+
+/* Command codes referenced by WRITE_PROTECT protection levels */
+/** OPERATION command code: writable at PROTECT_IMMEDIATE and above */
+#define MTB_PMBUS_OPERATION_CMD_CODE            (0x01U)
+/** ON_OFF_CONFIG command code: writable at PROTECT_VOLATILE */
+#define MTB_PMBUS_ON_OFF_CONFIG_CMD_CODE        (0x02U)
+/** First command code of the VOUT_* family: writable at PROTECT_VOLATILE */
+#define MTB_PMBUS_VOUT_FIRST_CMD_CODE           (0x20U)
+/** Last command code of the VOUT_* family */
+#define MTB_PMBUS_VOUT_LAST_CMD_CODE            (0x29U)
+/** First command code of the VOUT_TRANSITION/DROOP group: writable at PROTECT_VOLATILE */
+#define MTB_PMBUS_VOUT_TRANS_FIRST_CMD_CODE     (0x37U)
+/** Last command code of the VOUT_TRANSITION/DROOP group */
+#define MTB_PMBUS_VOUT_TRANS_LAST_CMD_CODE      (0x3AU)
+
+/** WRITE_PROTECT value: disable writes to all commands except the Protect Locks group */
+#define MTB_PMBUS_WP_VAL_PROTECT_ALL            (0x80U)
+/** WRITE_PROTECT value: disable all writes except Protect Locks group and OPERATION
+ *  (\c MTB_PMBUS_OPERATION_CMD_CODE) */
+#define MTB_PMBUS_WP_VAL_PROTECT_IMMEDIATE      (0x40U)
+/** WRITE_PROTECT value: disable all writes except Protect Locks group,
+ *  \c MTB_PMBUS_OPERATION_CMD_CODE, \c MTB_PMBUS_ON_OFF_CONFIG_CMD_CODE,
+ *  and output voltage commands (\c MTB_PMBUS_VOUT_FIRST_CMD_CODE–\c MTB_PMBUS_VOUT_LAST_CMD_CODE,
+ *  \c MTB_PMBUS_VOUT_TRANS_FIRST_CMD_CODE–\c MTB_PMBUS_VOUT_TRANS_LAST_CMD_CODE) */
+#define MTB_PMBUS_WP_VAL_PROTECT_VOLATILE       (0x20U)
+/** WRITE_PROTECT value: enable all writes (no protection) */
+#define MTB_PMBUS_WP_VAL_NO_PROTECTION          (0x00U)
+
+/** Minimum block count ACK'd without error in Locked/LockedOut state (spec §19.3.9). */
+#define MTB_PMBUS_PASSKEY_STEALTH_MIN_LEN       (2U)
+/** Maximum block count ACK'd without error in Locked/LockedOut state.
+ *  The stealth window is [MTB_PMBUS_PASSKEY_STEALTH_MIN_LEN, MTB_PMBUS_PASSKEY_STEALTH_MAX_LEN]
+ *  — counts outside this range are NACKed. */
+#define MTB_PMBUS_PASSKEY_STEALTH_MAX_LEN       (8U)
+/** Maximum number of non-matching unlock attempts before lockout */
+#define MTB_PMBUS_PASSKEY_MAX_FAIL_CNT          (14U)
+
+/** PASSKEY read-response state byte: base value for Locked state (OR'd with fail_cnt) */
+#define MTB_PMBUS_PASSKEY_STATE_BYTE_LOCKED_BASE    (0x10U)
+/** PASSKEY read-response state byte: mask to extract the fail counter (bits [3:0]) */
+#define MTB_PMBUS_PASSKEY_FAIL_CNT_MASK             (0x0FU)
+/** PASSKEY read-response state byte: fixed value when LockedOut */
+#define MTB_PMBUS_PASSKEY_STATE_BYTE_LOCKED_OUT     (0x1FU)
+
+/**
+ * \addtogroup group_pmbus_access_control_macro Access Control (0x0F) Bit Macros
+ * \{
+ */
+/** Access Control Byte bit [7]: block write access to the target command */
+#define MTB_PMBUS_ACL_BIT_WRITE_ACCESS          (0x80U)
+/** Access Control Byte bit [6]: block read access to the target command */
+#define MTB_PMBUS_ACL_BIT_READ_ACCESS           (0x40U)
+/** Access Control Byte bit [5]: disable authenticated write (security action request) */
+#define MTB_PMBUS_ACL_BIT_AUTH_WRITE            (0x20U)
+/** Access Control Byte bit [4]: block NVM STORE for the target command */
+#define MTB_PMBUS_ACL_BIT_NVM_STORE             (0x10U)
+/** Access Control Byte bit [3]: block NVM RESTORE for the target command */
+#define MTB_PMBUS_ACL_BIT_NVM_RESTORE           (0x08U)
+/** Access Control Byte bit [2]: allow one write only, then block subsequent writes */
+#define MTB_PMBUS_ACL_BIT_WRITE_ONCE            (0x04U)
+/** Access Control Byte bit [1]: ACL byte not alterable even when PASSKEY is unlocked */
+#define MTB_PMBUS_ACL_BIT_NO_MORE               (0x02U)
+/** Access Control Byte bit [0]: ACL byte permanently locked (set at POR) */
+#define MTB_PMBUS_ACL_BIT_NEVER_AGAIN           (0x01U)
+/** \} group_pmbus_access_control_macro */
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
+
 #define MTB_PMBUS_CMD_CAP_FORMAT_POS            (6U)
 #define MTB_PMBUS_BLOCK_COUNT_BYTE_SIZE         (1U)
 #define MTB_PMBUS_ZONE_READ_PAGE_STATUS_SIZE    (2U)
@@ -224,6 +299,19 @@ extern "C" {
 #define MTB_PMBUS_ERR_READ_REQ_FOR_FF           (0x100000U)
 /** The controller attempts to read data for the write-only command */
 #define MTB_PMBUS_ERR_REQ_RD_FOR_WR_ONLY        (0x200000U)
+/** Read is attempted to a command that is ACL read-protected
+ * (ACCESS_CONTROL bit [6]) */
+#define MTB_PMBUS_ERR_RD_FROM_PROT_CMD          (0x400000U)
+/** ACCESS_CONTROL write was rejected because the target command's ACL byte has
+ *  the No More [1] or Never Again [0] bit set */
+#define MTB_PMBUS_ERR_ACL_WR_REJECTED           (0x800000U)
+/** A PASSKEY write was received without a valid PEC byte.
+ *  PEC is mandatory for PASSKEY writes when \ref MTB_PMBUS_SUPPORT_SECURITY is
+ *  enabled and PEC support is compiled in. */
+#define MTB_PMBUS_ERR_PEC_REQUIRED              (0x1000000U)
+/** The PASSKEY fail counter reached the maximum allowed attempts and the device
+ *  transitioned to the Locked Out state (no further PASSKEY unlock is possible). */
+#define MTB_PMBUS_ERR_PASSKEY_LOCKED_OUT        (0x2000000U)
 
 /** \} group_pmbus_macro_error_evt */
 
@@ -294,8 +382,36 @@ typedef enum
      */
     MTB_PMBUS_STATUS_CMD_IS_ACTIVE = MTB_PMBUS_HAL_STATUS_CMD_IS_ACTIVE,
     /** The requested action is aborted as the PMBus instance takes part in communication */
-    MTB_PMBUS_STATUS_IS_BUSY = MTB_PMBUS_HAL_STATUS_IS_BUSY
+    MTB_PMBUS_STATUS_IS_BUSY = MTB_PMBUS_HAL_STATUS_IS_BUSY,
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U)) || defined(MTB_PMBUS_DOXYGEN)
+    /** One or more mandatory Security Level 0 commands are missing from the command table */
+    MTB_PMBUS_STATUS_L0_CMDS_MISSING = MTB_PMBUS_HAL_STATUS_L0_CMDS_MISSING
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
 } mtb_pmbus_status_t;
+
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U)) || defined(MTB_PMBUS_DOXYGEN)
+/**
+ * PASSKEY state machine state.
+ * @see mtb_pmbus_get_passkey_state_isr
+ * @see mtb_pmbus_passkey_transition_isr
+ */
+typedef enum
+{
+    /** PASSKEY is Unlocked. ACCESS_CONTROL writes are permitted.
+     *  Passkey value can be changed. */
+    MTB_PMBUS_PASSKEY_ST_UNLOCKED       = 0x00U,
+    /** Intermediate state. First passkey write received; awaiting second confirmation write. */
+    MTB_PMBUS_PASSKEY_ST_SET_NOT_LOCKED = 0x01U,
+    /** PASSKEY is Locked. ACCESS_CONTROL writes are blocked.
+     *  Only accepting passkey write attempts for unlock. */
+    MTB_PMBUS_PASSKEY_ST_LOCKED         = 0x02U,
+    /** Fail count reached \c MTB_PMBUS_PASSKEY_MAX_FAIL_CNT.
+     *  All passkey writes are silently ACKed. State is permanently frozen until power cycle. */
+    MTB_PMBUS_PASSKEY_ST_LOCKED_OUT     = 0x03U
+} mtb_pmbus_passkey_state_t;
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
 
 #if (defined(MTB_PMBUS_SUPPORT_SMBALERT) && (MTB_PMBUS_SUPPORT_SMBALERT != 0U)) || defined (MTB_PMBUS_DOXYGEN)
 /** The modes for SMBALERT pin
@@ -539,7 +655,16 @@ typedef enum
 typedef enum
 {
     /** PMBus revision 1.4 */
-    MTB_PMBUS_REVISION_1_4 = 0U
+    MTB_PMBUS_REVISION_1_4 = 0U,
+    /** PMBus revision 1.5.
+     *
+     * \note Reporting PMBus v1.5 implies the device complies with the
+     * Secure Device Application Profile. It is strongly recommended to
+     * enable \ref MTB_PMBUS_SUPPORT_SECURITY and implement the mandatory
+     * Security Level 0 commands (PASSKEY, ACCESS_CONTROL, WRITE_PROTECT)
+     * when this revision is selected.
+     */
+    MTB_PMBUS_REVISION_1_5 = 1U
 } mtb_pmbus_revision_t;
 #endif \
     /* #if (defined(MTB_PMBUS_IMPL_CMD_REVISION) && (MTB_PMBUS_IMPL_CMD_REVISION != 0U)) || defined
@@ -801,6 +926,16 @@ typedef struct
      * time options.
      */
     uint8_t ext_cmd_num;
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U)) || defined(MTB_PMBUS_DOXYGEN)
+    /** Optional application-supplied storage for extended-command ACL bytes.
+     *  Length must be at least \c ext_cmd_num bytes. If NULL, extended-command
+     *  ACL is disabled.
+     * \note This field is only available when \ref MTB_PMBUS_SUPPORT_EXT_CMD and
+     * \ref MTB_PMBUS_SUPPORT_SECURITY are enabled at compile time options.
+     */
+    uint8_t *ext_acl_table;
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
 #endif \
     /* #if (defined(MTB_PMBUS_SUPPORT_EXT_CMD) && (MTB_PMBUS_SUPPORT_EXT_CMD != 0U)) || defined
        (MTB_PMBUS_DOXYGEN) */
@@ -928,6 +1063,21 @@ typedef struct
     mtb_pmbus_smbalert_mode_t smbalert_mode;
     bool smbalert_is_trig;
 #endif /* #if (defined(MTB_PMBUS_SUPPORT_SMBALERT) && (MTB_PMBUS_SUPPORT_SMBALERT != 0U)) */
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U)) || defined(MTB_PMBUS_DOXYGEN)
+    /** Per-command ACL bytes.
+     *  Index = command code (0x00–0xFF).
+     *  0x00 = all access permitted. */
+    uint8_t acl_table[MTB_PMBUS_CMD_MAX_NUM];
+    /** Current PASSKEY state machine state. */
+    mtb_pmbus_passkey_state_t passkey_state;
+    /** Number of non-matching unlock attempts; valid when \c passkey_state is Locked. */
+    uint8_t passkey_fail_cnt;
+    /** Current WRITE_PROTECT byte value. Power-on default is 0x00 (no protection).
+     *  Updated by \ref mtb_pmbus_apply_write_protect_isr(). Read back by the user
+     *  WRITE_PROTECT callback to respond to a Read Byte request. */
+    uint8_t write_protect_val;
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
     /** \endcond */
 } mtb_pmbus_stc_t;
 
@@ -1512,6 +1662,185 @@ mtb_pmbus_status_t mtb_pmbus_cmd_wr_protect(mtb_pmbus_stc_t *inst, uint32_t code
  */
 mtb_pmbus_status_t mtb_pmbus_cmd_all_wr_protect(mtb_pmbus_stc_t *inst, bool status);
 
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U)) || defined(MTB_PMBUS_DOXYGEN)
+/**
+ * @brief Returns the Access Control Byte for the specified command code.
+ *
+ * Accepts a standard 8-bit code (0x00-0xFF) or an encoded extended code
+ * of the form produced by \ref MTB_PMBUS_CONV_CMD_EXT_CMD_FORMAT.
+ *
+ * @param inst     The pointer to the PMBus instance structure.
+ * @param cmd_code Command code whose ACL byte is queried.
+ * @return         Current ACL byte value (0x00 = all access permitted).
+ */
+uint8_t mtb_pmbus_get_acl(const mtb_pmbus_stc_t *inst, uint32_t cmd_code);
+
+/**
+ * @brief ISR-safe: stores the Access Control Byte for the specified command and
+ *        synchronizes the write-access restriction with the IS_WR_PROTECTED flag.
+ *
+ * Must be called from the PMBus ISR context (e.g. in a CMD_WRITE_DONE callback).
+ * Enforces Never Again [0] and No More [1] permanence guards — updates are
+ * silently rejected with \ref MTB_PMBUS_ERR_ACL_WR_REJECTED if either bit is set.
+ *
+ * @param inst     The pointer to the PMBus instance structure.
+ * @param cmd_code Target command code (standard or encoded extended).
+ * @param acl_byte Access Control Byte value to store.
+ */
+void mtb_pmbus_set_acl_isr(mtb_pmbus_stc_t *inst, uint32_t cmd_code, uint8_t acl_byte);
+
+/**
+ * @brief Thread-safe variant of \ref mtb_pmbus_set_acl_isr.
+ *
+ * May be called from any non-ISR context. Disables the PMBus hardware IRQ
+ * around the update. Returns \ref MTB_PMBUS_STATUS_IS_BUSY if the bus is active.
+ *
+ * @param inst     The pointer to the PMBus instance structure.
+ * @param cmd_code Target command code (standard or encoded extended).
+ * @param acl_byte Access Control Byte value to store.
+ * @return         \ref MTB_PMBUS_STATUS_SUCCESS, \ref MTB_PMBUS_STATUS_IS_BUSY, or
+ *                 \ref MTB_PMBUS_STATUS_BAD_PARAM if the encoded extended code has
+ *                 no backing store or is out of range.
+ */
+mtb_pmbus_status_t mtb_pmbus_set_acl(mtb_pmbus_stc_t *inst, uint32_t cmd_code, uint8_t acl_byte);
+
+/**
+ * @brief ISR-safe: returns the current PASSKEY state.
+ *
+ * May be called from a command callback or any ISR context.
+ *
+ * @param inst  The pointer to the PMBus instance.
+ * @return      Current \c mtb_pmbus_passkey_state_t value.
+ */
+mtb_pmbus_passkey_state_t mtb_pmbus_get_passkey_state_isr(const mtb_pmbus_stc_t *inst);
+
+/**
+ * @brief ISR-safe: returns the byte to send as the PASSKEY read response.
+ *
+ * Call from the \c MTB_PMBUS_CMD_READ_REQ event in the PASSKEY command callback.
+ *
+ * @param inst  The pointer to the PMBus instance.
+ * @return      `0x00` = Unlocked/SetNotLocked;
+ *              \c MTB_PMBUS_PASSKEY_STATE_BYTE_LOCKED_BASE to
+ *              (\c MTB_PMBUS_PASSKEY_STATE_BYTE_LOCKED_BASE + \c MTB_PMBUS_PASSKEY_MAX_FAIL_CNT -
+ * 1U)
+ *              = Locked (fail count in bits [3:0], extractable with \c
+ * MTB_PMBUS_PASSKEY_FAIL_CNT_MASK);
+ *              \c MTB_PMBUS_PASSKEY_STATE_BYTE_LOCKED_OUT = LockedOut.
+ */
+uint8_t mtb_pmbus_get_passkey_read_byte_isr(const mtb_pmbus_stc_t *inst);
+
+/**
+ * @brief ISR-safe: drives the PASSKEY state machine one step.
+ *
+ * Must be called from the \c MTB_PMBUS_CMD_WRITE_DONE callback of the PASSKEY command.
+ *
+ * State transition rules:
+ * - Unlocked + non-zero key → SetNotLocked.
+ * - SetNotLocked + matching key → Locked.
+ * - SetNotLocked + all-zero key → Unlocked.
+ * - SetNotLocked + non-matching non-zero key → stays SetNotLocked. The application
+ *   must detect the mismatch in \c MTB_PMBUS_CMD_WRITE_BYTE and return \c false to
+ *   NACK the last data byte; \c MTB_PMBUS_CMD_WRITE_DONE is not fired in that case
+ *   (MW suppresses it when errors are set) and this function is not called.
+ * - Locked + matching key → SetNotLocked (first unlock step).
+ * - Locked + non-matching key → stays Locked; increments fail counter (stealth).
+ * - Locked, fail counter ≥ \c MTB_PMBUS_PASSKEY_MAX_FAIL_CNT → LockedOut.
+ * - LockedOut → no change.
+ *
+ * @param inst        The pointer to the PMBus instance.
+ * @param key_matched \c true if the received passkey matches the application's stored key.
+ * @param is_zero_key \c true if all received passkey data bytes are \c 0x00.
+ */
+void mtb_pmbus_passkey_transition_isr(mtb_pmbus_stc_t *inst, bool key_matched, bool is_zero_key);
+
+/**
+ * @brief ISR-safe: forces the PASSKEY state to Locked with an initial fail count.
+ *
+ * Call after \ref mtb_pmbus_init() and before the PMBus HAL IRQ is enabled, when
+ * NVM indicates that a passkey was previously set.
+ *
+ * @param inst      The pointer to the PMBus instance.
+ * @param fail_cnt  Initial fail count. Clamped to \c MTB_PMBUS_PASSKEY_MAX_FAIL_CNT - 1.
+ */
+void mtb_pmbus_passkey_force_locked_isr(mtb_pmbus_stc_t *inst, uint8_t fail_cnt);
+
+/**
+ * @brief Thread-safe variant of \ref mtb_pmbus_passkey_force_locked_isr.
+ *
+ * Returns \ref MTB_PMBUS_STATUS_IS_BUSY if a transaction is in progress.
+ *
+ * @param inst      The pointer to the PMBus instance.
+ * @param fail_cnt  Initial fail count.
+ * @return          \ref MTB_PMBUS_STATUS_SUCCESS or \ref MTB_PMBUS_STATUS_IS_BUSY.
+ */
+mtb_pmbus_status_t mtb_pmbus_passkey_force_locked(mtb_pmbus_stc_t *inst, uint8_t fail_cnt);
+
+/**
+ * @brief Bulk-initialises the ACL table from an NVM-stored array.
+ *
+ * Copies up to \p count bytes from \p nvm_acl into \c acl_table[], then
+ * synchronizes the IS_WR_PROTECTED flag for every entry with bit [7] set.
+ * Never Again [0] and No More [1] guards are bypassed — the NVM image is the
+ * authoritative source at power-on.
+ *
+ * Must be called after \ref mtb_pmbus_init() and before the PMBus HAL IRQ is enabled.
+ *
+ * @param inst    The pointer to the PMBus instance structure.
+ * @param nvm_acl Pointer to the application NVM buffer (index = command code).
+ * @param count   Number of ACL bytes to restore.
+ */
+void mtb_pmbus_set_acl_from_nvm(mtb_pmbus_stc_t *inst, const uint8_t *nvm_acl, uint16_t count);
+
+/**
+ * @brief ISR-safe: applies a WRITE_PROTECT byte value to all registered commands.
+ *
+ * Sets or clears the IS_WR_PROTECTED flag for every command in
+ * \c inst->cfg->cmd_table (and \c ext_cmd_table when \ref MTB_PMBUS_SUPPORT_EXT_CMD is
+ * enabled) according to the protection level encoded in \p value:
+ *
+ * - \c MTB_PMBUS_WP_VAL_PROTECT_ALL (`0x80`): protect all except the Protect Locks
+ *   group (\c MTB_PMBUS_WRITE_PROTECT_CMD_CODE, \c MTB_PMBUS_ACCESS_CONTROL_CMD_CODE,
+ *   \c MTB_PMBUS_PASSKEY_CMD_CODE).
+ * - \c MTB_PMBUS_WP_VAL_PROTECT_IMMEDIATE (`0x40`): protect all except Protect Locks
+ *   and \c MTB_PMBUS_OPERATION_CMD_CODE.
+ * - \c MTB_PMBUS_WP_VAL_PROTECT_VOLATILE (`0x20`): protect all except Protect Locks,
+ *   \c MTB_PMBUS_OPERATION_CMD_CODE, \c MTB_PMBUS_ON_OFF_CONFIG_CMD_CODE, and output
+ *   voltage commands (\c MTB_PMBUS_VOUT_FIRST_CMD_CODE–\c MTB_PMBUS_VOUT_LAST_CMD_CODE,
+ *   \c MTB_PMBUS_VOUT_TRANS_FIRST_CMD_CODE–\c MTB_PMBUS_VOUT_TRANS_LAST_CMD_CODE).
+ * - \c MTB_PMBUS_WP_VAL_NO_PROTECTION (`0x00`): clear WRITE_PROTECT-sourced protection
+ *   from all commands. Commands that are also protected by \c MTB_PMBUS_ACL_BIT_WRITE_ACCESS
+ *   in the ACL table remain write-protected (most-restrictive-wins rule).
+ *
+ * **Most-restrictive-wins**: WRITE_PROTECT level and \c MTB_PMBUS_ACL_BIT_WRITE_ACCESS are
+ * independent sources of write protection. IS_WR_PROTECTED is set when either source demands
+ * protection. Therefore, writing \c MTB_PMBUS_WP_VAL_NO_PROTECTION does NOT unprotect a
+ * command whose \c acl_table entry has \c MTB_PMBUS_ACL_BIT_WRITE_ACCESS set.
+ *
+ * Stores the new value in \c inst->write_protect_val for read-back by the user callback.
+ *
+ * Must be called from ISR context or with the PMBus HAL IRQ disabled.
+ *
+ * @param inst   The pointer to the PMBus instance.
+ * @param value  WRITE_PROTECT byte value. One of the \c MTB_PMBUS_WP_VAL_* macros.
+ */
+void mtb_pmbus_apply_write_protect_isr(mtb_pmbus_stc_t *inst, uint8_t value);
+
+/**
+ * @brief Thread-safe variant of \ref mtb_pmbus_apply_write_protect_isr.
+ *
+ * Disables the PMBus HAL IRQ, calls \ref mtb_pmbus_apply_write_protect_isr, then
+ * re-enables the IRQ. Returns \ref MTB_PMBUS_STATUS_IS_BUSY if a transaction is in
+ * progress.
+ *
+ * @param inst   The pointer to the PMBus instance.
+ * @param value  WRITE_PROTECT byte value. One of the \c MTB_PMBUS_WP_VAL_* macros.
+ * @return       \ref MTB_PMBUS_STATUS_SUCCESS or \ref MTB_PMBUS_STATUS_IS_BUSY.
+ */
+mtb_pmbus_status_t mtb_pmbus_apply_write_protect(mtb_pmbus_stc_t *inst, uint8_t value);
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
+
 /**
  * @brief Requests to pause the Process Call protocol execution and exit from the ISR handler.
  *
@@ -1866,6 +2195,67 @@ void mtb_pmbus_timer_isr(mtb_pmbus_stc_t *inst);
 /** \} group_pmbus_isr_func */
 
 /** \} group_pmbus_trgt_functions */
+
+/**
+ * \defgroup group_pmbus_sec_func Security Functions
+ * \{
+ */
+
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U)) || defined(MTB_PMBUS_DOXYGEN)
+/** Encoded Security Level 0 value returned by \ref mtb_pmbus_sec_get_level. */
+#define MTB_PMBUS_SEC_LEVEL_ENCODED_L0          (0x01U)
+/** Encoded Security Level 1 value returned by \ref mtb_pmbus_sec_get_level. */
+#define MTB_PMBUS_SEC_LEVEL_ENCODED_L1          (0x02U)
+/** Encoded Security Level 2 value returned by \ref mtb_pmbus_sec_get_level. */
+#define MTB_PMBUS_SEC_LEVEL_ENCODED_L2          (0x04U)
+/** Encoded Security Level 3 value returned by \ref mtb_pmbus_sec_get_level. */
+#define MTB_PMBUS_SEC_LEVEL_ENCODED_L3          (0x08U)
+
+/**
+ * @brief Returns the encoded Security Level currently compiled into the Middleware.
+ *
+ * Returns one of \ref MTB_PMBUS_SEC_LEVEL_ENCODED_L0, \ref MTB_PMBUS_SEC_LEVEL_ENCODED_L1,
+ * \ref MTB_PMBUS_SEC_LEVEL_ENCODED_L2, or \ref MTB_PMBUS_SEC_LEVEL_ENCODED_L3
+ * corresponding to the value of \ref MTB_PMBUS_SEC_LEVEL.
+ *
+ * @return Encoded Security Level byte.
+ */
+uint8_t mtb_pmbus_sec_get_level(void);
+
+/** Bit set in the \p missing_mask output of \ref mtb_pmbus_sec_check_l0_cmds when
+ *  the PASSKEY command is absent from the command table. */
+#define MTB_PMBUS_L0_MISSING_PASSKEY            (0x01U)
+/** Bit set in the \p missing_mask output of \ref mtb_pmbus_sec_check_l0_cmds when
+ *  the ACCESS_CONTROL command is absent from the command table. */
+#define MTB_PMBUS_L0_MISSING_ACCESS_CONTROL     (0x02U)
+/** Bit set in the \p missing_mask output of \ref mtb_pmbus_sec_check_l0_cmds when
+ *  the WRITE_PROTECT command is absent from the command table. */
+#define MTB_PMBUS_L0_MISSING_WRITE_PROTECT      (0x04U)
+
+/**
+ * @brief Checks that all mandatory Security Level 0 commands are registered in the command table.
+ *
+ * Verifies that the command table pointed to by \p inst contains entries for:
+ * - PASSKEY     (\c MTB_PMBUS_PASSKEY_CMD_CODE)
+ * - ACCESS_CONTROL (\c MTB_PMBUS_ACCESS_CONTROL_CMD_CODE)
+ * - WRITE_PROTECT  (\c MTB_PMBUS_WRITE_PROTECT_CMD_CODE)
+ *
+ * @param inst          The pointer to the PMBus instance.
+ * @param missing_mask  Output bitmask of missing commands. Use \ref MTB_PMBUS_L0_MISSING_PASSKEY,
+ *                      \ref MTB_PMBUS_L0_MISSING_ACCESS_CONTROL, and
+ *                      \ref MTB_PMBUS_L0_MISSING_WRITE_PROTECT to test individual bits.
+ *                      Set to 0 on success. May be NULL if the caller does not need details.
+ * @return \ref MTB_PMBUS_STATUS_SUCCESS if all three commands are present,
+ *         \ref MTB_PMBUS_STATUS_L0_CMDS_MISSING otherwise,
+ *         \ref MTB_PMBUS_STATUS_BAD_PARAM if \p inst is NULL.
+ */
+mtb_pmbus_status_t mtb_pmbus_sec_check_l0_cmds(mtb_pmbus_stc_t *inst, uint8_t *missing_mask);
+#endif \
+    /* #if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U)) ||
+       defined(MTB_PMBUS_DOXYGEN) */
+
+/** \} group_pmbus_sec_func */
 
 #ifdef __cplusplus
 }

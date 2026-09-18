@@ -611,6 +611,31 @@ void mtb_pmbus_cmd_wr_protect_isr(mtb_pmbus_stc_t *inst, uint32_t code, bool sta
     {
         cmd_lookup_tbl[code_tmp].flags &= (uint8_t)(~MTB_PMBUS_CMD_FLAG_IS_WR_PROTECTED);
     }
+
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U))
+#if (MTB_PMBUS_IMPL_CMD_NUM != 0U)
+    for (uint8_t i = 0U; i < MTB_PMBUS_IMPL_CMD_NUM; i++)
+    {
+        if ((inst->pre_impl_cmd_lookup_tbl[i].flags & MTB_PMBUS_CMD_FLAG_IS_PRESENT) != 0U)
+        {
+            if (inst->pre_impl_cmd_table[i].cmd_code == (uint8_t)code_tmp)
+            {
+                if (status)
+                {
+                    inst->pre_impl_cmd_lookup_tbl[i].flags |= MTB_PMBUS_CMD_FLAG_IS_WR_PROTECTED;
+                }
+                else
+                {
+                    inst->pre_impl_cmd_lookup_tbl[i].flags &=
+                        (uint8_t)(~MTB_PMBUS_CMD_FLAG_IS_WR_PROTECTED);
+                }
+                break;
+            }
+        }
+    }
+#endif /* #if (MTB_PMBUS_IMPL_CMD_NUM != 0U) */
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
 }
 
 
@@ -692,6 +717,461 @@ mtb_pmbus_status_t mtb_pmbus_cmd_all_wr_protect(mtb_pmbus_stc_t *inst, bool stat
 }
 
 
+/*******************************************************************************
+* WRITE_PROTECT helpers
+*******************************************************************************/
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U))
+/** Returns true if cmd_code is unprotected (writable) at the given WRITE_PROTECT level. */
+__STATIC_INLINE bool mtb_pmbus_int_is_wp_unprotected(uint8_t cmd_code, uint8_t wp_val)
+{
+    bool result;
+
+    if (mtb_pmbus_int_is_wp_exempt(cmd_code))
+    {
+        result = true;   /* Protect Locks: always writable */
+    }
+    else
+    {
+        switch (wp_val)
+        {
+            case MTB_PMBUS_WP_VAL_PROTECT_ALL:
+                result = false;
+                break;
+
+            case MTB_PMBUS_WP_VAL_PROTECT_IMMEDIATE:
+                result = (cmd_code == MTB_PMBUS_OPERATION_CMD_CODE);
+                break;
+
+            case MTB_PMBUS_WP_VAL_PROTECT_VOLATILE:
+                result = ((cmd_code == MTB_PMBUS_OPERATION_CMD_CODE) ||
+                          (cmd_code == MTB_PMBUS_ON_OFF_CONFIG_CMD_CODE) ||
+                          ((cmd_code >= MTB_PMBUS_VOUT_FIRST_CMD_CODE) && (cmd_code <= MTB_PMBUS_VOUT_LAST_CMD_CODE)) ||
+                          ((cmd_code >= MTB_PMBUS_VOUT_TRANS_FIRST_CMD_CODE) &&
+                           (cmd_code <= MTB_PMBUS_VOUT_TRANS_LAST_CMD_CODE)));
+                break;
+
+            case MTB_PMBUS_WP_VAL_NO_PROTECTION:
+                result = true;
+                break;
+
+            default:
+                /* Undefined WRITE_PROTECT value — apply PROTECT_ALL for safety. */
+                result = false;
+                break;
+        }
+    }
+
+    return result;
+}
+
+
+void mtb_pmbus_apply_write_protect_isr(mtb_pmbus_stc_t *inst, uint8_t value)
+{
+    /* Store the new value for read-back in the user callback */
+    inst->write_protect_val = value;
+
+    /* Apply IS_WR_PROTECTED flag to every command in the main table.
+     * Most-restrictive-wins: WRITE_PROTECT and ACCESS_CONTROL bit [7] are
+     * independent sources; set the flag if either source demands protection. */
+    for (uint16_t i = 0U; i < inst->cfg->cmd_num; i++)
+    {
+        uint8_t code = inst->cfg->cmd_table[i].cmd_code;
+        bool wp_protects  = !mtb_pmbus_int_is_wp_unprotected(code, value);
+        bool acl_protects = (inst->acl_table[code] & MTB_PMBUS_ACL_BIT_WRITE_ACCESS) != 0U;
+        mtb_pmbus_cmd_wr_protect_isr(inst, (uint32_t)code, wp_protects || acl_protects);
+    }
+
+#if (MTB_PMBUS_IMPL_CMD_NUM != 0U)
+    /* Apply IS_WR_PROTECTED to pre-implemented commands that support write direction.
+     * These are not in cmd_table so the loop above does not cover them.
+     * ACL does not apply to pre-impl commands (no acl_table entry). */
+    for (uint8_t i = 0U; i < MTB_PMBUS_IMPL_CMD_NUM; i++)
+    {
+        if ((inst->pre_impl_cmd_lookup_tbl[i].flags & MTB_PMBUS_CMD_FLAG_IS_PRESENT) != 0U)
+        {
+            uint8_t code = inst->pre_impl_cmd_table[i].cmd_code;
+            uint32_t cap = inst->pre_impl_cmd_table[i].cmd_cap;
+            if ((cap & (MTB_PMBUS_CMD_CAP_DIR_WR | MTB_PMBUS_CMD_CAP_DIR_PROCESS_CALL)) != 0U)
+            {
+                bool protect = !mtb_pmbus_int_is_wp_unprotected(code, value);
+                if (protect)
+                {
+                    inst->pre_impl_cmd_lookup_tbl[i].flags |= MTB_PMBUS_CMD_FLAG_IS_WR_PROTECTED;
+                }
+                else
+                {
+                    inst->pre_impl_cmd_lookup_tbl[i].flags &=
+                        (uint8_t)(~MTB_PMBUS_CMD_FLAG_IS_WR_PROTECTED);
+                }
+            }
+        }
+    }
+#endif /* #if (MTB_PMBUS_IMPL_CMD_NUM != 0U) */
+
+#if (defined(MTB_PMBUS_SUPPORT_EXT_CMD) && (MTB_PMBUS_SUPPORT_EXT_CMD != 0U))
+    if (inst->cfg->enable_ext_cmd)
+    {
+        /* Extended command codes: most-restrictive-wins between WRITE_PROTECT level
+         * and ext_acl_table bit [7] (if ext_acl_table is provided). */
+        bool protect_ext = (value != MTB_PMBUS_WP_VAL_NO_PROTECTION);
+        for (uint16_t i = 0U; i < inst->cfg->ext_cmd_num; i++)
+        {
+            uint32_t ext_code = ((uint32_t)inst->cfg->ext_cmd_table[i].cmd_code
+                                 << MTB_PMBUS_CMD_EXT_POS) | MTB_PMBUS_CMD_CODE_EXT;
+            if (inst->cfg->ext_acl_table != NULL)
+            {
+                uint8_t pos = inst->ext_cmd_lookup_tbl[inst->cfg->ext_cmd_table[i].cmd_code].cmd_pos;
+                bool acl_ext = (inst->cfg->ext_acl_table[pos] & MTB_PMBUS_ACL_BIT_WRITE_ACCESS) != 0U;
+                mtb_pmbus_cmd_wr_protect_isr(inst, ext_code, protect_ext || acl_ext);
+            }
+            else
+            {
+                mtb_pmbus_cmd_wr_protect_isr(inst, ext_code, protect_ext);
+            }
+        }
+    }
+#endif /* #if (defined(MTB_PMBUS_SUPPORT_EXT_CMD) && (MTB_PMBUS_SUPPORT_EXT_CMD != 0U)) */
+}
+
+
+mtb_pmbus_status_t mtb_pmbus_apply_write_protect(mtb_pmbus_stc_t *inst, uint8_t value)
+{
+    mtb_pmbus_status_t ret_status = MTB_PMBUS_STATUS_IS_BUSY;
+
+    CY_ASSERT(NULL != inst);
+
+    inst->cfg->hw_config->disable_hw_irq_callback();
+
+    if (!mtb_pmbus_is_busy(inst))
+    {
+        mtb_pmbus_apply_write_protect_isr(inst, value);
+        ret_status = MTB_PMBUS_STATUS_SUCCESS;
+    }
+
+    inst->cfg->hw_config->enable_hw_irq_callback();
+
+    return ret_status;
+}
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
+
+
+/*******************************************************************************
+* ACCESS_CONTROL ACL helpers
+*******************************************************************************/
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U))
+uint8_t mtb_pmbus_get_acl(const mtb_pmbus_stc_t *inst, uint32_t cmd_code)
+{
+    uint8_t acl_byte = 0x00U;
+
+#if (defined(MTB_PMBUS_SUPPORT_EXT_CMD) && (MTB_PMBUS_SUPPORT_EXT_CMD != 0U))
+    if (MTB_PMBUS_CMD_CODE_EXT == (MTB_PMBUS_CMD_EXT_MASK & cmd_code))
+    {
+        if (inst->cfg->ext_acl_table != NULL)
+        {
+            uint8_t ext_code = (uint8_t)((cmd_code >> MTB_PMBUS_CMD_EXT_POS) & 0xFFU);
+            if ((inst->ext_cmd_lookup_tbl[ext_code].flags & MTB_PMBUS_CMD_FLAG_IS_PRESENT) != 0U)
+            {
+                acl_byte = inst->cfg->ext_acl_table[inst->ext_cmd_lookup_tbl[ext_code].cmd_pos];
+            }
+        }
+    }
+    else
+#endif /* #if (defined(MTB_PMBUS_SUPPORT_EXT_CMD) && (MTB_PMBUS_SUPPORT_EXT_CMD != 0U)) */
+    {
+        acl_byte = inst->acl_table[(uint8_t)cmd_code];
+    }
+
+    return acl_byte;
+}
+
+
+void mtb_pmbus_set_acl_isr(mtb_pmbus_stc_t *inst, uint32_t cmd_code, uint8_t acl_byte)
+{
+    bool rejected = false;
+
+#if (defined(MTB_PMBUS_SUPPORT_EXT_CMD) && (MTB_PMBUS_SUPPORT_EXT_CMD != 0U))
+    if (MTB_PMBUS_CMD_CODE_EXT == (MTB_PMBUS_CMD_EXT_MASK & cmd_code))
+    {
+        if (inst->cfg->ext_acl_table != NULL)
+        {
+            uint8_t ext_code = (uint8_t)((cmd_code >> MTB_PMBUS_CMD_EXT_POS) & 0xFFU);
+            if ((inst->ext_cmd_lookup_tbl[ext_code].flags & MTB_PMBUS_CMD_FLAG_IS_PRESENT) != 0U)
+            {
+                uint8_t pos = inst->ext_cmd_lookup_tbl[ext_code].cmd_pos;
+                uint8_t current = inst->cfg->ext_acl_table[pos];
+                if ((current & MTB_PMBUS_ACL_BIT_NEVER_AGAIN) != 0U)
+                {
+                    inst->errors |= MTB_PMBUS_ERR_ACL_WR_REJECTED;
+                    MTB_PMBUS_LOG_WRN("ACL update for ext cmd [%x] rejected: Never Again bit set", ext_code);
+                    rejected = true;
+                }
+                else if ((current & MTB_PMBUS_ACL_BIT_NO_MORE) != 0U)
+                {
+                    inst->errors |= MTB_PMBUS_ERR_ACL_WR_REJECTED;
+                    MTB_PMBUS_LOG_WRN("ACL update for ext cmd [%x] rejected: No More bit set", ext_code);
+                    rejected = true;
+                }
+                else
+                {
+                    inst->cfg->ext_acl_table[pos] = acl_byte;
+                }
+            }
+        }
+    }
+    else
+#endif /* #if (defined(MTB_PMBUS_SUPPORT_EXT_CMD) && (MTB_PMBUS_SUPPORT_EXT_CMD != 0U)) */
+    {
+        uint8_t idx = (uint8_t)cmd_code;
+        uint8_t current = inst->acl_table[idx];
+
+        /* Never Again [0]: permanently locked */
+        if ((current & MTB_PMBUS_ACL_BIT_NEVER_AGAIN) != 0U)
+        {
+            inst->errors |= MTB_PMBUS_ERR_ACL_WR_REJECTED;
+            MTB_PMBUS_LOG_WRN("ACL update for cmd [%x] rejected: Never Again bit set", idx);
+            rejected = true;
+        }
+        /* No More [1]: not alterable even when PASSKEY is unlocked */
+        else if ((current & MTB_PMBUS_ACL_BIT_NO_MORE) != 0U)
+        {
+            inst->errors |= MTB_PMBUS_ERR_ACL_WR_REJECTED;
+            MTB_PMBUS_LOG_WRN("ACL update for cmd [%x] rejected: No More bit set", idx);
+            rejected = true;
+        }
+        else
+        {
+            inst->acl_table[idx] = acl_byte;
+        }
+    }
+
+    /* Synchronize write-access restriction with the IS_WR_PROTECTED flag so that both
+     * WRITE_PROTECT and ACCESS_CONTROL bit [7] can independently restrict writes
+     * (most-restrictive-wins is preserved automatically). */
+    if (!rejected)
+    {
+        mtb_pmbus_cmd_wr_protect_isr(inst, cmd_code,
+                                     (acl_byte & MTB_PMBUS_ACL_BIT_WRITE_ACCESS) != 0U);
+    }
+}
+
+
+mtb_pmbus_status_t mtb_pmbus_set_acl(mtb_pmbus_stc_t *inst, uint32_t cmd_code, uint8_t acl_byte)
+{
+    mtb_pmbus_status_t status;
+
+    CY_ASSERT(NULL != inst);
+
+#if (defined(MTB_PMBUS_SUPPORT_EXT_CMD) && (MTB_PMBUS_SUPPORT_EXT_CMD != 0U))
+    if (MTB_PMBUS_CMD_CODE_EXT == (MTB_PMBUS_CMD_EXT_MASK & cmd_code))
+    {
+        if (inst->cfg->ext_acl_table == NULL)
+        {
+            status = MTB_PMBUS_STATUS_BAD_PARAM;
+        }
+        else
+        {
+            uint8_t ext_code = (uint8_t)((cmd_code >> MTB_PMBUS_CMD_EXT_POS) & 0xFFU);
+            if ((inst->ext_cmd_lookup_tbl[ext_code].flags & MTB_PMBUS_CMD_FLAG_IS_PRESENT) == 0U)
+            {
+                status = MTB_PMBUS_STATUS_BAD_PARAM;
+            }
+            else
+            {
+                status = MTB_PMBUS_STATUS_IS_BUSY;
+            }
+        }
+    }
+    else
+#endif /* #if (defined(MTB_PMBUS_SUPPORT_EXT_CMD) && (MTB_PMBUS_SUPPORT_EXT_CMD != 0U)) */
+    {
+        /* Validate that the standard command code is registered */
+        status = mtb_pmbus_int_cmd_arg_is_valid(inst, cmd_code,
+                                                MTB_PMBUS_NO_PAGE_PHASE, MTB_PMBUS_NO_PAGE_PHASE,
+                                                0U, true);
+        if (status == MTB_PMBUS_STATUS_SUCCESS)
+        {
+            status = MTB_PMBUS_STATUS_IS_BUSY;
+        }
+    }
+
+    if (status == MTB_PMBUS_STATUS_IS_BUSY)
+    {
+        if (!mtb_pmbus_is_busy(inst))
+        {
+            inst->cfg->hw_config->disable_hw_irq_callback();
+            mtb_pmbus_set_acl_isr(inst, cmd_code, acl_byte);
+            inst->cfg->hw_config->enable_hw_irq_callback();
+            status = MTB_PMBUS_STATUS_SUCCESS;
+        }
+    }
+
+    return status;
+}
+
+
+void mtb_pmbus_set_acl_from_nvm(mtb_pmbus_stc_t *inst, const uint8_t *nvm_acl, uint16_t count)
+{
+    CY_ASSERT(NULL != inst);
+    CY_ASSERT(NULL != nvm_acl);
+
+    uint16_t limit = (count > (uint16_t)MTB_PMBUS_CMD_MAX_NUM)
+                     ? (uint16_t)MTB_PMBUS_CMD_MAX_NUM
+                     : count;
+
+    for (uint16_t i = 0U; i < limit; i++)
+    {
+        /* Write directly — NVM image is authoritative at power-on;
+         * Never Again / No More guards are intentionally bypassed. */
+        inst->acl_table[i] = nvm_acl[i];
+
+        /* Sync IS_WR_PROTECTED flag for commands with bit [7] set */
+        mtb_pmbus_cmd_wr_protect_isr(inst, (uint32_t)i,
+                                     (nvm_acl[i] & MTB_PMBUS_ACL_BIT_WRITE_ACCESS) != 0U);
+    }
+}
+
+
+/*******************************************************************************
+* PASSKEY helpers
+*******************************************************************************/
+mtb_pmbus_passkey_state_t mtb_pmbus_get_passkey_state_isr(const mtb_pmbus_stc_t *inst)
+{
+    CY_ASSERT(NULL != inst);
+    return inst->passkey_state;
+}
+
+
+uint8_t mtb_pmbus_get_passkey_read_byte_isr(const mtb_pmbus_stc_t *inst)
+{
+    CY_ASSERT(NULL != inst);
+    uint8_t result;
+
+    switch (inst->passkey_state)
+    {
+        case MTB_PMBUS_PASSKEY_ST_LOCKED:
+            result = (uint8_t)(MTB_PMBUS_PASSKEY_STATE_BYTE_LOCKED_BASE |
+                               (inst->passkey_fail_cnt & MTB_PMBUS_PASSKEY_FAIL_CNT_MASK));
+            break;
+
+        case MTB_PMBUS_PASSKEY_ST_LOCKED_OUT:
+            result = MTB_PMBUS_PASSKEY_STATE_BYTE_LOCKED_OUT;
+            break;
+
+        case MTB_PMBUS_PASSKEY_ST_UNLOCKED:
+            result = 0x00U;
+            break;
+
+        case MTB_PMBUS_PASSKEY_ST_SET_NOT_LOCKED:
+            result = 0x00U;
+            break;
+
+        default:
+            result = 0x00U;
+            break;
+    }
+
+    return result;
+}
+
+
+void mtb_pmbus_passkey_transition_isr(mtb_pmbus_stc_t *inst, bool key_matched, bool is_zero_key)
+{
+    CY_ASSERT(NULL != inst);
+    switch (inst->passkey_state)
+    {
+        case MTB_PMBUS_PASSKEY_ST_UNLOCKED:
+            if (!is_zero_key)
+            {
+                /* First passkey write — move to SetNotLocked; application stores key */
+                inst->passkey_state = MTB_PMBUS_PASSKEY_ST_SET_NOT_LOCKED;
+            }
+            /* Writing zero passkey when Unlocked has no defined effect; ignore */
+            break;
+
+        case MTB_PMBUS_PASSKEY_ST_SET_NOT_LOCKED:
+            if (is_zero_key)
+            {
+                /* Cancel — return to Unlocked */
+                inst->passkey_state = MTB_PMBUS_PASSKEY_ST_UNLOCKED;
+            }
+            else if (key_matched)
+            {
+                /* Confirmation write matches — transition to Locked */
+                inst->passkey_state    = MTB_PMBUS_PASSKEY_ST_LOCKED;
+                inst->passkey_fail_cnt = 0U;
+            }
+            else
+            {
+                /* Non-matching non-zero write in SetNotLocked state.
+                 * This branch is unreachable in normal usage: the application must
+                 * return false from MTB_PMBUS_CMD_WRITE_BYTE on the last data byte
+                 * to NACK it; the MW then sets errors and suppresses CMD_WRITE_DONE,
+                 * so this function is never called for the mismatch path. */
+            }
+            break;
+
+        case MTB_PMBUS_PASSKEY_ST_LOCKED:
+            if (key_matched && !is_zero_key)
+            {
+                /* Matching NVM passkey — first step of unlock (-> SetNotLocked) */
+                inst->passkey_state = MTB_PMBUS_PASSKEY_ST_SET_NOT_LOCKED;
+            }
+            else
+            {
+                /* Non-matching — stealth; increment fail counter */
+                inst->passkey_fail_cnt++;
+                if (inst->passkey_fail_cnt >= MTB_PMBUS_PASSKEY_MAX_FAIL_CNT)
+                {
+                    inst->passkey_state = MTB_PMBUS_PASSKEY_ST_LOCKED_OUT;
+                    inst->errors |= MTB_PMBUS_ERR_PASSKEY_LOCKED_OUT;
+                }
+            }
+            break;
+
+        case MTB_PMBUS_PASSKEY_ST_LOCKED_OUT:
+            /* All writes silently accepted; no state changes */
+            break;
+
+        default:
+            /* Unreachable: passkey_state is only assigned from mtb_pmbus_passkey_state_t values */
+            break;
+    }
+}
+
+
+void mtb_pmbus_passkey_force_locked_isr(mtb_pmbus_stc_t *inst, uint8_t fail_cnt)
+{
+    CY_ASSERT(NULL != inst);
+    inst->passkey_state    = MTB_PMBUS_PASSKEY_ST_LOCKED;
+    inst->passkey_fail_cnt = (fail_cnt >= MTB_PMBUS_PASSKEY_MAX_FAIL_CNT)
+                              ? (MTB_PMBUS_PASSKEY_MAX_FAIL_CNT - 1U)
+                              : fail_cnt;
+}
+
+
+mtb_pmbus_status_t mtb_pmbus_passkey_force_locked(mtb_pmbus_stc_t *inst, uint8_t fail_cnt)
+{
+    mtb_pmbus_status_t ret_status = MTB_PMBUS_STATUS_IS_BUSY;
+
+    CY_ASSERT(NULL != inst);
+
+    inst->cfg->hw_config->disable_hw_irq_callback();
+
+    if (!mtb_pmbus_is_busy(inst))
+    {
+        mtb_pmbus_passkey_force_locked_isr(inst, fail_cnt);
+        ret_status = MTB_PMBUS_STATUS_SUCCESS;
+    }
+
+    inst->cfg->hw_config->enable_hw_irq_callback();
+
+    return ret_status;
+}
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
+
+
 mtb_pmbus_status_t mtb_pmbus_cmd_process_call_wr_done(mtb_pmbus_stc_t *inst, bool *status)
 {
     mtb_pmbus_status_t ret_status = MTB_PMBUS_STATUS_BAD_PARAM;
@@ -771,3 +1251,62 @@ mtb_pmbus_status_t mtb_pmbus_cmd_complete_transfer(mtb_pmbus_stc_t *inst, uint32
 
     return status;
 }
+
+
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U))
+/*******************************************************************************
+* Function Name: mtb_pmbus_sec_get_level
+********************************************************************************
+* Returns the encoded Security Level compiled into the Middleware.
+*******************************************************************************/
+uint8_t mtb_pmbus_sec_get_level(void)
+{
+    return (uint8_t)(1U << MTB_PMBUS_SEC_LEVEL);
+}
+
+
+/*******************************************************************************
+* Function Name: mtb_pmbus_sec_check_l0_cmds
+********************************************************************************
+* Checks that all mandatory Security Level 0 commands are registered.
+*******************************************************************************/
+mtb_pmbus_status_t mtb_pmbus_sec_check_l0_cmds(mtb_pmbus_stc_t *inst, uint8_t *missing_mask)
+{
+    mtb_pmbus_status_t status;
+
+    if (NULL == inst)
+    {
+        status = MTB_PMBUS_STATUS_BAD_PARAM;
+    }
+    else
+    {
+        uint8_t mask = 0U;
+
+        if ((inst->cmd_lookup_tbl[MTB_PMBUS_PASSKEY_CMD_CODE].flags &
+             MTB_PMBUS_CMD_FLAG_IS_PRESENT) == 0U)
+        {
+            mask |= MTB_PMBUS_L0_MISSING_PASSKEY;
+        }
+        if ((inst->cmd_lookup_tbl[MTB_PMBUS_ACCESS_CONTROL_CMD_CODE].flags &
+             MTB_PMBUS_CMD_FLAG_IS_PRESENT) == 0U)
+        {
+            mask |= MTB_PMBUS_L0_MISSING_ACCESS_CONTROL;
+        }
+        if ((inst->cmd_lookup_tbl[MTB_PMBUS_WRITE_PROTECT_CMD_CODE].flags &
+             MTB_PMBUS_CMD_FLAG_IS_PRESENT) == 0U)
+        {
+            mask |= MTB_PMBUS_L0_MISSING_WRITE_PROTECT;
+        }
+
+        if (NULL != missing_mask)
+        {
+            *missing_mask = mask;
+        }
+
+        status = (mask == 0U) ? MTB_PMBUS_STATUS_SUCCESS : MTB_PMBUS_STATUS_L0_CMDS_MISSING;
+    }
+
+    return status;
+}
+#endif /* #if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U)) */

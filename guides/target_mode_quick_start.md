@@ -18,7 +18,7 @@ necessary hardware, and implement the basic SMBus/PMBus target functionality.
 
 > **Note:** The following SCB I2C configuration steps are simplified for quick start.
 > They will not cover all required settings to support all middleware features.
-> For a detailed description of the complete SCB I2C configuration, refer to the API Reference Guide.
+> For a detailed description of the complete SCB I2C configuration, refer to the [SCB I2C Configuration section in the API Reference Guide](https://github.com/Infineon/mtb-pmbus/blob/release-v1.2.0/docs/html/index.html#scb-i2c-configuration).
 
 1. Open the Device Configurator and switch to the Peripherals tab (#1.0).
 2. Enable the SCB block under Communication (#1.1) and select the I2C Personality (#1.2). Select the desired name for the SCB (e.g., PMBUS_I2C).

@@ -8,6 +8,8 @@ var group__group__pmbus__trgt__macro__conf =
     [ "MTB_PMBUS_SUPPORT_GEN_CALL_ADDR", "group__group__pmbus__trgt__macro__conf.html#ga84e81c33ff87c0afee3f5aa3049e1f5b", null ],
     [ "MTB_PMBUS_SUPPORT_EXT_CMD", "group__group__pmbus__trgt__macro__conf.html#ga5a67f5d404a0bdb38b480da5bf968198", null ],
     [ "MTB_PMBUS_SUPPORT_PEC", "group__group__pmbus__trgt__macro__conf.html#gaca4c77810990a2d79c54829515c23710", null ],
+    [ "MTB_PMBUS_SUPPORT_SECURITY", "group__group__pmbus__trgt__macro__conf.html#ga3956be68469d51c67eb97fd415d1e957", null ],
+    [ "MTB_PMBUS_SEC_LEVEL", "group__group__pmbus__trgt__macro__conf.html#ga1b01ade4d92f1579e15c2d255d2e5ca5", null ],
     [ "MTB_PMBUS_PAGES_NUM", "group__group__pmbus__trgt__macro__conf.html#ga0f89218d691a3d2675d57f8a3a9dcc48", null ],
     [ "MTB_PMBUS_IMPL_CMD_PAGE_SEL_ADV", "group__group__pmbus__trgt__macro__conf.html#gad1b0fe7aa0ec8cf8d56fa855c1d8341d", null ],
     [ "MTB_PMBUS_PHASES_NUM", "group__group__pmbus__trgt__macro__conf.html#ga14682f9b2ef9e937db61c9d9438bce38", null ],

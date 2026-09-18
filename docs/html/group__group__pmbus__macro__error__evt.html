@@ -34,7 +34,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign">
-   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.2.0.1772</span>
+   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.3.0.1943</span>
    </div>
   </td>
     <td>        <div id="MSearchBox" class="MSearchBoxInactive">
@@ -195,6 +195,21 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>MTB_PMBUS_ERR_REQ_RD_FOR_WR_ONLY</b>&#160;&#160;&#160;(0x200000U)</td></tr>
 <tr class="memdesc:ga00cbc6af7910fc94fefff4459ace1b13"><td class="mdescLeft">&#160;</td><td class="mdescRight">The controller attempts to read data for the write-only command. <br /></td></tr>
 <tr class="separator:ga00cbc6af7910fc94fefff4459ace1b13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8a90682ae4babfff919ae0947fdac695" id="r_ga8a90682ae4babfff919ae0947fdac695"><td class="memItemLeft" align="right" valign="top"><a id="ga8a90682ae4babfff919ae0947fdac695" name="ga8a90682ae4babfff919ae0947fdac695"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>MTB_PMBUS_ERR_RD_FROM_PROT_CMD</b>&#160;&#160;&#160;(0x400000U)</td></tr>
+<tr class="memdesc:ga8a90682ae4babfff919ae0947fdac695"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read is attempted to a command that is ACL read-protected (ACCESS_CONTROL bit [6]) <br /></td></tr>
+<tr class="separator:ga8a90682ae4babfff919ae0947fdac695"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3b226925adb4c332ff190ff1dec6135e" id="r_ga3b226925adb4c332ff190ff1dec6135e"><td class="memItemLeft" align="right" valign="top"><a id="ga3b226925adb4c332ff190ff1dec6135e" name="ga3b226925adb4c332ff190ff1dec6135e"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>MTB_PMBUS_ERR_ACL_WR_REJECTED</b>&#160;&#160;&#160;(0x800000U)</td></tr>
+<tr class="memdesc:ga3b226925adb4c332ff190ff1dec6135e"><td class="mdescLeft">&#160;</td><td class="mdescRight">ACCESS_CONTROL write was rejected because the target command's ACL byte has the No More [1] or Never Again [0] bit set. <br /></td></tr>
+<tr class="separator:ga3b226925adb4c332ff190ff1dec6135e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9308bb17ee7c75c0c6bdda26b3806e93" id="r_ga9308bb17ee7c75c0c6bdda26b3806e93"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga9308bb17ee7c75c0c6bdda26b3806e93">MTB_PMBUS_ERR_PEC_REQUIRED</a>&#160;&#160;&#160;(0x1000000U)</td></tr>
+<tr class="memdesc:ga9308bb17ee7c75c0c6bdda26b3806e93"><td class="mdescLeft">&#160;</td><td class="mdescRight">A PASSKEY write was received without a valid PEC byte.  <br /></td></tr>
+<tr class="separator:ga9308bb17ee7c75c0c6bdda26b3806e93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga86843e3766958fb202328b5441e2ac1e" id="r_ga86843e3766958fb202328b5441e2ac1e"><td class="memItemLeft" align="right" valign="top"><a id="ga86843e3766958fb202328b5441e2ac1e" name="ga86843e3766958fb202328b5441e2ac1e"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>MTB_PMBUS_ERR_PASSKEY_LOCKED_OUT</b>&#160;&#160;&#160;(0x2000000U)</td></tr>
+<tr class="memdesc:ga86843e3766958fb202328b5441e2ac1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The PASSKEY fail counter reached the maximum allowed attempts and the device transitioned to the Locked Out state (no further PASSKEY unlock is possible). <br /></td></tr>
+<tr class="separator:ga86843e3766958fb202328b5441e2ac1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ga02da61a220f51bcd49596059ebf220c3" name="ga02da61a220f51bcd49596059ebf220c3"></a>
@@ -300,6 +315,23 @@ Macros</h2></td></tr>
 
 <p>The protocol is started with Target Address with Read Direction. </p>
 <p>The error is only applicable for PMBus mode. </p>
+
+</div>
+</div>
+<a id="ga9308bb17ee7c75c0c6bdda26b3806e93" name="ga9308bb17ee7c75c0c6bdda26b3806e93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9308bb17ee7c75c0c6bdda26b3806e93">&#9670;&#160;</a></span>MTB_PMBUS_ERR_PEC_REQUIRED</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MTB_PMBUS_ERR_PEC_REQUIRED&#160;&#160;&#160;(0x1000000U)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>A PASSKEY write was received without a valid PEC byte. </p>
+<p>PEC is mandatory for PASSKEY writes when <a class="el" href="group__group__pmbus__trgt__macro__conf.html#ga3956be68469d51c67eb97fd415d1e957">MTB_PMBUS_SUPPORT_SECURITY</a> is enabled and PEC support is compiled in. </p>
 
 </div>
 </div>

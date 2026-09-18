@@ -34,7 +34,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign">
-   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.2.0.1772</span>
+   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.3.0.1943</span>
    </div>
   </td>
     <td>        <div id="MSearchBox" class="MSearchBoxInactive">
@@ -241,7 +241,7 @@ When using this generic transfer API, the application is responsible for proper 
 </ul>
 <p>Transaction format: </p><div class="fragment"><div class="line">[S] [ADDR+W] [A] [P] </div>
 </div><!-- fragment --><p>Where: S=Start, P=Stop, A=ACK, W=Write bit</p>
-<dl class="section note"><dt>Note</dt><dd>Quick Command with Read direction (ADDR+R) is not supported due to HW limitations. See <a class="el" href="index.html#quick-command-with-read-direction-limitation-controller-mode">Quick Command with Read Direction Limitation</a> for details.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Quick Command with Read direction (ADDR+R) is not supported due to HW limitations. See <a class="el" href="guide_design_considerations_hardware_and_timeout.html#quick-command-with-read-direction-limitation-controller-mode">Quick Command with Read Direction Limitation</a> for details.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">inst</td><td>The pointer to the PMBus Controller instance structure. </td></tr>

@@ -8,7 +8,14 @@ var group__group__pmbus__trgt__enums =
       [ "MTB_PMBUS_STATUS_BAD_PARAM", "group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5abb942ed95de9fe8142e9fa50f20cdbf9", null ],
       [ "MTB_PMBUS_STATUS_TOO_MANY_BYTES", "group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5aa90ee06b2fbcc4499d8856f242aac3fd", null ],
       [ "MTB_PMBUS_STATUS_CMD_IS_ACTIVE", "group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5ae0bfee429a7136cd933a8b79de7f3ae0", null ],
-      [ "MTB_PMBUS_STATUS_IS_BUSY", "group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5a1beacb4946d6c7d299119d7484bd1591", null ]
+      [ "MTB_PMBUS_STATUS_IS_BUSY", "group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5a1beacb4946d6c7d299119d7484bd1591", null ],
+      [ "MTB_PMBUS_STATUS_L0_CMDS_MISSING", "group__group__pmbus__trgt__enums.html#ggacd0443505a96d8e7fb968dbaeb98d9e5a6266ae8d7a41dd535e76095aa873169a", null ]
+    ] ],
+    [ "mtb_pmbus_passkey_state_t", "group__group__pmbus__trgt__enums.html#gaf8b939707aa3cb72ecfc2bc82bf9d968", [
+      [ "MTB_PMBUS_PASSKEY_ST_UNLOCKED", "group__group__pmbus__trgt__enums.html#ggaf8b939707aa3cb72ecfc2bc82bf9d968af6e543e79066f12f7a833c1eaa10e164", null ],
+      [ "MTB_PMBUS_PASSKEY_ST_SET_NOT_LOCKED", "group__group__pmbus__trgt__enums.html#ggaf8b939707aa3cb72ecfc2bc82bf9d968a8277bd77fe68fa2c89af903a31bfca50", null ],
+      [ "MTB_PMBUS_PASSKEY_ST_LOCKED", "group__group__pmbus__trgt__enums.html#ggaf8b939707aa3cb72ecfc2bc82bf9d968ac2db94e7c7de8feb04f71dc755c4c6af", null ],
+      [ "MTB_PMBUS_PASSKEY_ST_LOCKED_OUT", "group__group__pmbus__trgt__enums.html#ggaf8b939707aa3cb72ecfc2bc82bf9d968abb643b82a555798020f077df95b98507", null ]
     ] ],
     [ "mtb_pmbus_smbalert_mode_t", "group__group__pmbus__trgt__enums.html#ga09fafc609e90108dc91921d1617c7841", [
       [ "MTB_PMBUS_SMBALERT_MODE_MANUAL", "group__group__pmbus__trgt__enums.html#gga09fafc609e90108dc91921d1617c7841a651d68567cad937f48a8f58020e91a04", null ],
@@ -55,7 +62,8 @@ var group__group__pmbus__trgt__enums =
       [ "MTB_PMBUS_HW_RESOURCES_DISABLE", "group__group__pmbus__trgt__enums.html#gga1bb31edd0dd7bfd77d22956fcdaf3802a8c752fb6cef0df60b2bcd0463da83e84", null ]
     ] ],
     [ "mtb_pmbus_revision_t", "group__group__pmbus__trgt__enums.html#ga47ecda55d2fb84f84a2c87ddfec49ed9", [
-      [ "MTB_PMBUS_REVISION_1_4", "group__group__pmbus__trgt__enums.html#gga47ecda55d2fb84f84a2c87ddfec49ed9a78ebea09dba2dc8ff96543b23f5117db", null ]
+      [ "MTB_PMBUS_REVISION_1_4", "group__group__pmbus__trgt__enums.html#gga47ecda55d2fb84f84a2c87ddfec49ed9a78ebea09dba2dc8ff96543b23f5117db", null ],
+      [ "MTB_PMBUS_REVISION_1_5", "group__group__pmbus__trgt__enums.html#gga47ecda55d2fb84f84a2c87ddfec49ed9a65cf4e4d3a8c0bbbe43b4f2ee0d7be82", null ]
     ] ],
     [ "mtb_pmbus_speed_t", "group__group__pmbus__trgt__enums.html#ga9326cea03b903096ddf50cc7b4dfa76e", [
       [ "MTB_PMBUS_SPEED_100", "group__group__pmbus__trgt__enums.html#gga9326cea03b903096ddf50cc7b4dfa76eae0b2dcdf750b8c35913714abab365306", null ],

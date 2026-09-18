@@ -234,6 +234,19 @@ bool mtb_pmbus_handle_addr(mtb_pmbus_stc_t *inst, uint8_t addr)
                                                                                            0U);
 #endif /* #if (defined(MTB_PMBUS_ENABLE_CMD_CALLBACK_ADV) && (MTB_PMBUS_ENABLE_CMD_CALLBACK_ADV != 0U)) */
                                     }
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+                                    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U))
+                                    /* ACL Write Once [2]: auto-lock after first successful write
+                                     * (Process Call write phase) */
+                                    if ((inst->errors == 0U) &&
+                                        ((inst->acl_table[inst->cmd_code] & MTB_PMBUS_ACL_BIT_WRITE_ONCE) != 0U))
+                                    {
+                                        inst->acl_table[inst->cmd_code] |= MTB_PMBUS_ACL_BIT_WRITE_ACCESS;
+                                        inst->active_lookup_tbl[inst->cmd_code].flags |=
+                                            MTB_PMBUS_CMD_FLAG_IS_WR_PROTECTED;
+                                        MTB_PMBUS_LOG_DBG("Write Once: cmd [%x] write-locked", inst->cmd_code);
+                                    }
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
                                 }
                             }
                             else
@@ -266,7 +279,23 @@ bool mtb_pmbus_handle_addr(mtb_pmbus_stc_t *inst, uint8_t addr)
 #endif /* #if (MTB_PMBUS_IMPL_CMD_NUM != 0U) */
                                 (0U == (inst->active_lookup_tbl[inst->cmd_code].flags & MTB_PMBUS_CMD_FLAG_IS_PAUSED)))
                             {
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+                                defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U))
+                                /* ACL read restriction (ACCESS_CONTROL bit [6]):
+                                 * applied to all commands including pre-implemented ones */
+                                if ((inst->acl_table[inst->cmd_code] & MTB_PMBUS_ACL_BIT_READ_ACCESS) != 0U)
+                                {
+                                    inst->errors |= MTB_PMBUS_ERR_RD_FROM_PROT_CMD;
+                                    MTB_PMBUS_LOG_WRN("Cmd [%x] is ACL read-protected", inst->cmd_code);
+                                    /* int_buff left unset — controller receives FFh */
+                                }
+                                else
+                                {
+                                    mtb_pmbus_int_cmd_handle_tx(inst);
+                                }
+#else
                                 mtb_pmbus_int_cmd_handle_tx(inst);
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
                             }
                         }
                         else
@@ -632,28 +661,113 @@ bool mtb_pmbus_handle_rx(mtb_pmbus_stc_t *inst, uint8_t byte)
                     }
                     #endif /* #if (MTB_PMBUS_IMPL_CMD_NUM != 0U) */
 
-                    /* Check if command is protected */
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+                    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U))
+                    /* Check if command is protected — exempt the Protect Locks group
+                     * (ACCESS_CONTROL 0x0F and PASSKEY 0x0E):
+                     * "A device shall allow write transactions on these commands regardless of
+                     * WRITE_PROTECT or ACCESS_CONTROL itself."
+                     * Exception: when PASSKEY is Locked or LockedOut, ACCESS_CONTROL writes
+                     * are NOT exempt — they must be NACKed to enforce the lock. */
+
+                    /* cmd_code_full encodes FE-extended commands with MTB_PMBUS_CMD_CODE_EXT
+                     * in the upper byte, so a plain compare against the 8-bit standard codes
+                     * naturally excludes any FE-prefixed command without an explicit ext guard. */
+                    bool is_passkey_cmd = (inst->cmd_code_full == MTB_PMBUS_PASSKEY_CMD_CODE);
+                    bool is_acl_cmd     = (inst->cmd_code_full == MTB_PMBUS_ACCESS_CONTROL_CMD_CODE);
+
+                    bool passkey_locked =
+                        ((inst->passkey_state == MTB_PMBUS_PASSKEY_ST_LOCKED) ||
+                         (inst->passkey_state == MTB_PMBUS_PASSKEY_ST_LOCKED_OUT));
+
+                    /* Explicit block: PASSKEY Locked/LockedOut overrides all other flags for
+                     * ACCESS_CONTROL — even if IS_WR_PROTECTED is not set. */
+                    bool passkey_blocks_acl = is_acl_cmd && passkey_locked;
+
+                    bool is_protect_lock_bypass =
+                        is_passkey_cmd || (is_acl_cmd && !passkey_locked);
+
+                    if (!passkey_blocks_acl &&
+                        (((inst->active_lookup_tbl[wr_prot_idx].flags & MTB_PMBUS_CMD_FLAG_IS_WR_PROTECTED) == 0U) ||
+                         is_protect_lock_bypass))
+#else
                     if ((inst->active_lookup_tbl[wr_prot_idx].flags & MTB_PMBUS_CMD_FLAG_IS_WR_PROTECTED) == 0U)
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
                     {
                         /* Check if it is a Count byte*/
                         if (inst->is_cmd_block && ((inst->state & MTB_PMBUS_STATE_GOT_BYTE_COUNT) == 0U))
                         {
-                            /* Check if byte Count does not exceed cmd length */
-                            if (byte > inst->active_cmd_tbl[inst->cmd_pos].data_size)
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+                            defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U))
+                            bool passkey_stealth =
+                                (is_passkey_cmd &&
+                                 ((inst->passkey_state == MTB_PMBUS_PASSKEY_ST_LOCKED) ||
+                                  (inst->passkey_state == MTB_PMBUS_PASSKEY_ST_LOCKED_OUT)));
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
+
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+                            defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U))
+                            if (passkey_stealth)
                             {
-                                inst->errors |= MTB_PMBUS_ERR_BYTE_COUNT_TOO_BIG;
-                                MTB_PMBUS_LOG_WRN("Count byte [%x] exceed length", byte);
+                                /* Special length rules when Locked */
+                                if (byte < MTB_PMBUS_PASSKEY_STEALTH_MIN_LEN)
+                                {
+                                    /* Block count below minimum — NACK, no STATUS bits */
+                                    response = false;
+                                    MTB_PMBUS_LOG_WRN("PASSKEY Locked: block count [%x] < %u (NACK)",
+                                                      byte, MTB_PMBUS_PASSKEY_STEALTH_MIN_LEN);
+                                }
+                                else if ((byte > MTB_PMBUS_PASSKEY_STEALTH_MAX_LEN) ||
+                                         (byte > inst->active_cmd_tbl[inst->cmd_pos].data_size))
+                                {
+                                    /* Block count exceeds the stealth range (> 8) OR the device
+                                     * buffer size — NACK + increment fail counter.
+                                     * Both limits are checked independently (OR) to prevent an
+                                     * OOB write into int_buff when data_size < STEALTH_MAX_LEN:
+                                     * any count > data_size must be rejected even if count <= 8. */
+                                    if (inst->passkey_state == MTB_PMBUS_PASSKEY_ST_LOCKED)
+                                    {
+                                        inst->passkey_fail_cnt++;
+                                        if (inst->passkey_fail_cnt >= MTB_PMBUS_PASSKEY_MAX_FAIL_CNT)
+                                        {
+                                            inst->passkey_state = MTB_PMBUS_PASSKEY_ST_LOCKED_OUT;
+                                            inst->errors |= MTB_PMBUS_ERR_PASSKEY_LOCKED_OUT;
+                                        }
+                                    }
+                                    response = false;
+                                    MTB_PMBUS_LOG_WRN(
+                                        "PASSKEY Locked: block count [%x] exceeds stealth or device max (NACK)", byte);
+                                }
+                                else
+                                {
+                                    /* Stealth ACK — accept all bytes without setting error bits */
+                                    response = true;
+                                    inst->byte_requested = (uint16_t)(byte) + 1U;
+                                    inst->int_buff[inst->byte_received] = byte;
+                                    inst->byte_received++;
+                                    inst->state |= MTB_PMBUS_STATE_GOT_BYTE_COUNT;
+                                }
                             }
                             else
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
                             {
-                                /* Send ACK */
-                                response = true;
+                                /* Normal block-count check for all other commands */
+                                if (byte > inst->active_cmd_tbl[inst->cmd_pos].data_size)
+                                {
+                                    inst->errors |= MTB_PMBUS_ERR_BYTE_COUNT_TOO_BIG;
+                                    MTB_PMBUS_LOG_WRN("Count byte [%x] exceed length", byte);
+                                }
+                                else
+                                {
+                                    /* Send ACK */
+                                    response = true;
 
-                                /* Store count value */
-                                inst->byte_requested = (uint16_t)(byte) + 1U;
-                                inst->int_buff[inst->byte_received] = byte;
-                                inst->byte_received++;
-                                inst->state |= MTB_PMBUS_STATE_GOT_BYTE_COUNT;
+                                    /* Store count value */
+                                    inst->byte_requested = (uint16_t)(byte) + 1U;
+                                    inst->int_buff[inst->byte_received] = byte;
+                                    inst->byte_received++;
+                                    inst->state |= MTB_PMBUS_STATE_GOT_BYTE_COUNT;
+                                }
                             }
                         }
                         else
@@ -1349,31 +1463,64 @@ void mtb_pmbus_handle_stop(mtb_pmbus_stc_t *inst)
                                 else
 #endif /* #if (MTB_PMBUS_IMPL_CMD_NUM != 0U) */
                                 {
-                                    mtb_pmbus_int_update_data(inst);
-                                    /* Call the command callback */
-                                    if (inst->active_cmd_tbl[inst->cmd_pos].callback != NULL)
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+                                    defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U))
+#if (defined(MTB_PMBUS_SUPPORT_PEC) && (MTB_PMBUS_SUPPORT_PEC != 0U))
+                                    /* PASSKEY writes must use PEC (mandatory from Security Level 0
+                                       up).
+                                     * Reject the write if PEC is enabled but was not executed. */
+                                    if ((inst->cmd_code_full == MTB_PMBUS_PASSKEY_CMD_CODE) &&
+                                        inst->cfg->enable_pec &&
+                                        ((inst->state & MTB_PMBUS_STATE_PEC_IS_EXECUTED) == 0U))
                                     {
-                                        /* Ignore the return status as it is not applicable for this
-                                           event */
-                                        (void)inst->active_cmd_tbl[inst->cmd_pos].callback(MTB_PMBUS_CMD_WRITE_DONE,
+                                        inst->errors |= MTB_PMBUS_ERR_PEC_REQUIRED;
+                                        MTB_PMBUS_LOG_WRN("PASSKEY write rejected: PEC is mandatory");
+                                    }
+                                    else
+#endif /* #if MTB_PMBUS_SUPPORT_PEC */
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
+                                    {
+                                        mtb_pmbus_int_update_data(inst);
+                                        /* Call the command callback */
+                                        if (inst->active_cmd_tbl[inst->cmd_pos].callback != NULL)
+                                        {
+                                            /* Ignore the return status as it is not applicable for
+                                               this
+                                               event */
+                                            (void)inst->active_cmd_tbl[inst->cmd_pos].callback(MTB_PMBUS_CMD_WRITE_DONE,
 #if (defined(MTB_PMBUS_PAGES_NUM) && (MTB_PMBUS_PAGES_NUM != 0U))
-                                                                                           (int32_t)inst->act_page,
+                                                                                               (int32_t)inst->act_page,
 #else
-                                                                                           MTB_PMBUS_NO_PAGE_PHASE,
+                                                                                               MTB_PMBUS_NO_PAGE_PHASE,
 #endif /* #if (defined(MTB_PMBUS_PAGES_NUM) && (MTB_PMBUS_PAGES_NUM != 0U)) */
 #if (defined(MTB_PMBUS_PHASES_NUM) && (MTB_PMBUS_PHASES_NUM != 0U))
-                                                                                           (int32_t)inst->act_phase,
+                                                                                               (int32_t)inst->act_phase,
 #else
-                                                                                           MTB_PMBUS_NO_PAGE_PHASE,
+                                                                                               MTB_PMBUS_NO_PAGE_PHASE,
 #endif /* #if (defined(MTB_PMBUS_PHASES_NUM) && (MTB_PMBUS_PHASES_NUM != 0U)) */
 #if (defined(MTB_PMBUS_ENABLE_CMD_CALLBACK_ADV) && (MTB_PMBUS_ENABLE_CMD_CALLBACK_ADV != 0U))
-                                                                                           0U, 0U);
+                                                                                               0U, 0U);
 #else
-                                                                                           0U);
+                                                                                               0U);
 #endif /* #if (defined(MTB_PMBUS_ENABLE_CMD_CALLBACK_ADV) && (MTB_PMBUS_ENABLE_CMD_CALLBACK_ADV != 0U)) */
-                                        inst->active_lookup_tbl[inst->cmd_code].flags |=
-                                            MTB_PMBUS_CMD_FLAG_IS_TRANSMITTED;
-                                    }
+                                            inst->active_lookup_tbl[inst->cmd_code].flags |=
+                                                MTB_PMBUS_CMD_FLAG_IS_TRANSMITTED;
+                                        }
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+                                        defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U))
+                                        /* ACL Write Once [2]: auto-lock after first successful
+                                           write
+                                         * (normal write STOP path) */
+                                        if ((inst->errors == 0U) &&
+                                            ((inst->acl_table[inst->cmd_code] & MTB_PMBUS_ACL_BIT_WRITE_ONCE) != 0U))
+                                        {
+                                            inst->acl_table[inst->cmd_code] |= MTB_PMBUS_ACL_BIT_WRITE_ACCESS;
+                                            inst->active_lookup_tbl[inst->cmd_code].flags |=
+                                                MTB_PMBUS_CMD_FLAG_IS_WR_PROTECTED;
+                                            MTB_PMBUS_LOG_DBG("Write Once: cmd [%x] write-locked", inst->cmd_code);
+                                        }
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
+                                    } /* end PEC-mandatory else block */
                                 }
                             }
                             else
@@ -1800,6 +1947,15 @@ static bool mtb_pmbus_int_impl_cmd_rev(mtb_pmbus_stc_t *inst, mtb_pmbus_cmd_even
             /* Middleware supports only the same revision for Part 1 and Part 2 specification */
             inst->int_buff[0U] = MTB_PMBUS_REV_1_4;
             inst->byte_to_send = MTB_PMBUS_IMPL_CMD_REVISION_SIZE;
+        }
+        else if (inst->cfg->revision == MTB_PMBUS_REVISION_1_5)
+        {
+            inst->int_buff[0U] = MTB_PMBUS_REV_1_5;
+            inst->byte_to_send = MTB_PMBUS_IMPL_CMD_REVISION_SIZE;
+        }
+        else
+        {
+            /* Unknown revision — return no data */
         }
     }
 

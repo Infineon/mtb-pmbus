@@ -34,7 +34,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign">
-   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.2.0.1772</span>
+   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.3.0.1943</span>
    </div>
   </td>
     <td>        <div id="MSearchBox" class="MSearchBoxInactive">
@@ -137,6 +137,12 @@ Macros</h2></td></tr>
 <tr class="memitem:gaca4c77810990a2d79c54829515c23710" id="r_gaca4c77810990a2d79c54829515c23710"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaca4c77810990a2d79c54829515c23710">MTB_PMBUS_SUPPORT_PEC</a>&#160;&#160;&#160;(1U)</td></tr>
 <tr class="memdesc:gaca4c77810990a2d79c54829515c23710"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable PEC.  <br /></td></tr>
 <tr class="separator:gaca4c77810990a2d79c54829515c23710"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3956be68469d51c67eb97fd415d1e957" id="r_ga3956be68469d51c67eb97fd415d1e957"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga3956be68469d51c67eb97fd415d1e957">MTB_PMBUS_SUPPORT_SECURITY</a>&#160;&#160;&#160;(0U)</td></tr>
+<tr class="memdesc:ga3956be68469d51c67eb97fd415d1e957"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable PMBus Security feature support.  <br /></td></tr>
+<tr class="separator:ga3956be68469d51c67eb97fd415d1e957"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1b01ade4d92f1579e15c2d255d2e5ca5" id="r_ga1b01ade4d92f1579e15c2d255d2e5ca5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga1b01ade4d92f1579e15c2d255d2e5ca5">MTB_PMBUS_SEC_LEVEL</a>&#160;&#160;&#160;(0U)</td></tr>
+<tr class="memdesc:ga1b01ade4d92f1579e15c2d255d2e5ca5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Select the PMBus Security Level.  <br /></td></tr>
+<tr class="separator:ga1b01ade4d92f1579e15c2d255d2e5ca5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0f89218d691a3d2675d57f8a3a9dcc48" id="r_ga0f89218d691a3d2675d57f8a3a9dcc48"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga0f89218d691a3d2675d57f8a3a9dcc48">MTB_PMBUS_PAGES_NUM</a>&#160;&#160;&#160;(0x10U)</td></tr>
 <tr class="memdesc:ga0f89218d691a3d2675d57f8a3a9dcc48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of pages.  <br /></td></tr>
 <tr class="separator:ga0f89218d691a3d2675d57f8a3a9dcc48"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -371,6 +377,47 @@ Macros</h2></td></tr>
 <p>The APIs will be not available if this option is disabled:</p><ul>
 <li><a class="el" href="group__group__pmbus__trgt__data__structs.html#ac6ee99196564e5ab772952f5ef93ae81">mtb_pmbus_stc_config_t::enable_pec</a> </li>
 </ul>
+
+</div>
+</div>
+<a id="ga3956be68469d51c67eb97fd415d1e957" name="ga3956be68469d51c67eb97fd415d1e957"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3956be68469d51c67eb97fd415d1e957">&#9670;&#160;</a></span>MTB_PMBUS_SUPPORT_SECURITY</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MTB_PMBUS_SUPPORT_SECURITY&#160;&#160;&#160;(0U)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Enable or disable PMBus Security feature support. </p>
+<p>When enabled, the Middleware enforces the Security Level defined by <a class="el" href="#ga1b01ade4d92f1579e15c2d255d2e5ca5">MTB_PMBUS_SEC_LEVEL</a> and exposes the related APIs.</p>
+<p>Default: 0U (Disabled) </p>
+
+</div>
+</div>
+<a id="ga1b01ade4d92f1579e15c2d255d2e5ca5" name="ga1b01ade4d92f1579e15c2d255d2e5ca5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1b01ade4d92f1579e15c2d255d2e5ca5">&#9670;&#160;</a></span>MTB_PMBUS_SEC_LEVEL</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MTB_PMBUS_SEC_LEVEL&#160;&#160;&#160;(0U)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Select the PMBus Security Level. </p>
+<p>Supported values:</p><ul>
+<li>0 — Security Level 0 (supported, except for the FW update)</li>
+<li>1 — Security Level 1 (not currently supported)</li>
+<li>2 — Security Level 2 (not currently supported)</li>
+<li>3 — Security Level 3 (not currently supported)</li>
+</ul>
+<p>Default: 0U (Level 0) </p>
 
 </div>
 </div>

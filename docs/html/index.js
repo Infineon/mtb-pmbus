@@ -8,55 +8,10 @@ var index =
     ] ],
     [ "Quick Start", "index.html#quick-start", [
       [ "Target Mode Guides", "index.html#target-mode-guides", null ],
-      [ "Controller Mode Guides", "index.html#controller-mode-guides", null ]
+      [ "Controller Mode Guides", "index.html#controller-mode-guides", null ],
+      [ "Migration Steps from Manual Configuration", "index.html#migration-steps-from-manual-configuration", null ]
     ] ],
-    [ "Design Considerations", "index.html#design-considerations", [
-      [ "Solution Configuration", "index.html#solution-configuration", null ],
-      [ "Initialization Sequence", "index.html#initialization-sequence", [
-        [ "Target Mode", "index.html#target-mode", null ],
-        [ "Controller Mode", "index.html#controller-mode", null ]
-      ] ],
-      [ "Communication Protocols", "index.html#communication-protocols", [
-        [ "Target Mode", "index.html#target-mode-1", null ],
-        [ "Controller Mode", "index.html#controller-mode-1", null ]
-      ] ],
-      [ "Timeout Handling", "index.html#timeout-handling", null ],
-      [ "Callback Handling", "index.html#callback-handling", [
-        [ "Target Mode", "index.html#target-mode-2", [
-          [ "Command Callback", "index.html#command-callback", null ],
-          [ "General Callback", "index.html#general-callback", null ]
-        ] ],
-        [ "Controller Mode", "index.html#controller-mode-2", [
-          [ "Event Callback", "index.html#event-callback", null ]
-        ] ]
-      ] ],
-      [ "Command Organization", "index.html#command-organization", [
-        [ "Command Capabilities", "index.html#command-capabilities", null ],
-        [ "Implemented Commands", "index.html#implemented-commands", null ],
-        [ "Extended Commands Support", "index.html#extended-commands-support", null ]
-      ] ],
-      [ "Data Format Conversion Functions", "index.html#data-format-conversion-functions", null ],
-      [ "Optional Signals", "index.html#optional-signals", null ],
-      [ "Logging", "index.html#logging", null ],
-      [ "Low Power Support", "index.html#low-power-support", null ],
-      [ "Compile Time Options", "index.html#compile-time-options", null ],
-      [ "Host Notify Protocol", "index.html#host-notify-protocol", [
-        [ "Target Mode", "index.html#target-mode-3", null ],
-        [ "Controller Mode", "index.html#controller-mode-3", null ]
-      ] ],
-      [ "Hardware-Dependent Layer", "index.html#hardware-dependent-layer", [
-        [ "Limitations and Exceptions of the Zone Feature (Target Mode)", "index.html#limitations-and-exceptions-of-the-zone-feature-target-mode", null ],
-        [ "Quick Command with Read Direction Limitation (Controller Mode)", "index.html#quick-command-with-read-direction-limitation-controller-mode", null ],
-        [ "SCB I2C Configuration", "index.html#scb-i2c-configuration", [
-          [ "Target Mode", "index.html#target-mode-4", null ],
-          [ "Controller Mode", "index.html#controller-mode-4", null ]
-        ] ],
-        [ "Different Timeout Detection HW Implementations", "index.html#different-timeout-detection-hw-implementations", null ],
-        [ "Timeout Detection Configuration", "index.html#timeout-detection-configuration", null ],
-        [ "Frequency Selection for Timeout Handling", "index.html#frequency-selection-for-timeout-handling", null ],
-        [ "Hardware Configuration of the SMBALERT Signal", "index.html#hardware-configuration-of-the-smbalert-signal", null ]
-      ] ]
-    ] ],
+    [ "Design Considerations", "index.html#design-considerations", null ],
     [ "Compatible Software", "index.html#compatible-software", null ],
     [ "Industry Standards and Compliance", "index.html#industry-standards-and-compliance", [
       [ "MISRA-C:2012 Compliance", "index.html#misra-c2012-compliance", [

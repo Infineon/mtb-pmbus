@@ -34,7 +34,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign">
-   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.2.0.1772</span>
+   <div id="projectname">mtb-pmbus<span id="projectnumber">&#160;1.3.0.1943</span>
    </div>
   </td>
     <td>        <div id="MSearchBox" class="MSearchBoxInactive">
@@ -129,10 +129,24 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="#ggacd0443505a96d8e7fb968dbaeb98d9e5ae0bfee429a7136cd933a8b79de7f3ae0">MTB_PMBUS_STATUS_CMD_IS_ACTIVE</a> = MTB_PMBUS_HAL_STATUS_CMD_IS_ACTIVE
 , <br />
 &#160;&#160;<a class="el" href="#ggacd0443505a96d8e7fb968dbaeb98d9e5a1beacb4946d6c7d299119d7484bd1591">MTB_PMBUS_STATUS_IS_BUSY</a> = MTB_PMBUS_HAL_STATUS_IS_BUSY
+, <br />
+&#160;&#160;<a class="el" href="#ggacd0443505a96d8e7fb968dbaeb98d9e5a6266ae8d7a41dd535e76095aa873169a">MTB_PMBUS_STATUS_L0_CMDS_MISSING</a> = MTB_PMBUS_HAL_STATUS_L0_CMDS_MISSING
 <br />
  }</td></tr>
 <tr class="memdesc:gacd0443505a96d8e7fb968dbaeb98d9e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to return the statuses of most PMBus APIs.  <a href="#gacd0443505a96d8e7fb968dbaeb98d9e5">More...</a><br /></td></tr>
 <tr class="separator:gacd0443505a96d8e7fb968dbaeb98d9e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf8b939707aa3cb72ecfc2bc82bf9d968" id="r_gaf8b939707aa3cb72ecfc2bc82bf9d968"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#gaf8b939707aa3cb72ecfc2bc82bf9d968">mtb_pmbus_passkey_state_t</a> { <br />
+&#160;&#160;<a class="el" href="#ggaf8b939707aa3cb72ecfc2bc82bf9d968af6e543e79066f12f7a833c1eaa10e164">MTB_PMBUS_PASSKEY_ST_UNLOCKED</a> = 0x00U
+, <br />
+&#160;&#160;<a class="el" href="#ggaf8b939707aa3cb72ecfc2bc82bf9d968a8277bd77fe68fa2c89af903a31bfca50">MTB_PMBUS_PASSKEY_ST_SET_NOT_LOCKED</a> = 0x01U
+, <br />
+&#160;&#160;<a class="el" href="#ggaf8b939707aa3cb72ecfc2bc82bf9d968ac2db94e7c7de8feb04f71dc755c4c6af">MTB_PMBUS_PASSKEY_ST_LOCKED</a> = 0x02U
+, <br />
+&#160;&#160;<a class="el" href="#ggaf8b939707aa3cb72ecfc2bc82bf9d968abb643b82a555798020f077df95b98507">MTB_PMBUS_PASSKEY_ST_LOCKED_OUT</a> = 0x03U
+<br />
+ }</td></tr>
+<tr class="memdesc:gaf8b939707aa3cb72ecfc2bc82bf9d968"><td class="mdescLeft">&#160;</td><td class="mdescRight">PASSKEY state machine state.  <a href="#gaf8b939707aa3cb72ecfc2bc82bf9d968">More...</a><br /></td></tr>
+<tr class="separator:gaf8b939707aa3cb72ecfc2bc82bf9d968"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga09fafc609e90108dc91921d1617c7841" id="r_ga09fafc609e90108dc91921d1617c7841"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga09fafc609e90108dc91921d1617c7841">mtb_pmbus_smbalert_mode_t</a> { <br />
 &#160;&#160;<a class="el" href="#gga09fafc609e90108dc91921d1617c7841a651d68567cad937f48a8f58020e91a04">MTB_PMBUS_SMBALERT_MODE_MANUAL</a> = 0U
 , <br />
@@ -221,7 +235,11 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:ga1bb31edd0dd7bfd77d22956fcdaf3802"><td class="mdescLeft">&#160;</td><td class="mdescRight">I2C HW actions.  <a href="#ga1bb31edd0dd7bfd77d22956fcdaf3802">More...</a><br /></td></tr>
 <tr class="separator:ga1bb31edd0dd7bfd77d22956fcdaf3802"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga47ecda55d2fb84f84a2c87ddfec49ed9" id="r_ga47ecda55d2fb84f84a2c87ddfec49ed9"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga47ecda55d2fb84f84a2c87ddfec49ed9">mtb_pmbus_revision_t</a> { <a class="el" href="#gga47ecda55d2fb84f84a2c87ddfec49ed9a78ebea09dba2dc8ff96543b23f5117db">MTB_PMBUS_REVISION_1_4</a> = 0U
+<tr class="memitem:ga47ecda55d2fb84f84a2c87ddfec49ed9" id="r_ga47ecda55d2fb84f84a2c87ddfec49ed9"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ga47ecda55d2fb84f84a2c87ddfec49ed9">mtb_pmbus_revision_t</a> { <br />
+&#160;&#160;<a class="el" href="#gga47ecda55d2fb84f84a2c87ddfec49ed9a78ebea09dba2dc8ff96543b23f5117db">MTB_PMBUS_REVISION_1_4</a> = 0U
+, <br />
+&#160;&#160;<a class="el" href="#gga47ecda55d2fb84f84a2c87ddfec49ed9a65cf4e4d3a8c0bbbe43b4f2ee0d7be82">MTB_PMBUS_REVISION_1_5</a> = 1U
+<br />
  }</td></tr>
 <tr class="memdesc:ga47ecda55d2fb84f84a2c87ddfec49ed9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Revision of the PMBus specification.  <a href="#ga47ecda55d2fb84f84a2c87ddfec49ed9">More...</a><br /></td></tr>
 <tr class="separator:ga47ecda55d2fb84f84a2c87ddfec49ed9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -267,6 +285,41 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="ggacd0443505a96d8e7fb968dbaeb98d9e5ae0bfee429a7136cd933a8b79de7f3ae0" name="ggacd0443505a96d8e7fb968dbaeb98d9e5ae0bfee429a7136cd933a8b79de7f3ae0"></a>MTB_PMBUS_STATUS_CMD_IS_ACTIVE&#160;</td><td class="fielddoc"><p>The requested action is aborted for the command as this command takes part in communication. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ggacd0443505a96d8e7fb968dbaeb98d9e5a1beacb4946d6c7d299119d7484bd1591" name="ggacd0443505a96d8e7fb968dbaeb98d9e5a1beacb4946d6c7d299119d7484bd1591"></a>MTB_PMBUS_STATUS_IS_BUSY&#160;</td><td class="fielddoc"><p>The requested action is aborted as the PMBus instance takes part in communication. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggacd0443505a96d8e7fb968dbaeb98d9e5a6266ae8d7a41dd535e76095aa873169a" name="ggacd0443505a96d8e7fb968dbaeb98d9e5a6266ae8d7a41dd535e76095aa873169a"></a>MTB_PMBUS_STATUS_L0_CMDS_MISSING&#160;</td><td class="fielddoc"><p>One or more mandatory Security Level 0 commands are missing from the command table. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="gaf8b939707aa3cb72ecfc2bc82bf9d968" name="gaf8b939707aa3cb72ecfc2bc82bf9d968"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf8b939707aa3cb72ecfc2bc82bf9d968">&#9670;&#160;</a></span>mtb_pmbus_passkey_state_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#gaf8b939707aa3cb72ecfc2bc82bf9d968">mtb_pmbus_passkey_state_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>PASSKEY state machine state. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__group__pmbus__cmd__func.html#ga21b22a8fa87739dbea908cadbe606924" title="ISR-safe: returns the current PASSKEY state.">mtb_pmbus_get_passkey_state_isr</a> </dd>
+<dd>
+<a class="el" href="group__group__pmbus__cmd__func.html#gab8a90a81185a7266b3f6b9147011b497" title="ISR-safe: drives the PASSKEY state machine one step.">mtb_pmbus_passkey_transition_isr</a> </dd></dl>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggaf8b939707aa3cb72ecfc2bc82bf9d968af6e543e79066f12f7a833c1eaa10e164" name="ggaf8b939707aa3cb72ecfc2bc82bf9d968af6e543e79066f12f7a833c1eaa10e164"></a>MTB_PMBUS_PASSKEY_ST_UNLOCKED&#160;</td><td class="fielddoc"><p>PASSKEY is Unlocked. </p>
+<p>ACCESS_CONTROL writes are permitted. Passkey value can be changed. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaf8b939707aa3cb72ecfc2bc82bf9d968a8277bd77fe68fa2c89af903a31bfca50" name="ggaf8b939707aa3cb72ecfc2bc82bf9d968a8277bd77fe68fa2c89af903a31bfca50"></a>MTB_PMBUS_PASSKEY_ST_SET_NOT_LOCKED&#160;</td><td class="fielddoc"><p>Intermediate state. </p>
+<p>First passkey write received; awaiting second confirmation write. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaf8b939707aa3cb72ecfc2bc82bf9d968ac2db94e7c7de8feb04f71dc755c4c6af" name="ggaf8b939707aa3cb72ecfc2bc82bf9d968ac2db94e7c7de8feb04f71dc755c4c6af"></a>MTB_PMBUS_PASSKEY_ST_LOCKED&#160;</td><td class="fielddoc"><p>PASSKEY is Locked. </p>
+<p>ACCESS_CONTROL writes are blocked. Only accepting passkey write attempts for unlock. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggaf8b939707aa3cb72ecfc2bc82bf9d968abb643b82a555798020f077df95b98507" name="ggaf8b939707aa3cb72ecfc2bc82bf9d968abb643b82a555798020f077df95b98507"></a>MTB_PMBUS_PASSKEY_ST_LOCKED_OUT&#160;</td><td class="fielddoc"><p>Fail count reached <code>MTB_PMBUS_PASSKEY_MAX_FAIL_CNT</code>. </p>
+<p>All passkey writes are silently ACKed. State is permanently frozen until power cycle. </p>
 </td></tr>
 </table>
 
@@ -482,6 +535,9 @@ Enumerations</h2></td></tr>
 <dl class="section note"><dt>Note</dt><dd>This enum is only available when <a class="el" href="group__group__pmbus__trgt__macro__conf.html#ga393eb8770f9955db3097f18c338cf645">MTB_PMBUS_IMPL_CMD_REVISION</a> is enabled at compile time options. </dd></dl>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga47ecda55d2fb84f84a2c87ddfec49ed9a78ebea09dba2dc8ff96543b23f5117db" name="gga47ecda55d2fb84f84a2c87ddfec49ed9a78ebea09dba2dc8ff96543b23f5117db"></a>MTB_PMBUS_REVISION_1_4&#160;</td><td class="fielddoc"><p>PMBus revision 1.4. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga47ecda55d2fb84f84a2c87ddfec49ed9a65cf4e4d3a8c0bbbe43b4f2ee0d7be82" name="gga47ecda55d2fb84f84a2c87ddfec49ed9a65cf4e4d3a8c0bbbe43b4f2ee0d7be82"></a>MTB_PMBUS_REVISION_1_5&#160;</td><td class="fielddoc"><p>PMBus revision 1.5. </p>
+<dl class="section note"><dt>Note</dt><dd>Reporting PMBus v1.5 implies the device complies with the Secure Device Application Profile. It is strongly recommended to enable <a class="el" href="group__group__pmbus__trgt__macro__conf.html#ga3956be68469d51c67eb97fd415d1e957">MTB_PMBUS_SUPPORT_SECURITY</a> and implement the mandatory Security Level 0 commands (PASSKEY, ACCESS_CONTROL, WRITE_PROTECT) when this revision is selected. </dd></dl>
 </td></tr>
 </table>
 

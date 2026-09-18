@@ -200,6 +200,7 @@
     <ParamString id='stdCmd$idxPhasesNumArr' name='stdCmd$idxPhasesNumArr' group='Internal' default='`${(stdCmd$idxBinCap &amp; $PMBUS_CMD_CAP_PHASE) &amp;&amp; (phasesNum &gt; 0) ? "[" . phasesNum . "U]" : ""}`' visible='`${debug}`' editable='false' desc='' />
     <ParamString id='stdCmd$idxDataBuf' name='Data Buffer' group='Configurator General/Standard Command$idx' default='NULL' visible='`${stdCmd$idxVis}`' editable='`${stdCmd$idxEna}`' desc='The pointer to the command data buffer.' />
     <ParamRange id='stdCmd$idxDataSize' name='Data Size' group='Configurator General/Standard Command$idx' default='0' min='0' max='255' resolution='1' visible='`${stdCmd$idxVis}`' editable='`${stdCmd$idxEna}`' desc='Command data size (uint8_t)' />
+    <ParamString id='stdCmd$idxBufSize' name='stdCmd$idxBufSize' group='Internal' default='`${(stdCmd$idxBinCap &amp; $PMBUS_CMD_CAP_BLOCK) ? (stdCmd$idxDataSize + 1) : stdCmd$idxDataSize}`' visible='`${debug}`' editable='false' desc='Buffer size: DataSize + 1 for block commands (count byte), DataSize otherwise.' />
     <ParamString id='stdCmd$idxCallback' name='Callback' group='Configurator General/Standard Command$idx' default='NULL' visible='`${stdCmd$idxVis}`' editable='`${stdCmd$idxEna}`' desc='Command callback function name' />
   </Repeat>
 
@@ -225,6 +226,7 @@
     <ParamString id='extCmd$idxPhasesNumArr' name='extCmd$idxPhasesNumArr' group='Internal' default='`${(extCmd$idxBinCap &amp; $PMBUS_CMD_CAP_PHASE) &amp;&amp; (phasesNum &gt; 0) ? "[" . phasesNum . "U]" : ""}`' visible='`${debug}`' editable='false' desc='' />
     <ParamString id='extCmd$idxDataBuf' name='Data Buffer' group='Configurator General/Extended Command$idx' default='NULL' visible='`${extCmd$idxVis}`' editable='`${extCmd$idxEna}`'  desc='The pointer to the extended command data buffer.' />
     <ParamRange id='extCmd$idxDataSize' name='Data Size' group='Configurator General/Extended Command$idx' default='0' min='0' max='255' resolution='1' visible='`${extCmd$idxVis}`' editable='`${extCmd$idxEna}`'  desc='Extended command data size (uint8_t)' />
+    <ParamString id='extCmd$idxBufSize' name='extCmd$idxBufSize' group='Internal' default='`${(extCmd$idxBinCap &amp; $PMBUS_CMD_CAP_BLOCK) ? (extCmd$idxDataSize + 1) : extCmd$idxDataSize}`' visible='`${debug}`' editable='false' desc='Buffer size: DataSize + 1 for block commands (count byte), DataSize otherwise.' />
     <ParamString id='extCmd$idxCallback' name='Callback' group='Configurator General/Extended Command$idx' default='NULL' visible='`${extCmd$idxVis}`' editable='`${extCmd$idxEna}`'  desc='Extended command callback function name' />
   </Repeat>
 
@@ -350,19 +352,19 @@
       <Entry name='TCPWM timeout measurement' value='TCPWM' visible='true' />
     </ParamChoice>
     <ParamBool id='toTmrResIsTCPWM' name='toTmrResIsTCPWM' group='Timeout Detection' default='`${toTmrRes eq "TCPWM"}`' visible='`${debug}`' editable='false' desc='The TCPWM timer is selected as the timeout detection hardware resource.' />
-    <ParamChoice id='toConfig' group='Timeout Detection' name='Timing Configuration' visible='true' editable='true' default='AUTO' desc='Timeout detection configuration' >
+    <ParamChoice id='toConfig' group='Timeout Detection' name='Timing Configuration' visible='`${ctoEnableTimeout}`' editable='true' default='AUTO' desc='Timeout detection configuration' >
       <Entry name='Auto' value='AUTO' visible='true' />
       <Entry name='Manual' value='MANUAL' visible='true' />
     </ParamChoice>
     <ParamBool id='toConfigIsManual' name='toConfigIsManual' group='Timeout Detection' default='`${toConfig eq "MANUAL"}`' visible='`${debug}`' editable='false' desc='Manual configuration mode is selected for the timeout detection.' />
 
     <!-- TGS -->
-    <ParamSignal templateId='i2c_hw' port='clock_tgs_en[0]' name='Clock Signal' group='Timeout Detection' visible='`${hasVisibleOption("clock_tgs_en[0]") &amp;&amp; !pmbus_tcpwm.toTmrResIsTCPWM}`' desc='The clock which operates the TGS.' canBeEmpty="`${pmbus_tcpwm.toTmrResIsTCPWM}`" />
+    <ParamSignal templateId='i2c_hw' port='clock_tgs_en[0]' name='Clock Signal' group='Timeout Detection' visible='`${pmbus_tcpwm.ctoEnableTimeout &amp;&amp; hasVisibleOption("clock_tgs_en[0]") &amp;&amp; !pmbus_tcpwm.toTmrResIsTCPWM}`' desc='The clock which operates the TGS.' canBeEmpty="`${pmbus_tcpwm.toTmrResIsTCPWM || !pmbus_tcpwm.ctoEnableTimeout}`" />
     <ParamRange id='tgsTmrWidth' name="tgsTmrWidth(bit's)" group='Timeout Detection' default='18' min='18' max='18' resolution='1' visible='`${debug}`' editable='false' desc="TGS timer width in bit's" />
     <ParamString id='tgsClkRes' name='tgsClkRes' group='Timeout Detection' default='`${getOrDefault(getBlockFromSignal(makeId("i2c_hw", "clock_tgs_en[0]")), "")}`' visible='`${debug}`' editable='false' desc='TGS timer clock resource' />
     <!-- TCPWM -->
     <ParamString templateId='tcpwmTimer' id='instName' name='Instance Name' group='Timeout Detection' default='`${pmbus_tcpwm.instName}`_TIMEOUT' visible='`${pmbus_tcpwm.debug &amp;&amp; pmbus_tcpwm.toTmrResIsTCPWM}`' editable='false' desc='' />
-    <ParamSignal templateId='tcpwmTimer' port='clock_counter_en[0]' name='Clock Signal' group='Timeout Detection' visible='`${hasVisibleOption("clock_counter_en[0]") &amp;&amp; pmbus_tcpwm.toTmrResIsTCPWM}`' desc='The clock input defines the operating frequency.' canBeEmpty='`${!pmbus_tcpwm.toTmrResIsTCPWM}`' />
+    <ParamSignal templateId='tcpwmTimer' port='clock_counter_en[0]' name='Clock Signal' group='Timeout Detection' visible='`${pmbus_tcpwm.ctoEnableTimeout &amp;&amp; hasVisibleOption("clock_counter_en[0]") &amp;&amp; pmbus_tcpwm.toTmrResIsTCPWM}`' desc='The clock input defines the operating frequency.' canBeEmpty='`${!pmbus_tcpwm.toTmrResIsTCPWM || !pmbus_tcpwm.ctoEnableTimeout}`' />
     <ParamString templateId='tcpwmTimer' id='pCntWidthEx' name='pCntWidthEx' desc='pCntWidthEx' group='Timeout Detection'  default='GRP_NR[`${getInstNumber("group")}`].CNT.GRP_CNT_WIDTH' visible='false' editable='false' />
     <ParamRange templateId='tcpwmTimer' id='pCntWidth' name='pCntWidth' desc='pCntWidth' group='Timeout Detection'  default='`${lookupExpression(pCntWidthEx)}`' min='16' max='32' resolution='1' visible='false' editable='false' />
     <ParamString id='tcpwmClkRes' name='tcpwmClkRes' group='Timeout Detection' default='`${getOrDefault(getBlockFromSignal(makeId("tcpwmTimer", "clock_counter_en[0]")), "")}`' visible='`${debug}`' editable='false' desc='TCPWM timer clock resource' />
@@ -374,10 +376,10 @@
                                                                                                                             ceil((1e6 * (1 + $SCB_CLK_ACCURACY))/ $MIN_I2C_THIGH_AT1K0_USEC)}`' min='1' max='10000000000' resolution='0.001' visible='`${debug}`' editable='false' desc='' />
     <ParamRange id='toClkFreq' name='toClkFreq(Hz)' group='Timeout Detection' default='`${toClkUsed ? getExposedMember(toClkRes, "frequency") : 0}`' min='0' max='1000000000' resolution='1' visible='`${debug}`' editable='false' desc='' />
     <ParamBool id='toClkIsToLow' name='toClkIsToLow' group='Timeout Detection' default='`${toClkFreq &lt; toClkMinFreq}`' visible='`${debug}`' editable='false' desc='' />
-    <ParamRange id='toClkRefMultiplier' name='toClkRefMultiplier' group='Timeout Detection' default='`${toClkMinFreq / toClkFreq}`' min='0' max='10000000000' resolution='0.001' visible='`${debug}`' editable='false' desc='' />
+    <ParamRange id='toClkRefMultiplier' name='toClkRefMultiplier' group='Timeout Detection' default='`${toClkFreq > 0 ? toClkMinFreq / toClkFreq : 0}`' min='0' max='10000000000' resolution='0.001' visible='`${debug}`' editable='false' desc='' />
     <ParamRange id='toClkFreq_MHz' name='toClkFreq(MHz)' group='Timeout Detection' default='`${toClkFreq * 1e-6}`' min='0.0' max='1000.0' resolution='0.001' visible='`${debug}`' editable='false' desc='' />
     <ParamString id='toClkAccu'  name='toClkAccu'  group='Timeout Detection' default='`${toClkUsed ? getExposedMember(toClkRes, "accuracy") : 0}`' visible='`${debug}`' editable='false' desc='' />
-    <ParamString id='toClkFreqInfo' name='Clock Frequency' group='Timeout Detection' default='`${formatFrequency(toClkFreq,toClkAccu)}`' visible='`${toClkUsed}`' editable='false' desc='The clock frequency of the timeout detection timer. ' />
+    <ParamString id='toClkFreqInfo' name='Clock Frequency' group='Timeout Detection' default='`${formatFrequency(toClkFreq,toClkAccu)}`' visible='`${ctoEnableTimeout &amp;&amp; toClkUsed}`' editable='false' desc='The clock frequency of the timeout detection timer. ' />
 
     <!-- Timeout Timer Period Calculation -->
     <ParamRange id='toTmrWidthBit' name="toTmrWidth(bit's)" group='Timeout Detection' default='`${toTmrResIsTCPWM ? tcpwmTimer.pCntWidth : tgsTmrWidth}`' min='16' max='32' resolution='1' visible='`${debug}`' editable='false' desc='' />
@@ -398,7 +400,7 @@
     <ParamBool id='toTmrWidtNotEnough' name='toTmrWidtNotEnough' group='Timeout Detection' default='`${toTmrPeriod &gt; toTmrWidthCnt}`' visible='`${debug}`' editable='false' desc='' />
     <ParamRange id='toClkRefDivider' name='toClkRefDivider' group='Timeout Detection' default='`${toTmrPeriod / toTmrWidthCnt}`' min='0' max='10000000000' resolution='0.001' visible='`${debug}`' editable='false' desc='' />
 
-    <ParamChoice id="toTmrManPresc" name="toTmrManPresc" group="Timeout Detection/Manual Configuratios" default="1" visible="`${toConfigIsManual &amp;&amp; toTmrResIsTCPWM}`" editable="`${toConfigIsManual &amp;&amp; toTmrResIsTCPWM}`" desc="Divides down the input clock." >
+    <ParamChoice id="toTmrManPresc" name="toTmrManPresc" group="Timeout Detection/Manual Configuratios" default="1" visible="`${ctoEnableTimeout &amp;&amp; toConfigIsManual &amp;&amp; toTmrResIsTCPWM}`" editable="`${toConfigIsManual &amp;&amp; toTmrResIsTCPWM}`" desc="Divides down the input clock." >
       <Entry name="Divide by 1"   value="1" visible="true" />
       <Entry name="Divide by 2"   value="2" visible="true" />
       <Entry name="Divide by 4"   value="4" visible="true" />
@@ -410,9 +412,9 @@
     </ParamChoice>
     <ParamRange id='toTmrPresc' name='toTmrCalcPresc' group='Timeout Detection' default='`${toConfigIsManual ? toTmrManPresc : toTmrCalcPresc}`' min='0' max='128' resolution='1' visible='`${debug}`' editable='false' desc='The timeout detection timer clock prescaler' />
     <ParamString templateId='tcpwmTimer' id='ClockPrescaler' name='Clock Prescaler' group='Timeout Detection' default='CY_TCPWM_COUNTER_PRESCALER_DIVBY_`${pmbus_tcpwm.toTmrPresc}`' visible='`${pmbus_tcpwm.debug &amp;&amp; pmbus_tcpwm.toTmrResIsTCPWM}`' editable='false' desc='Divides down the input clock.' />
-    <ParamRange id='toTmrManPeriod' name='Period' group='Timeout Detection/Manual Configuratios' visible='`${toConfigIsManual}`' editable='true' min='1' max='`${toTmrWidthCnt - 1}`' resolution='1' default='`${(toTmrWidthCnt / 2) - 1}`' desc='Timeout period' />
+    <ParamRange id='toTmrManPeriod' name='Period' group='Timeout Detection/Manual Configuratios' visible='`${ctoEnableTimeout &amp;&amp; toConfigIsManual}`' editable='true' min='1' max='`${toTmrWidthCnt - 1}`' resolution='1' default='`${(toTmrWidthCnt / 2) - 1}`' desc='Timeout period' />
     <ParamBool templateId='tcpwmTimer' id='mxs40tcpwm' name='mxs40tcpwm' group='Timeout Detection/Manual Configuratios' default='`${"mxs40tcpwm" eq getIpBlockName()}`' visible='`${debug}`' editable='false' desc='' />
-    <ParamBool templateId='tcpwmTimer' id='gf_enable' name='Glitch Filter Enable' group='Timeout Detection/Manual Configuratios' default='false' visible='`${pmbus_tcpwm.toConfigIsManual &amp;&amp; pmbus_tcpwm.toTmrResIsTCPWM &amp;&amp; mxs40tcpwm}`' editable='`${pmbus_tcpwm.toConfigIsManual}`' 
+    <ParamBool templateId='tcpwmTimer' id='gf_enable' name='Glitch Filter Enable' group='Timeout Detection/Manual Configuratios' default='false' visible='`${pmbus_tcpwm.ctoEnableTimeout &amp;&amp; pmbus_tcpwm.toConfigIsManual &amp;&amp; pmbus_tcpwm.toTmrResIsTCPWM &amp;&amp; mxs40tcpwm}`' editable='`${pmbus_tcpwm.toConfigIsManual}`' 
                desc='Enables the glitch filter for input triggers. The number of glitch filters is design-specific, and if a glitch filter is connected to this input trigger, it will be used.' />
     <ParamChoice templateId='tcpwmTimer' id='gf_depth' name='Glitch Filter Depth' group='Timeout Detection/Manual Configuratios' default='CY_GLITCH_FILTER_DEPTH_SUPPORT_VALUE_0' visible='`${gf_enable}`' editable='`${gf_enable}`' desc='The supported glitch filter depth values.' >
       <Entry name='Depth Value 0'   value='CY_GLITCH_FILTER_DEPTH_SUPPORT_VALUE_0'   visible='true' />
@@ -428,14 +430,14 @@
       <Entry name='Depth Value 512' value='CY_GLITCH_FILTER_DEPTH_SUPPORT_VALUE_512' visible='true' />
     </ParamChoice>
 
-    <ParamRange id='toSampleInterval' name='Sample Interval (us)' group='Timeout Detection' default='`${((toTmrPresc * 1e10 / toClkFreq) + 0.5) * 1e-4}`' min='0' max='10000000000' resolution='0.0001' visible='true' editable='false' desc='Sample time (µs based on resolution).' />
-    <ParamPlacement templateId='tcpwmTimer' name='Timer Placement' group='Timeout Detection/Routing' desc='Timeout timer consumed by this solution' visible='`${pmbus_tcpwm.toTmrResIsTCPWM}`' />
+    <ParamRange id='toSampleInterval' name='Sample Interval (us)' group='Timeout Detection' default='`${toClkFreq > 0 ? ((toTmrPresc * 1e10 / toClkFreq) + 0.5) * 1e-4 : 0}`' min='0' max='10000000000' resolution='0.0001' visible='`${ctoEnableTimeout}`' editable='false' desc='Sample time (µs based on resolution).' />
+    <ParamPlacement templateId='tcpwmTimer' name='Timer Placement' group='Timeout Detection/Routing' desc='Timeout timer consumed by this solution' visible='`${pmbus_tcpwm.ctoEnableTimeout &amp;&amp; pmbus_tcpwm.toTmrResIsTCPWM}`' />
 
     <!-- Internal Routing -->
-    <ParamBool id='routingIsManual' name='Route signal "tr_i2c_scl_filtered"' group='Internal Routing' default='false' visible='`${!pmbus_tcpwm.toTmrResIsTCPWM}`' editable='`${!pmbus_tcpwm.toTmrResIsTCPWM}`' desc='Route the "tr_i2c_scl_filtered" I2C trigger output signal' />
-    <ParamSignal templateId='i2c_hw'     port='tr_i2c_scl_filtered[0]' name='I2C "tr_i2c_scl_filtered" output' group='Internal Routing' visible='`${pmbus_tcpwm.toTmrResIsTCPWM || pmbus_tcpwm.routingIsManual}`' editable='`${pmbus_tcpwm.toTmrResIsTCPWM || pmbus_tcpwm.routingIsManual}`' desc='I2C trigger output signal' canBeEmpty='false' />
-    <ParamSignal templateId='tcpwmTimer' port='reload[0]'              name='Timeout Timer "reload" input'     group='Internal Routing' visible='`${pmbus_tcpwm.toTmrResIsTCPWM}`' editable='`${pmbus_tcpwm.debug}`' desc='This parameter is set automatically' canBeEmpty='`${!pmbus_tcpwm.toTmrResIsTCPWM}`' />
-    <ParamSignal templateId='tcpwmTimer' port='stop[0]'                name='Timeout Timer "stop" input'       group='Internal Routing' visible='`${pmbus_tcpwm.toTmrResIsTCPWM}`' editable='`${pmbus_tcpwm.debug}`' desc='This parameter is set automatically' canBeEmpty='`${!pmbus_tcpwm.toTmrResIsTCPWM}`' />
+    <ParamBool id='routingIsManual' name='Route signal "tr_i2c_scl_filtered"' group='Internal Routing' default='false' visible='`${pmbus_tcpwm.ctoEnableTimeout &amp;&amp; !pmbus_tcpwm.toTmrResIsTCPWM}`' editable='`${!pmbus_tcpwm.toTmrResIsTCPWM}`' desc='Route the "tr_i2c_scl_filtered" I2C trigger output signal' />
+    <ParamSignal templateId='i2c_hw'     port='tr_i2c_scl_filtered[0]' name='I2C "tr_i2c_scl_filtered" output' group='Internal Routing' visible='`${pmbus_tcpwm.ctoEnableTimeout &amp;&amp; (pmbus_tcpwm.toTmrResIsTCPWM || pmbus_tcpwm.routingIsManual)}`' editable='`${pmbus_tcpwm.toTmrResIsTCPWM || pmbus_tcpwm.routingIsManual}`' desc='I2C trigger output signal' canBeEmpty='`${!pmbus_tcpwm.ctoEnableTimeout}`' />
+    <ParamSignal templateId='tcpwmTimer' port='reload[0]'              name='Timeout Timer "reload" input'     group='Internal Routing' visible='`${pmbus_tcpwm.ctoEnableTimeout &amp;&amp; pmbus_tcpwm.toTmrResIsTCPWM}`' editable='`${pmbus_tcpwm.debug}`' desc='This parameter is set automatically' canBeEmpty='`${!pmbus_tcpwm.toTmrResIsTCPWM || !pmbus_tcpwm.ctoEnableTimeout}`' />
+    <ParamSignal templateId='tcpwmTimer' port='stop[0]'                name='Timeout Timer "stop" input'       group='Internal Routing' visible='`${pmbus_tcpwm.ctoEnableTimeout &amp;&amp; pmbus_tcpwm.toTmrResIsTCPWM}`' editable='`${pmbus_tcpwm.debug}`' desc='This parameter is set automatically' canBeEmpty='`${!pmbus_tcpwm.toTmrResIsTCPWM || !pmbus_tcpwm.ctoEnableTimeout}`' />
 
     <!-- Physical Layer Extensions -->
     <!-- Physical Layer Extensions / Defauld Extra Lines -->
@@ -578,16 +580,16 @@
     <DRC type='ERROR' text='SCB block must be selected' condition='`${scb eq null}`' />
     <DRC type='ERROR' text='SDA pin must be selected' condition='`${sda eq null}`' />
     <DRC type='ERROR' text='SCL pin must be selected' condition='`${scl eq null}`' />
-    <DRC type='WARNING' text='Timeout sample interval does not meet minimum required duration' condition='`${timeoutSampleInterval &lt; minSampleInterval}`' />
+    <DRC type='WARNING' text='Timeout sample interval does not meet minimum required duration' condition='`${ctoEnableTimeout &amp;&amp; timeoutSampleInterval &lt; minSampleInterval}`' />
 
     <DRC type='ERROR' text='Custom signal name is invalid. It contains one or more unallowed symbols' condition='`${!custSignalNameOk$idx}`' paramId='custSignalName$idx' repeatCount='$NUM_OF_CUSTOM_EXTRA_LINES' />
 
-    <DRC type='ERROR' text='Timeout detection timer width is not enough, select timer with resolution higher then `${toTmrWidthBit}`-bit, or reduce the "Data Rate (kbps)" value' condition='`${((toClkIsToLow &amp;&amp; toTmrWidtNotEnough) || toPrescClkIsToLow) &amp;&amp;  pmbus_tcpwm.toTmrResIsTCPWM}`' paramId='tcpwmTimer#tcpwmTimer' />
-    <DRC type='ERROR' text='Timeout detection timer width is not enough, select timer with resolution higher then `${toTmrWidthBit}`-bit, or reduce the "Data Rate (kbps)" value' condition='`${toClkIsToLow &amp;&amp; toTmrWidtNotEnough &amp;&amp; !pmbus_tcpwm.toTmrResIsTCPWM}`' paramId='toTmrRes' />
-    <DRC type='ERROR' text='The minimum allowed timeout detection timer frequency should be at least `${toClkRefMultiplier}` times higher. Decrease the divider value' condition='`${toClkIsToLow &amp;&amp; !toTmrWidtNotEnough}`' location='`${toClkRes}`' paramId='intDivider' >
+    <DRC type='ERROR' text='Timeout detection timer width is not enough, select timer with resolution higher then `${toTmrWidthBit}`-bit, or reduce the "Data Rate (kbps)" value' condition='`${ctoEnableTimeout &amp;&amp; toClkUsed &amp;&amp; ((toClkIsToLow &amp;&amp; toTmrWidtNotEnough) || toPrescClkIsToLow) &amp;&amp;  pmbus_tcpwm.toTmrResIsTCPWM}`' paramId='tcpwmTimer#tcpwmTimer' />
+    <DRC type='ERROR' text='Timeout detection timer width is not enough, select timer with resolution higher then `${toTmrWidthBit}`-bit, or reduce the "Data Rate (kbps)" value' condition='`${ctoEnableTimeout &amp;&amp; toClkUsed &amp;&amp; toClkIsToLow &amp;&amp; toTmrWidtNotEnough &amp;&amp; !pmbus_tcpwm.toTmrResIsTCPWM}`' paramId='toTmrRes' />
+    <DRC type='ERROR' text='The minimum allowed timeout detection timer frequency should be at least `${toClkRefMultiplier}` times higher. Decrease the divider value' condition='`${ctoEnableTimeout &amp;&amp; toClkUsed &amp;&amp; toClkIsToLow &amp;&amp; !toTmrWidtNotEnough}`' location='`${toClkRes}`' paramId='intDivider' >
       <FixIt action='SET_PARAM' target='`${toClkRes . ".intDivider"}`' value='`${floor(getExposedMember(toClkRes, "divider") / toClkRefMultiplier)}`' valid='true' />
     </DRC>
-    <DRC type='ERROR' text="The timeout detection timer frequency is to high. It's clock frequency divider should be at least `${toClkRefDivider}` times lower. Increase the divider value" condition='`${!toClkIsToLow &amp;&amp; toTmrWidtNotEnough}`' location='`${toClkRes}`' paramId='intDivider' >
+    <DRC type='ERROR' text="The timeout detection timer frequency is to high. It's clock frequency divider should be at least `${toClkRefDivider}` times lower. Increase the divider value" condition='`${ctoEnableTimeout &amp;&amp; toClkUsed &amp;&amp; !toClkIsToLow &amp;&amp; toTmrWidtNotEnough}`' location='`${toClkRes}`' paramId='intDivider' >
       <FixIt action='SET_PARAM' target='`${toClkRes . ".intDivider"}`' value='`${ceil(getExposedMember(toClkRes, "divider") * toClkRefDivider)}`' valid='true' />
     </DRC>
     <DRC type='INFO' text='Extended commands are enabled, but no commands are defined. Configure commands to start using this feature.' condition='`${(extCmdNum eq 0) &amp;&amp; extCmdEna}`' paramId='extCmdEna' />
@@ -604,23 +606,30 @@
     <ConfigInclude value='cy_sysclk.h' include='true' />
     <ConfigInclude value='mtb_pmbus.h' include='true' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
     <ConfigDefine name='CYCFG_PMBUS_CFG' value='true' public='true' include='true' />
+    <ConfigDefine name='`${instName}`_NUM_PAGES' value='(`${pagesNum}`U)' public='true' include='`${!ctrlEna}`' guard='defined(MTB_PMBUS_PAGES_NUM) &amp;&amp; (MTB_PMBUS_PAGES_NUM != 0U) &amp;&amp; defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigDefine name='`${instName}`_NUM_PHASES' value='(`${phasesNum}`U)' public='true' include='`${!ctrlEna}`' guard='defined(MTB_PMBUS_PHASES_NUM) &amp;&amp; (MTB_PMBUS_PHASES_NUM != 0U) &amp;&amp; defined(COMPONENT_MW_MTB_PMBUS)' />
+
+    <ConfigDefine name='`${instName}`_`${stdCmd$idxName}`_CMD_CODE' value='(`${stdCmd$idxCode}`U)' public='true' include='`${!ctrlEna &amp;&amp; stdCmd$idxEna}`' repeatCount='$PMBUS_STD_CMD_MAX' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigDefine name='`${instName}`_`${stdCmd$idxName}`_CMD_SIZE' value='(`${stdCmd$idxDataSize}`U)' public='true' include='`${!ctrlEna &amp;&amp; stdCmd$idxEna}`' repeatCount='$PMBUS_STD_CMD_MAX' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigDefine name='`${instName}`_`${extCmd$idxName}`_CMD_CODE' value='(`${extCmd$idxCode}`U)' public='true' include='`${extCmdEna &amp;&amp; !ctrlEna &amp;&amp; extCmd$idxEna}`' repeatCount='$PMBUS_EXT_CMD_MAX' guard='defined(MTB_PMBUS_SUPPORT_EXT_CMD) &amp;&amp; (MTB_PMBUS_SUPPORT_EXT_CMD != 0U) &amp;&amp; defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigDefine name='`${instName}`_`${extCmd$idxName}`_CMD_SIZE' value='(`${extCmd$idxDataSize}`U)' public='true' include='`${extCmdEna &amp;&amp; !ctrlEna &amp;&amp; extCmd$idxEna}`' repeatCount='$PMBUS_EXT_CMD_MAX' guard='defined(MTB_PMBUS_SUPPORT_EXT_CMD) &amp;&amp; (MTB_PMBUS_SUPPORT_EXT_CMD != 0U) &amp;&amp; defined(COMPONENT_MW_MTB_PMBUS)' />
 
     <ConfigArray name='`${instName . stdCmdTableName}`' type='mtb_pmbus_stc_config_cmd_t' const='false' public='false' include='`${(stdCmdNum ne 0) &amp;&amp; !ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' >
       <ConfigStruct name='empty' type='nested' const='false' public='true' repeatCount='$PMBUS_STD_CMD_MAX' include='`${stdCmd$idxEna}`' >
-        <Member name='cmd_code' value='`${stdCmd$idxCode}`' />
+        <Member name='cmd_code' value='`${instName . "_" . stdCmd$idxName . "_CMD_CODE"}`' />
         <Member name='cmd_cap' value='`${stdCmd$idxMask}`' />
         <Member name='data_buf' value='`${stdCmd$idxDataBuf}`' />
-        <Member name='data_size' value='`${stdCmd$idxDataSize}`' />
+        <Member name='data_size' value='`${instName . "_" . stdCmd$idxName . "_CMD_SIZE"}`' />
         <Member name='callback' value='`${stdCmd$idxCallback}`' />
       </ConfigStruct>
     </ConfigArray>
 
     <ConfigArray name='`${instName . extCmdTableName}`' type='mtb_pmbus_stc_config_cmd_t' const='false' public='false' include='`${extCmdEna &amp;&amp; !ctrlEna}`' guard='defined(MTB_PMBUS_SUPPORT_EXT_CMD) &amp;&amp; (MTB_PMBUS_SUPPORT_EXT_CMD != 0U) &amp;&amp; defined(COMPONENT_MW_MTB_PMBUS)' >
       <ConfigStruct name='empty' type='nested' const='false' public='true' repeatCount='$PMBUS_EXT_CMD_MAX' include='`${extCmd$idxEna}`' >
-        <Member name='cmd_code' value='`${extCmd$idxCode}`' />
+        <Member name='cmd_code' value='`${instName . "_" . extCmd$idxName . "_CMD_CODE"}`' />
         <Member name='cmd_cap' value='`${extCmd$idxMask}`' />
         <Member name='data_buf' value='`${extCmd$idxDataBuf}`' />
-        <Member name='data_size' value='`${extCmd$idxDataSize}`' />
+        <Member name='data_size' value='`${instName . "_" . extCmd$idxName . "_CMD_SIZE"}`' />
         <Member name='callback' value='`${extCmd$idxCallback}`' />
       </ConfigStruct>
     </ConfigArray>
@@ -671,8 +680,8 @@
     <ConfigExternVariable type='mtb_pmbus_stc_config_hal_t' name='`${instName . halCfgStructName}`' const='false' public='true' include='`${!ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
     <ConfigExternVariable type='mtb_pmbus_ctrl_stc_config_hal_t' name='`${instName . ctrlHalCfgStructName}`' const='false' public='true' include='`${ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
 
-    <ConfigVariable type='uint8_t' name='`${stdCmd$idxDataBuf . stdCmd$idxPagesNumArr . stdCmd$idxPhasesNumArr . "[" . stdCmd$idxDataSize . "U]"}`' const='false' public='true' include='`${!ctrlEna &amp;&amp; (stdCmd$idxDataBuf ne "NULL") &amp;&amp; (stdCmd$idxDataBuf ne "null") &amp;&amp; (stdCmd$idxDataBuf ne "0") &amp;&amp; (stdCmd$idxDataSize != 0)}`' repeatCount='$PMBUS_STD_CMD_MAX' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
-    <ConfigVariable type='uint8_t' name='`${extCmd$idxDataBuf . extCmd$idxPagesNumArr . extCmd$idxPhasesNumArr . "[" . extCmd$idxDataSize . "U]"}`' const='false' public='true' include='`${!ctrlEna &amp;&amp; (extCmd$idxDataBuf ne "NULL") &amp;&amp; (extCmd$idxDataBuf ne "null") &amp;&amp; (extCmd$idxDataBuf ne "0") &amp;&amp; (extCmd$idxDataSize != 0)}`' repeatCount='$PMBUS_EXT_CMD_MAX' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigVariable type='uint8_t' name='`${stdCmd$idxDataBuf . stdCmd$idxPagesNumArr . stdCmd$idxPhasesNumArr . "[" . stdCmd$idxBufSize . "U]"}`' const='false' public='true' include='`${!ctrlEna &amp;&amp; (stdCmd$idxDataBuf ne "NULL") &amp;&amp; (stdCmd$idxDataBuf ne "null") &amp;&amp; (stdCmd$idxDataBuf ne "0") &amp;&amp; (stdCmd$idxDataSize != 0)}`' repeatCount='$PMBUS_STD_CMD_MAX' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
+    <ConfigVariable type='uint8_t' name='`${extCmd$idxDataBuf . extCmd$idxPagesNumArr . extCmd$idxPhasesNumArr . "[" . extCmd$idxBufSize . "U]"}`' const='false' public='true' include='`${!ctrlEna &amp;&amp; (extCmd$idxDataBuf ne "NULL") &amp;&amp; (extCmd$idxDataBuf ne "null") &amp;&amp; (extCmd$idxDataBuf ne "0") &amp;&amp; (extCmd$idxDataSize != 0)}`' repeatCount='$PMBUS_EXT_CMD_MAX' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
 
     <ConfigExternFunction signature='void `${instName . hwResCtrlCallName}`(mtb_pmbus_hw_resources_ctrl_action_t)' public='true' include='`${!ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
     <ConfigExternFunction signature='void `${instName . hwIrqEnaCallName}`(void)' public='true' include='`${!ctrlEna}`' guard='defined(COMPONENT_MW_MTB_PMBUS)' />
@@ -796,7 +805,7 @@
         <Member name='highPhaseDutyCycle' value='0' />
       </ConfigStruct>
 
-      <ConfigStruct name='`${instName}`_tgs_config' type='cy_stc_scb_tgs_config_t' const='`${pmbus_tcpwm.inFlash}`' public='true' include='`${!pmbus_tcpwm.toTmrResIsTCPWM}`' >
+      <ConfigStruct name='`${instName}`_tgs_config' type='cy_stc_scb_tgs_config_t' const='`${pmbus_tcpwm.inFlash}`' public='true' include='`${pmbus_tcpwm.ctoEnableTimeout &amp;&amp; !pmbus_tcpwm.toTmrResIsTCPWM}`' >
         <Member name='count' value='0' />
         <Member name='reload' value='`${pmbus_tcpwm.toConfigIsManual ? pmbus_tcpwm.toTmrManPeriod : pmbus_tcpwm.toTmrPeriod - 1}`' />
         <Member name='reloadTx' value='false' />
@@ -823,12 +832,12 @@
       </ConfigStruct>
 
       <ConfigInstruction purpose='INITIALIZE' value='Cy_SysClk_PeriPclkAssignDivider(`${pScbDst}`, `${getExposedMember(pmbus_tcpwm.scbClkRes, "clockSel")}`);' include='true' />
-      <ConfigInstruction purpose='INITIALIZE' value='Cy_SysClk_PeriPclkAssignDivider(`${pTgsDst}`, `${getExposedMember(pmbus_tcpwm.tgsClkRes, "clockSel")}`);' include='`${!pmbus_tcpwm.toTmrResIsTCPWM}`' />
+      <ConfigInstruction purpose='INITIALIZE' value='Cy_SysClk_PeriPclkAssignDivider(`${pTgsDst}`, `${getExposedMember(pmbus_tcpwm.tgsClkRes, "clockSel")}`);' include='`${pmbus_tcpwm.ctoEnableTimeout &amp;&amp; !pmbus_tcpwm.toTmrResIsTCPWM}`' />
 
     </ConfigFirmware>
   </PersonalityTemplate>
 
-  <PersonalityTemplate id='tcpwmTimer' valid='`${pmbus_tcpwm.toTmrRes eq "TCPWM"}`' >
+  <PersonalityTemplate id='tcpwmTimer' valid='`${pmbus_tcpwm.ctoEnableTimeout &amp;&amp; pmbus_tcpwm.toTmrRes eq "TCPWM"}`' >
     <FittingRules>
       <MappingRules>
         <IpBlock name='mxs40tcpwm' />
@@ -886,7 +895,7 @@
         <Member name='gf_depth' value='`${(gf_depth)}`' guard='defined (CY_IP_MXS40TCPWM)' />
       </ConfigStruct>
 
-    <ConfigInstruction purpose='INITIALIZE' value='Cy_SysClk_PeriphAssignDivider(`${clkDst}`, `${getExposedMember(getBlockFromSignal("clock_counter_en[0]"), "clockSel")}`);' include='true' />
+    <ConfigInstruction purpose='INITIALIZE' value='Cy_SysClk_PeriphAssignDivider(`${clkDst}`, `${getExposedMember(getBlockFromSignal("clock_counter_en[0]"), "clockSel")}`);' include='`${pmbus_tcpwm.toClkUsed}`' />
 
     </ConfigFirmware>
   </PersonalityTemplate>

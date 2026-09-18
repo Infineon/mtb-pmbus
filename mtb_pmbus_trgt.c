@@ -256,7 +256,34 @@ mtb_pmbus_status_t mtb_pmbus_init(mtb_pmbus_stc_t *inst, mtb_pmbus_stc_config_t 
 
                 inst->received_byte = MTB_PMBUS_RECEIVED_BYTE_DEFAULT;
 
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+                defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL >= 0U))
+                /* Initialize ACL table — 0x00 = all access permitted */
+                (void)memset(inst->acl_table, 0, sizeof(inst->acl_table));
+#if (defined(MTB_PMBUS_SUPPORT_EXT_CMD) && (MTB_PMBUS_SUPPORT_EXT_CMD != 0U))
+                if ((config->ext_acl_table != NULL) && (config->ext_cmd_num > 0U))
+                {
+                    (void)memset(config->ext_acl_table, 0, config->ext_cmd_num);
+                }
+#endif /* #if (defined(MTB_PMBUS_SUPPORT_EXT_CMD) && (MTB_PMBUS_SUPPORT_EXT_CMD != 0U)) */
+
+                /* PASSKEY state — power-on default is Unlocked.
+                 * Applications that store a non-zero passkey in NVM must call
+                 * mtb_pmbus_passkey_force_locked_isr() before enabling the PMBus HAL IRQ. */
+                inst->passkey_state    = MTB_PMBUS_PASSKEY_ST_UNLOCKED;
+                inst->passkey_fail_cnt = 0U;
+
+                /* WRITE_PROTECT — power-on default is 0x00 (no protection) */
+                inst->write_protect_val = MTB_PMBUS_WP_VAL_NO_PROTECTION;
+#endif /* #if MTB_PMBUS_SUPPORT_SECURITY */
+
+#if (defined(MTB_PMBUS_SUPPORT_SECURITY) && (MTB_PMBUS_SUPPORT_SECURITY != 0U) && \
+                defined(MTB_PMBUS_SEC_LEVEL) && (MTB_PMBUS_SEC_LEVEL == 0U))
+                /* Verify all mandatory Security Level 0 commands are registered */
+                status = mtb_pmbus_sec_check_l0_cmds(inst, NULL);
+#else
                 status = MTB_PMBUS_STATUS_SUCCESS;
+#endif /* MTB_PMBUS_SUPPORT_SECURITY && MTB_PMBUS_SEC_LEVEL == 0 */
             }
         }
     }
